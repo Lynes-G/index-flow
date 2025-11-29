@@ -1,0 +1,9 @@
+{"timestamp": "2025-12-10 10:00:00", "profileUsername": "JohnDoe", "profileUserId": "user_123", "linkId": "link_1", "linkTitle": "My GitHub", "linkUrl": "https://github.com/JohnDoe", "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/", "referrer": "https://example.com", "location": {"country": "US", "region": "NY", "city": "New York", "latitude": 40.7128, "longitude": -74.006}}
+
+{"timestamp": "2025-12-11 14:30:00", "profileUsername": "JaneSmith", "profileUserId": "user_456", "linkId": "link_2", "linkTitle": "My Portfolio", "linkUrl": "https://janesmith.com", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15", "referrer": "https://anotherexample.com", "location": {"country": "CA", "region": "ON", "city": "Toronto", "latitude": 43.65107, "longitude": -79.347015}}
+
+
+{"timestamp": "2025-12-12 09:15:00", "profileUsername": "AliceWonder", "profileUserId": "user_789", "linkId": "link_3", "linkTitle": "Blog Post", "linkUrl": "https://alicewonder.blog/post", "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "referrer": "https://yetanotherexample.com", "location": {"country": "UK", "region": "ENG", "city": "London", "latitude": 51.5074, "longitude": -0.1278}}
+
+
+{"timestamp": "2025-12-13 18:45:00", "profileUsername": "BobBuilder", "profileUserId": "user_321", "linkId": "link_4", "linkTitle": "Project Page", "linkUrl": "https://bobbuilder.projects/page", "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1", "referrer": "https://someexample.com", "location": {"country": "AU", "region": "NSW", "city": "Sydney", "latitude": -33.8688, "longitude": 151.2093}}
