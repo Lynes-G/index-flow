@@ -27,5 +27,22 @@ export default defineSchema({
     profilePictureStorageId: v.optional(v.id("_storage")), // Convex storage ID for profile picture
     description: v.optional(v.string()), // Custom description
     accentColor: v.optional(v.string()), // Custom accent color
+    themePreset: v.optional(v.string()),
+    fontFamily: v.optional(v.string()),
+    layoutStyle: v.optional(v.string()),
+    linkStyle: v.optional(v.string()),
+    backgroundType: v.optional(v.string()),
+    backgroundValue: v.optional(v.string()),
+    backgroundImageStorageId: v.optional(v.id("_storage")),
+    bannerImageStorageId: v.optional(v.id("_storage")),
+    avatarShape: v.optional(v.string()),
+    socialLinks: v.optional(
+      v.array(
+        v.object({
+          platform: v.string(),
+          url: v.string(),
+        }),
+      ),
+    ),
   }).index("by_user_id", ["userId"]),
 });

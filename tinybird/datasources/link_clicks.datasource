@@ -8,6 +8,7 @@ SCHEMA >
     `linkId` String `json:$.linkId`,
     `linkTitle` String `json:$.linkTitle`,
     `linkUrl` String `json:$.linkUrl`,
+    `event_type` String `json:$.eventType`,
     `userAgent` String `json:$.userAgent`,
     `referrer` String `json:$.referrer`,
     `location_country` String `json:$.location.country`,

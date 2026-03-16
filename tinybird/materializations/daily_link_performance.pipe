@@ -18,6 +18,7 @@ NODE daily_link_performance_node
         minState(timestamp) as first_click_time,
         maxState(timestamp) as last_click_time
     FROM link_clicks
+    WHERE event_type = 'link_click' OR event_type = ''
     GROUP BY
         date,
         profileUserId,

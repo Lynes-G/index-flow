@@ -3,6 +3,7 @@ export interface AnalyticsData {
   uniqueVisitors: number;
   countriesReached: number;
   totalLinksClicked: number;
+  qrScans: number;
   topLinkTitle: string | null;
   topReferrer: string | null;
   firstClick: string | null;
@@ -21,6 +22,7 @@ export async function fetchAnalytics(
       uniqueVisitors: 0,
       countriesReached: 0,
       totalLinksClicked: 0,
+      qrScans: 0,
       topLinkTitle: null,
       topReferrer: null,
       firstClick: null,
@@ -54,6 +56,7 @@ export async function fetchAnalytics(
         uniqueVisitors: 0,
         countriesReached: 0,
         totalLinksClicked: 0,
+        qrScans: 0,
         topLinkTitle: null,
         topReferrer: null,
         firstClick: null,
@@ -68,6 +71,7 @@ export async function fetchAnalytics(
       uniqueVisitors: analytics.unique_visitors || 0,
       countriesReached: analytics.countries_reached || 0,
       totalLinksClicked: analytics.total_links_clicked || 0,
+      qrScans: analytics.total_qr_scans || 0,
       topLinkTitle: analytics.top_link_title?.[0] || null,
       topReferrer: analytics.top_referrer?.[0] || null,
       firstClick: analytics.first_click || null,
@@ -81,6 +85,7 @@ export async function fetchAnalytics(
       uniqueVisitors: 0,
       countriesReached: 0,
       totalLinksClicked: 0,
+      qrScans: 0,
       topLinkTitle: null,
       topReferrer: null,
       firstClick: null,

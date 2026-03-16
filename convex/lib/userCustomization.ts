@@ -16,6 +16,25 @@ export const getUserCustomizations = query({
       profilePictureUrl: v.optional(v.string()),
       description: v.optional(v.string()),
       accentColor: v.optional(v.string()),
+      themePreset: v.optional(v.string()),
+      fontFamily: v.optional(v.string()),
+      layoutStyle: v.optional(v.string()),
+      linkStyle: v.optional(v.string()),
+      backgroundType: v.optional(v.string()),
+      backgroundValue: v.optional(v.string()),
+      backgroundImageStorageId: v.optional(v.id("_storage")),
+      backgroundImageUrl: v.optional(v.string()),
+      bannerImageStorageId: v.optional(v.id("_storage")),
+      bannerImageUrl: v.optional(v.string()),
+      avatarShape: v.optional(v.string()),
+      socialLinks: v.optional(
+        v.array(
+          v.object({
+            platform: v.string(),
+            url: v.string(),
+          }),
+        ),
+      ),
     }),
   ),
   handler: async ({ db, storage }, args) => {
@@ -31,9 +50,23 @@ export const getUserCustomizations = query({
       const url = await storage.getUrl(customization.profilePictureStorageId);
       profilePictureUrl = url || undefined;
     }
+
+    let backgroundImageUrl: string | undefined;
+    if (customization.backgroundImageStorageId) {
+      const url = await storage.getUrl(customization.backgroundImageStorageId);
+      backgroundImageUrl = url || undefined;
+    }
+
+    let bannerImageUrl: string | undefined;
+    if (customization.bannerImageStorageId) {
+      const url = await storage.getUrl(customization.bannerImageStorageId);
+      bannerImageUrl = url || undefined;
+    }
     return {
       ...customization,
       profilePictureUrl,
+      backgroundImageUrl,
+      bannerImageUrl,
     };
   },
 });
@@ -51,6 +84,25 @@ export const getCustomizationBySlug = query({
       profilePictureUrl: v.optional(v.string()),
       description: v.optional(v.string()),
       accentColor: v.optional(v.string()),
+      themePreset: v.optional(v.string()),
+      fontFamily: v.optional(v.string()),
+      layoutStyle: v.optional(v.string()),
+      linkStyle: v.optional(v.string()),
+      backgroundType: v.optional(v.string()),
+      backgroundValue: v.optional(v.string()),
+      backgroundImageStorageId: v.optional(v.id("_storage")),
+      backgroundImageUrl: v.optional(v.string()),
+      bannerImageStorageId: v.optional(v.id("_storage")),
+      bannerImageUrl: v.optional(v.string()),
+      avatarShape: v.optional(v.string()),
+      socialLinks: v.optional(
+        v.array(
+          v.object({
+            platform: v.string(),
+            url: v.string(),
+          }),
+        ),
+      ),
     }),
   ),
   handler: async ({ db, storage }, args) => {
@@ -81,9 +133,23 @@ export const getCustomizationBySlug = query({
       const url = await storage.getUrl(customization.profilePictureStorageId);
       profilePictureUrl = url || undefined;
     }
+
+    let backgroundImageUrl: string | undefined;
+    if (customization.backgroundImageStorageId) {
+      const url = await storage.getUrl(customization.backgroundImageStorageId);
+      backgroundImageUrl = url || undefined;
+    }
+
+    let bannerImageUrl: string | undefined;
+    if (customization.bannerImageStorageId) {
+      const url = await storage.getUrl(customization.bannerImageStorageId);
+      bannerImageUrl = url || undefined;
+    }
     return {
       ...customization,
       profilePictureUrl,
+      backgroundImageUrl,
+      bannerImageUrl,
     };
   },
 });
@@ -94,6 +160,23 @@ export const updateCustomizations = mutation({
     profilePictureStorageId: v.optional(v.id("_storage")),
     description: v.optional(v.string()),
     accentColor: v.optional(v.string()),
+    themePreset: v.optional(v.string()),
+    fontFamily: v.optional(v.string()),
+    layoutStyle: v.optional(v.string()),
+    linkStyle: v.optional(v.string()),
+    backgroundType: v.optional(v.string()),
+    backgroundValue: v.optional(v.string()),
+    backgroundImageStorageId: v.optional(v.id("_storage")),
+    bannerImageStorageId: v.optional(v.id("_storage")),
+    avatarShape: v.optional(v.string()),
+    socialLinks: v.optional(
+      v.array(
+        v.object({
+          platform: v.string(),
+          url: v.string(),
+        }),
+      ),
+    ),
   },
   returns: v.id("userCustomizations"),
   handler: async ({ db, auth, storage }, args) => {
@@ -112,6 +195,14 @@ export const updateCustomizations = mutation({
         await storage.delete(existing.profilePictureStorageId);
       }
 
+      if (args.backgroundImageStorageId && existing.backgroundImageStorageId) {
+        await storage.delete(existing.backgroundImageStorageId);
+      }
+
+      if (args.bannerImageStorageId && existing.bannerImageStorageId) {
+        await storage.delete(existing.bannerImageStorageId);
+      }
+
       // Update existing customization
       await db.patch(existing._id, {
         ...(args.profilePictureStorageId !== undefined && {
@@ -122,6 +213,36 @@ export const updateCustomizations = mutation({
         }),
         ...(args.accentColor !== undefined && {
           accentColor: args.accentColor,
+        }),
+        ...(args.themePreset !== undefined && {
+          themePreset: args.themePreset,
+        }),
+        ...(args.fontFamily !== undefined && {
+          fontFamily: args.fontFamily,
+        }),
+        ...(args.layoutStyle !== undefined && {
+          layoutStyle: args.layoutStyle,
+        }),
+        ...(args.linkStyle !== undefined && {
+          linkStyle: args.linkStyle,
+        }),
+        ...(args.backgroundType !== undefined && {
+          backgroundType: args.backgroundType,
+        }),
+        ...(args.backgroundValue !== undefined && {
+          backgroundValue: args.backgroundValue,
+        }),
+        ...(args.backgroundImageStorageId !== undefined && {
+          backgroundImageStorageId: args.backgroundImageStorageId,
+        }),
+        ...(args.bannerImageStorageId !== undefined && {
+          bannerImageStorageId: args.bannerImageStorageId,
+        }),
+        ...(args.avatarShape !== undefined && {
+          avatarShape: args.avatarShape,
+        }),
+        ...(args.socialLinks !== undefined && {
+          socialLinks: args.socialLinks,
         }),
       });
       return existing._id;
@@ -137,6 +258,36 @@ export const updateCustomizations = mutation({
         }),
         ...(args.accentColor !== undefined && {
           accentColor: args.accentColor,
+        }),
+        ...(args.themePreset !== undefined && {
+          themePreset: args.themePreset,
+        }),
+        ...(args.fontFamily !== undefined && {
+          fontFamily: args.fontFamily,
+        }),
+        ...(args.layoutStyle !== undefined && {
+          layoutStyle: args.layoutStyle,
+        }),
+        ...(args.linkStyle !== undefined && {
+          linkStyle: args.linkStyle,
+        }),
+        ...(args.backgroundType !== undefined && {
+          backgroundType: args.backgroundType,
+        }),
+        ...(args.backgroundValue !== undefined && {
+          backgroundValue: args.backgroundValue,
+        }),
+        ...(args.backgroundImageStorageId !== undefined && {
+          backgroundImageStorageId: args.backgroundImageStorageId,
+        }),
+        ...(args.bannerImageStorageId !== undefined && {
+          bannerImageStorageId: args.bannerImageStorageId,
+        }),
+        ...(args.avatarShape !== undefined && {
+          avatarShape: args.avatarShape,
+        }),
+        ...(args.socialLinks !== undefined && {
+          socialLinks: args.socialLinks,
         }),
       });
     }
@@ -175,6 +326,48 @@ export const removeProfilePicture = mutation({
       // Update the record to remove the storage ID
       await db.patch(existing._id, {
         profilePictureStorageId: undefined,
+      });
+    }
+    return null;
+  },
+});
+
+export const removeBannerImage = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async ({ db, storage, auth }) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const existing = await db
+      .query("userCustomizations")
+      .withIndex("by_user_id", (q) => q.eq("userId", identity.subject))
+      .unique();
+
+    if (existing && existing.bannerImageStorageId) {
+      await storage.delete(existing.bannerImageStorageId);
+      await db.patch(existing._id, { bannerImageStorageId: undefined });
+    }
+    return null;
+  },
+});
+
+export const removeBackgroundImage = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async ({ db, storage, auth }) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const existing = await db
+      .query("userCustomizations")
+      .withIndex("by_user_id", (q) => q.eq("userId", identity.subject))
+      .unique();
+
+    if (existing && existing.backgroundImageStorageId) {
+      await storage.delete(existing.backgroundImageStorageId);
+      await db.patch(existing._id, {
+        backgroundImageStorageId: undefined,
       });
     }
     return null;

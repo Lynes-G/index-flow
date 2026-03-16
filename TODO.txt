@@ -1,0 +1,2 @@
+1- Add Dynamic QR code.
+2- QR code scan tracking

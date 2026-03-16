@@ -6,6 +6,7 @@ export interface ClientTrackingData {
   linkId: string;
   linkTitle: string;
   linkUrl: string;
+  eventType?: "link_click" | "qr_scan";
   userAgent?: string;
   referrer?: string;
 }
@@ -16,4 +17,5 @@ export interface ServerTrackingEvent extends ClientTrackingData {
   profileUserId: string;
   location: Geo;
   timestamp: string;
+  eventType: "link_click" | "qr_scan";
 }

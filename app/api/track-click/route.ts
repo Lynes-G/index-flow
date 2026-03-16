@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
 
     const trackingEvent: ServerTrackingEvent = {
       ...data, // Client data
+      eventType: data.eventType || "link_click",
 
       // Server data
       timestamp: new Date().toISOString(),
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
           linkId: trackingEvent.linkId,
           linkTitle: trackingEvent.linkTitle,
           linkUrl: trackingEvent.linkUrl,
+          eventType: trackingEvent.eventType,
           userAgent: trackingEvent.userAgent,
           referrer: trackingEvent.referrer,
           location: {

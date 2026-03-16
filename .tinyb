@@ -1,0 +1,14 @@
+{
+    "host": "https://api.eu-west-1.aws.tinybird.co",
+    "id": "2c45f63d-5edc-465e-9a46-fe8b01db593b",
+    "name": "lynes_workspace",
+    "scope": "user",
+    "token": "p.eyJ1IjogIjJjNDVmNjNkLTVlZGMtNDY1ZS05YTQ2LWZlOGIwMWRiNTkzYiIsICJpZCI6ICJkZDEzYzg3Mi0zYzgxLTRkNjQtYTc3NS01NGIwN2VhNzgxMTIiLCAiaG9zdCI6ICJhd3MtZXUtd2VzdC0xIn0.0e8j-CefDk3ZZz2D-um6VIwD7nf0mJhOv2LSOzj042k",
+    "tokens": {
+        "https://api.eu-west-1.aws.tinybird.co": "p.eyJ1IjogIjJjNDVmNjNkLTVlZGMtNDY1ZS05YTQ2LWZlOGIwMWRiNTkzYiIsICJpZCI6ICJkZDEzYzg3Mi0zYzgxLTRkNjQtYTc3NS01NGIwN2VhNzgxMTIiLCAiaG9zdCI6ICJhd3MtZXUtd2VzdC0xIn0.0e8j-CefDk3ZZz2D-um6VIwD7nf0mJhOv2LSOzj042k"
+    },
+    "user_email": "lynesghalib@gmail.com",
+    "user_id": "8fc068e8-c475-4490-a929-a6aa189da67d",
+    "user_token": "p.eyJ1IjogIjhmYzA2OGU4LWM0NzUtNDQ5MC1hOTI5LWE2YWExODlkYTY3ZCIsICJpZCI6ICJlZjQxYmM3MS00YmRmLTQ1OGMtOTYwNS1jY2Y2Y2YzZWY5NWMiLCAiaG9zdCI6ICJhd3MtZXUtd2VzdC0xIn0.6RYAG6D1iqCduVV80bRnNOB466WV4L_uhOZTuXV82jE",
+    "version": "0.0.1.dev324"
+}

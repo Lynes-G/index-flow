@@ -7,17 +7,39 @@ import { Preloaded, usePreloadedQuery } from "convex/react";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { LayoutStyle, LinkStyle } from "@/lib/themePresets";
+
+const layoutClassMap: Record<LayoutStyle, string> = {
+  stacked: "space-y-4",
+  cards: "space-y-4",
+  grid: "grid grid-cols-1 gap-4 sm:grid-cols-2",
+};
+
+const linkStyleMap: Record<LinkStyle, string> = {
+  pill: "rounded-full border border-slate-200/60 bg-white/80",
+  rounded: "rounded-2xl border border-slate-200/60 bg-white/80",
+  outline: "rounded-2xl border-2 border-slate-300/70 bg-white/60",
+  shadow:
+    "rounded-2xl border border-slate-200/40 bg-white/90 shadow-lg shadow-slate-900/5",
+};
 
 const Links = ({
   preloadedLinks,
+  accentColor,
+  layoutStyle = "stacked",
+  linkStyle = "rounded",
 }: {
   preloadedLinks: Preloaded<typeof api.lib.links.getLinksBySlug>;
+  accentColor: string;
+  layoutStyle?: LayoutStyle;
+  linkStyle?: LinkStyle;
 }) => {
   const links = usePreloadedQuery(preloadedLinks);
   const params = useParams();
   const username = params.username as string;
+
   const handleLinkClick = async (link: Doc<"links">) => {
-    // Track the click before navigating
     await trackLinkClick({
       profileUsername: username,
       linkId: link._id.toString(),
@@ -43,7 +65,7 @@ const Links = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className={layoutClassMap[layoutStyle]}>
       {links.map((link, index) => (
         <Link
           key={link._id}
@@ -52,19 +74,33 @@ const Links = ({
           style={{ animationDelay: `${index * 50}ms` }}
           onClick={() => handleLinkClick(link)}
         >
-          <div className="relative rounded-2xl border border-slate-200/50 bg-white/70 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300/50 hover:bg-white/90 hover:shadow-lg hover:shadow-slate-900/5">
-            {/* Subtle hover gradient */}
-            <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-50/0 via-purple-50/0 to-blue-50/0 transition-all duration-300 group-hover:from-blue-50/30 group-hover:via-purple-50/20 group-hover:to-blue-50/30" />
+          <div
+            className={cn(
+              "relative p-6 transition-all duration-300 hover:-translate-y-0.5",
+              linkStyleMap[linkStyle],
+            )}
+            style={{
+              borderColor: `${accentColor}33`,
+              boxShadow:
+                linkStyle === "shadow"
+                  ? `0 16px 30px -24px ${accentColor}66`
+                  : undefined,
+            }}
+          >
+            <div className="absolute inset-0 rounded-[inherit] bg-linear-to-r from-transparent via-white/10 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
             <div className="relative flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <h3 className="mb-1 text-lg font-bold text-slate-900 transition-colors duration-200 group-hover:text-slate-800">
+                <h3 className="mb-1 text-lg font-semibold text-slate-900 transition-colors duration-200">
                   {link.title}
                 </h3>
-                <p className="truncate text-xs font-normal text-slate-400 italic transition-colors duration-200 group-hover:text-slate-500">
+                <p className="truncate text-xs font-normal text-slate-500 transition-colors duration-200">
                   {link.url.replace(/^https?:\/\//, "")}
                 </p>
               </div>
-              <div className="ml-4 text-slate-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-slate-500">
+              <div
+                className="ml-4 transition-all duration-200 group-hover:translate-x-1"
+                style={{ color: accentColor }}
+              >
                 <ArrowUpRight className="size-5" />
               </div>
             </div>

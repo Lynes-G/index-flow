@@ -14,6 +14,7 @@ NODE link_analytics_node
     FROM link_clicks
     WHERE
         profileUserId = {{String(profileUserId)}}
+        AND (event_type = 'link_click' OR event_type = '')
         {% if defined(start_date) %}
         AND date >= {{Date(start_date)}}
         {% else %}

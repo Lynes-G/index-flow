@@ -9,6 +9,7 @@ const trackLinkClick = async (event: ClientTrackingData) => {
       linkId: event.linkId,
       linkTitle: event.linkTitle,
       linkUrl: event.linkUrl,
+      eventType: event.eventType || "link_click",
       userAgent: event.userAgent || navigator.userAgent,
       referrer: event.referrer || document.referrer || "direct",
     };

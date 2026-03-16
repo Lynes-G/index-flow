@@ -9,6 +9,7 @@ import {
   Lock,
   MapPin,
   MousePointer,
+  QrCode,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -49,7 +50,7 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
             <p className="text-gray-600"> Last 30 days performance metrics</p>
           </div>
 
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-6">
             {/* Total clicks */}
             <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50 to-blue-100 p-6">
               <div className="mb-4 flex items-center justify-between">
@@ -149,6 +150,26 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
                 </p>
                 <p className="text-3xl font-bold text-indigo-900">
                   {analytics.totalLinksClicked.toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            {/* QR scans */}
+            <div className="rounded-2xl border border-teal-200 bg-linear-to-br from-teal-50 to-teal-100 p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="rounded-xl bg-teal-500 p-3">
+                  <QrCode className="size-6 text-white" />
+                </div>
+                <div className="text-teal-600">
+                  <TrendingUp className="size-6" />
+                </div>
+              </div>
+              <div>
+                <p className="mb-1 text-sm font-medium text-teal-700">
+                  QR Scans
+                </p>
+                <p className="text-3xl font-bold text-teal-900">
+                  {analytics.qrScans.toLocaleString()}
                 </p>
               </div>
             </div>

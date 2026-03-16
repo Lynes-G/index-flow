@@ -4,6 +4,7 @@ import ManageLinks from "@/components/ManageLinks";
 import UsernameForm from "@/components/UsernameForm";
 import { api } from "@/convex/_generated/api";
 import { fetchAnalytics } from "@/lib/fetchAnalytics";
+import { checkTinybirdConnection } from "@/lib/checkTinybirdConnection";
 import { Protect } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
@@ -17,6 +18,7 @@ const DashboardPage = async () => {
   });
 
   const analytics = await fetchAnalytics(user!.id);
+  const tinybirdStatus = await checkTinybirdConnection(user!.id);
 
   console.log(analytics);
 
@@ -58,6 +60,23 @@ const DashboardPage = async () => {
       >
         <DashboardMetrics analytics={analytics} />
       </Protect>
+
+      <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+        <div className="mx-auto max-w-7xl">
+          <div
+            className={`rounded-2xl border p-6 text-sm shadow-sm ${
+              tinybirdStatus.ok
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-amber-200 bg-amber-50 text-amber-900"
+            }`}
+          >
+            <p className="font-semibold">
+              Tinybird status: {tinybirdStatus.ok ? "Connected" : "Check"}
+            </p>
+            <p className="mt-1 text-xs opacity-80">{tinybirdStatus.message}</p>
+          </div>
+        </div>
+      </div>
 
       {/* Customize links url form */}
 
