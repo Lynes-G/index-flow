@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "tinybird": {
+      "source": "tinybirdco/tinybird-agent-skills",
+      "sourceType": "github",
+      "computedHash": "92c0542f7fcda9e274654db52cbaacc09a69d7838b35c87af0e86859dfdfc331"
+    },
+    "tinybird-cli-guidelines": {
+      "source": "tinybirdco/tinybird-agent-skills",
+      "sourceType": "github",
+      "computedHash": "4d0bfe89bacb527a8de089620f804e6e48bb1c9e8265af3ac626702b5c4ae29a"
+    },
+    "tinybird-typescript-sdk-guidelines": {
+      "source": "tinybirdco/tinybird-agent-skills",
+      "sourceType": "github",
+      "computedHash": "5b4ebdaba600c48989c1925e8d0536b6adcd3115f04b9f511270e62b4c85f342"
+    }
+  }
+}

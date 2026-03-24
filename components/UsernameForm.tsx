@@ -97,7 +97,7 @@ const UsernameForm = () => {
           message: response.error || "Failed to update username.",
         });
       }
-    } catch (err) {
+    } catch {
       form.setError("username", {
         type: "server",
         message:

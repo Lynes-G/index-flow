@@ -60,26 +60,28 @@ const DashboardPage = async () => {
       >
         <DashboardMetrics analytics={analytics} />
       </Protect>
-
-      <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
-        <div className="mx-auto max-w-7xl">
-          <div
-            className={`rounded-2xl border p-6 text-sm shadow-sm ${
-              tinybirdStatus.ok
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                : "border-amber-200 bg-amber-50 text-amber-900"
-            }`}
-          >
-            <p className="font-semibold">
-              Tinybird status: {tinybirdStatus.ok ? "Connected" : "Check"}
-            </p>
-            <p className="mt-1 text-xs opacity-80">{tinybirdStatus.message}</p>
+      {/* Tinybird status (Dev only) */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+          <div className="mx-auto max-w-7xl">
+            <div
+              className={`rounded-2xl border p-6 text-sm shadow-sm ${
+                tinybirdStatus.ok
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  : "border-amber-200 bg-amber-50 text-amber-900"
+              }`}
+            >
+              <p className="font-semibold">
+                Tinybird status: {tinybirdStatus.ok ? "Connected" : "Check"}
+              </p>
+              <p className="mt-1 text-xs opacity-80">
+                {tinybirdStatus.message}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-
+      )}
       {/* Customize links url form */}
-
       <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
         <div className="mx-auto max-w-7xl">
           <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
@@ -87,14 +89,12 @@ const DashboardPage = async () => {
           </div>
         </div>
       </div>
-
       {/* Page customization section*/}
       <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
         <div className="mx-auto max-w-7xl">
           <CustomizationForm />
         </div>
       </div>
-
       {/* Manage links section */}
       <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
         <div className="mx-auto max-w-7xl">

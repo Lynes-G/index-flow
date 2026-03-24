@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
-import { use, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   closestCenter,
   DndContext,

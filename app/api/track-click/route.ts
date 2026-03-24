@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     let data: ClientTrackingData;
     try {
       data = await request.json();
-    } catch (jsonErr) {
+    } catch {
       return NextResponse.json(
         { error: "Invalid JSON in request body" },
         { status: 400 },

@@ -17,6 +17,7 @@ import {
   Square,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import type { ComponentType } from "react";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,11 @@ import {
   themePresetList,
 } from "@/lib/themePresets";
 
-const layoutOptions: Array<{ value: LayoutStyle; label: string; icon: any }> = [
+const layoutOptions: Array<{
+  value: LayoutStyle;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+}> = [
   { value: "stacked", label: "Stacked", icon: LayoutList },
   { value: "cards", label: "Cards", icon: LayoutGrid },
   { value: "grid", label: "Grid", icon: LayoutGrid },
@@ -51,7 +56,7 @@ const linkStyleOptions: Array<{ value: LinkStyle; label: string }> = [
 const avatarShapeOptions: Array<{
   value: AvatarShape;
   label: string;
-  icon: any;
+  icon: ComponentType<{ className?: string }>;
 }> = [
   { value: "circle", label: "Circle", icon: Circle },
   { value: "rounded", label: "Rounded", icon: Square },

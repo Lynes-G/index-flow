@@ -108,7 +108,7 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
                       Countries Reached
                     </p>
                     <p className="text-3xl font-bold text-green-900">
-                      "Upgrade to Ultra"
+                      Upgrade to Ultra
                     </p>
                   </div>
                 </div>
