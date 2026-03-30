@@ -33,8 +33,15 @@ export default defineSchema({
     linkStyle: v.optional(v.string()),
     backgroundType: v.optional(v.string()),
     backgroundValue: v.optional(v.string()),
+    backgroundSolidColor: v.optional(v.string()),
+    patternOverlayEnabled: v.optional(v.boolean()),
+    patternOverlayValue: v.optional(v.string()),
     backgroundImageStorageId: v.optional(v.id("_storage")),
+    backgroundImagePositionX: v.optional(v.number()),
+    backgroundImagePositionY: v.optional(v.number()),
     bannerImageStorageId: v.optional(v.id("_storage")),
+    bannerImagePositionX: v.optional(v.number()),
+    bannerImagePositionY: v.optional(v.number()),
     avatarShape: v.optional(v.string()),
     socialLinks: v.optional(
       v.array(

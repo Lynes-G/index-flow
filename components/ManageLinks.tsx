@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -35,6 +35,10 @@ const ManageLinks = ({
 
   const [items, setItems] = useState(links.map((link) => link._id));
 
+  useEffect(() => {
+    setItems(links.map((link) => link._id));
+  }, [links]);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -50,10 +54,11 @@ const ManageLinks = ({
   const handleDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
 
-    if (active.id !== over?.id) {
+    if (!over) return;
+    if (active.id !== over.id) {
       setItems((items) => {
         const oldIndex = items.indexOf(active.id as Id<"links">);
-        const newIndex = items.indexOf(over!.id as Id<"links">);
+        const newIndex = items.indexOf(over.id as Id<"links">);
         const newItems = arrayMove(items, oldIndex, newIndex);
 
         // Update the order in the DB
@@ -64,22 +69,39 @@ const ManageLinks = ({
   };
 
   // ---------------------------------------------------------------
+  const hasLinks = items.length > 0;
+
   return (
     <>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
-            {items.map((id) => {
-              const link = linkMap[id];
-              return <SortableItem key={id} id={id} link={link} />;
-            })}
-          </div>
-        </SortableContext>
-      </DndContext>
+      {hasLinks ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={items} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {items.map((id) => {
+                const link = linkMap[id];
+                return <SortableItem key={id} id={id} link={link} />;
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
+          <p className="text-sm font-semibold text-slate-900">No links yet</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Add your first link to start building your page.
+          </p>
+        </div>
+      )}
+      {hasLinks && (
+        <p className="mt-3 text-xs text-slate-500">
+          Tip: Press space to lift a link, use arrow keys to move, then press
+          space to drop.
+        </p>
+      )}
       <Button
         variant="outline"
         className="mt-4 w-full border-purple-600 text-purple-600 transition-all duration-200 hover:border-purple-700 hover:bg-purple-600 hover:text-white"

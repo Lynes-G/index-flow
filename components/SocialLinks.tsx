@@ -36,18 +36,18 @@ const SocialLinks = ({
   if (socialLinks.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+    <div className="flex flex-wrap items-center justify-center gap-2.5 lg:justify-start">
       {socialLinks.map((link, index) => {
         const Icon = platformIcons[link.platform] || Globe;
         return (
           <Link
             key={`${link.platform}-${index}`}
             href={link.url}
-            className="group inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:-translate-y-0.5 hover:shadow-md"
-            style={{ borderColor: `${accentColor}33` }}
+            className="group inline-flex items-center gap-2 rounded-full border bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:bg-white"
+            style={{ borderColor: `${accentColor}30` }}
           >
             <span className="inline-flex" style={{ color: accentColor }}>
-              <Icon className="size-4" />
+              <Icon className="size-3.5" />
             </span>
             {link.platform}
           </Link>

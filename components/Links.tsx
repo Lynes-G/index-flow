@@ -17,11 +17,11 @@ const layoutClassMap: Record<LayoutStyle, string> = {
 };
 
 const linkStyleMap: Record<LinkStyle, string> = {
-  pill: "rounded-full border border-slate-200/60 bg-white/80",
-  rounded: "rounded-2xl border border-slate-200/60 bg-white/80",
-  outline: "rounded-2xl border-2 border-slate-300/70 bg-white/60",
+  pill: "rounded-full border border-slate-200/50 bg-white/85",
+  rounded: "rounded-2xl border border-slate-200/50 bg-white/85",
+  outline: "rounded-2xl border-2 border-slate-300/60 bg-white/70",
   shadow:
-    "rounded-2xl border border-slate-200/40 bg-white/90 shadow-lg shadow-slate-900/5",
+    "rounded-2xl border border-slate-200/40 bg-white/95 shadow-lg shadow-slate-900/5",
 };
 
 const Links = ({
@@ -76,21 +76,21 @@ const Links = ({
         >
           <div
             className={cn(
-              "relative p-6 transition-all duration-300 hover:-translate-y-0.5",
+              "relative p-5 transition-all duration-300 hover:-translate-y-0.5",
               linkStyleMap[linkStyle],
             )}
             style={{
-              borderColor: `${accentColor}33`,
+              borderColor: `${accentColor}2e`,
               boxShadow:
                 linkStyle === "shadow"
-                  ? `0 16px 30px -24px ${accentColor}66`
+                  ? `0 18px 32px -24px ${accentColor}55`
                   : undefined,
             }}
           >
-            <div className="absolute inset-0 rounded-[inherit] bg-linear-to-r from-transparent via-white/10 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
+            <div className="absolute inset-0 rounded-[inherit] bg-linear-to-r from-transparent via-white/15 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
             <div className="relative flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <h3 className="mb-1 text-lg font-semibold text-slate-900 transition-colors duration-200">
+                <h3 className="mb-1 text-base font-semibold text-slate-900 transition-colors duration-200">
                   {link.title}
                 </h3>
                 <p className="truncate text-xs font-normal text-slate-500 transition-colors duration-200">

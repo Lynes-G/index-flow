@@ -163,12 +163,14 @@ const UsernameForm = () => {
             {getBaseUrl()}/u/{currentSlug}
           </Link>
           <button
+            type="button"
             onClick={() => {
               navigator.clipboard.writeText(`${getBaseUrl()}/u/${currentSlug}`);
               toast.success("Copied to clipboard!");
             }}
             className="flex h-10 w-10 items-center justify-center border border-r bg-white transition-colors hover:bg-gray-50"
             title="Copy to clipboard"
+            aria-label="Copy public URL"
           >
             <Copy className="size-5 text-gray-500" />
           </button>

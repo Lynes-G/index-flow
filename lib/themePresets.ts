@@ -1,4 +1,4 @@
-export type BackgroundType = "gradient" | "pattern" | "image";
+export type BackgroundType = "solid" | "gradient" | "pattern" | "image";
 export type LayoutStyle = "stacked" | "cards" | "grid";
 export type LinkStyle = "rounded" | "outline" | "shadow" | "pill";
 export type AvatarShape = "circle" | "rounded" | "square";
@@ -156,28 +156,66 @@ export const getBackgroundStyle = ({
   backgroundType,
   backgroundValue,
   backgroundImageUrl,
+  backgroundSolidColor,
+  patternOverlayEnabled,
+  patternOverlayValue,
+  backgroundImagePositionX,
+  backgroundImagePositionY,
   preset,
 }: {
   backgroundType?: BackgroundType;
   backgroundValue?: string;
   backgroundImageUrl?: string;
+  backgroundSolidColor?: string;
+  patternOverlayEnabled?: boolean;
+  patternOverlayValue?: string;
+  backgroundImagePositionX?: number;
+  backgroundImagePositionY?: number;
   preset: ThemePreset;
 }) => {
   if (backgroundType === "image" && backgroundImageUrl) {
     return {
       backgroundImage: `url(${backgroundImageUrl})`,
       backgroundSize: "cover",
-      backgroundPosition: "center",
+      backgroundPosition: `${backgroundImagePositionX ?? 50}% ${backgroundImagePositionY ?? 50}%`,
     } as const;
   }
 
-  if (
-    (backgroundType === "gradient" || backgroundType === "pattern") &&
-    backgroundValue
-  ) {
+  const resolvedType = backgroundType || preset.background.type;
+  const resolvedValue = backgroundValue || preset.background.value;
+  const resolvedSolid =
+    backgroundSolidColor ||
+    preset.background.baseColor ||
+    (resolvedType === "solid" ? resolvedValue : undefined);
+  const legacyPattern = resolvedType === "pattern" ? resolvedValue : undefined;
+  const resolvedPattern =
+    patternOverlayEnabled === true
+      ? patternOverlayValue || legacyPattern
+      : patternOverlayEnabled === false
+        ? undefined
+        : legacyPattern;
+  const resolvedGradient =
+    resolvedType === "gradient" ? resolvedValue : undefined;
+
+  const layers = [resolvedPattern, resolvedGradient].filter(
+    Boolean,
+  ) as string[];
+  if (layers.length > 0 || resolvedSolid) {
+    const patternSize = preset.background.size || "24px 24px";
+    const hasGradient = Boolean(resolvedGradient);
     return {
-      backgroundImage: backgroundValue,
-      backgroundRepeat: backgroundType === "pattern" ? "repeat" : undefined,
+      backgroundColor: resolvedSolid,
+      backgroundImage: layers.length > 0 ? layers.join(", ") : undefined,
+      backgroundRepeat: resolvedPattern
+        ? hasGradient
+          ? "repeat, no-repeat"
+          : "repeat"
+        : undefined,
+      backgroundSize: resolvedPattern
+        ? hasGradient
+          ? `${patternSize}, cover`
+          : patternSize
+        : undefined,
     } as const;
   }
 

@@ -39,8 +39,14 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
     }
   };
 
+  const hasActivity =
+    analytics.totalClicks > 0 ||
+    analytics.uniqueVisitors > 0 ||
+    analytics.totalLinksClicked > 0 ||
+    analytics.qrScans > 0;
+
   return (
-    <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+    <div className="mb-8 bg-slate-50/80 p-4 lg:p-8">
       <div className="mx-auto max-w-7xl">
         <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
           <div className="mb-8">
@@ -194,6 +200,17 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
               </div>
             </div>
           </div>
+
+          {!hasActivity && (
+            <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
+              <p className="text-sm font-semibold text-slate-900">
+                No activity yet
+              </p>
+              <p className="mt-1 text-sm text-slate-600">
+                Share your link-in-bio to start tracking clicks and visitors.
+              </p>
+            </div>
+          )}
 
           {/* Additional metrics */}
           {(analytics.topLinkTitle || analytics.topReferrer) && (

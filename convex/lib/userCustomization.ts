@@ -22,10 +22,17 @@ export const getUserCustomizations = query({
       linkStyle: v.optional(v.string()),
       backgroundType: v.optional(v.string()),
       backgroundValue: v.optional(v.string()),
+      backgroundSolidColor: v.optional(v.string()),
+      patternOverlayEnabled: v.optional(v.boolean()),
+      patternOverlayValue: v.optional(v.string()),
       backgroundImageStorageId: v.optional(v.id("_storage")),
       backgroundImageUrl: v.optional(v.string()),
+      backgroundImagePositionX: v.optional(v.number()),
+      backgroundImagePositionY: v.optional(v.number()),
       bannerImageStorageId: v.optional(v.id("_storage")),
       bannerImageUrl: v.optional(v.string()),
+      bannerImagePositionX: v.optional(v.number()),
+      bannerImagePositionY: v.optional(v.number()),
       avatarShape: v.optional(v.string()),
       socialLinks: v.optional(
         v.array(
@@ -90,10 +97,17 @@ export const getCustomizationBySlug = query({
       linkStyle: v.optional(v.string()),
       backgroundType: v.optional(v.string()),
       backgroundValue: v.optional(v.string()),
+      backgroundSolidColor: v.optional(v.string()),
+      patternOverlayEnabled: v.optional(v.boolean()),
+      patternOverlayValue: v.optional(v.string()),
       backgroundImageStorageId: v.optional(v.id("_storage")),
       backgroundImageUrl: v.optional(v.string()),
+      backgroundImagePositionX: v.optional(v.number()),
+      backgroundImagePositionY: v.optional(v.number()),
       bannerImageStorageId: v.optional(v.id("_storage")),
       bannerImageUrl: v.optional(v.string()),
+      bannerImagePositionX: v.optional(v.number()),
+      bannerImagePositionY: v.optional(v.number()),
       avatarShape: v.optional(v.string()),
       socialLinks: v.optional(
         v.array(
@@ -166,8 +180,15 @@ export const updateCustomizations = mutation({
     linkStyle: v.optional(v.string()),
     backgroundType: v.optional(v.string()),
     backgroundValue: v.optional(v.string()),
+    backgroundSolidColor: v.optional(v.string()),
+    patternOverlayEnabled: v.optional(v.boolean()),
+    patternOverlayValue: v.optional(v.string()),
     backgroundImageStorageId: v.optional(v.id("_storage")),
+    backgroundImagePositionX: v.optional(v.number()),
+    backgroundImagePositionY: v.optional(v.number()),
     bannerImageStorageId: v.optional(v.id("_storage")),
+    bannerImagePositionX: v.optional(v.number()),
+    bannerImagePositionY: v.optional(v.number()),
     avatarShape: v.optional(v.string()),
     socialLinks: v.optional(
       v.array(
@@ -232,11 +253,32 @@ export const updateCustomizations = mutation({
         ...(args.backgroundValue !== undefined && {
           backgroundValue: args.backgroundValue,
         }),
+        ...(args.backgroundSolidColor !== undefined && {
+          backgroundSolidColor: args.backgroundSolidColor,
+        }),
+        ...(args.patternOverlayEnabled !== undefined && {
+          patternOverlayEnabled: args.patternOverlayEnabled,
+        }),
+        ...(args.patternOverlayValue !== undefined && {
+          patternOverlayValue: args.patternOverlayValue,
+        }),
         ...(args.backgroundImageStorageId !== undefined && {
           backgroundImageStorageId: args.backgroundImageStorageId,
         }),
+        ...(args.backgroundImagePositionX !== undefined && {
+          backgroundImagePositionX: args.backgroundImagePositionX,
+        }),
+        ...(args.backgroundImagePositionY !== undefined && {
+          backgroundImagePositionY: args.backgroundImagePositionY,
+        }),
         ...(args.bannerImageStorageId !== undefined && {
           bannerImageStorageId: args.bannerImageStorageId,
+        }),
+        ...(args.bannerImagePositionX !== undefined && {
+          bannerImagePositionX: args.bannerImagePositionX,
+        }),
+        ...(args.bannerImagePositionY !== undefined && {
+          bannerImagePositionY: args.bannerImagePositionY,
         }),
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
@@ -277,11 +319,32 @@ export const updateCustomizations = mutation({
         ...(args.backgroundValue !== undefined && {
           backgroundValue: args.backgroundValue,
         }),
+        ...(args.backgroundSolidColor !== undefined && {
+          backgroundSolidColor: args.backgroundSolidColor,
+        }),
+        ...(args.patternOverlayEnabled !== undefined && {
+          patternOverlayEnabled: args.patternOverlayEnabled,
+        }),
+        ...(args.patternOverlayValue !== undefined && {
+          patternOverlayValue: args.patternOverlayValue,
+        }),
         ...(args.backgroundImageStorageId !== undefined && {
           backgroundImageStorageId: args.backgroundImageStorageId,
         }),
+        ...(args.backgroundImagePositionX !== undefined && {
+          backgroundImagePositionX: args.backgroundImagePositionX,
+        }),
+        ...(args.backgroundImagePositionY !== undefined && {
+          backgroundImagePositionY: args.backgroundImagePositionY,
+        }),
         ...(args.bannerImageStorageId !== undefined && {
           bannerImageStorageId: args.bannerImageStorageId,
+        }),
+        ...(args.bannerImagePositionX !== undefined && {
+          bannerImagePositionX: args.bannerImagePositionX,
+        }),
+        ...(args.bannerImagePositionY !== undefined && {
+          bannerImagePositionY: args.bannerImagePositionY,
         }),
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
