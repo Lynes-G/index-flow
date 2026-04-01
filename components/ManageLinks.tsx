@@ -104,7 +104,7 @@ const ManageLinks = ({
       )}
       <Button
         variant="outline"
-        className="mt-4 w-full border-purple-600 text-purple-600 transition-all duration-200 hover:border-purple-700 hover:bg-purple-600 hover:text-white"
+        className="mt-4 w-full border-blue-600 text-blue-700 transition-all duration-200 hover:border-blue-700 hover:bg-blue-600 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
         asChild
       >
         <Link

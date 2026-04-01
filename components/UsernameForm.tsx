@@ -32,6 +32,7 @@ import { toast } from "sonner";
 const UsernameForm = () => {
   const { user } = useUser();
   const [debouncedUsername, setDebouncedUsername] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   const form = useForm<UsernameFormData>({
     resolver: zodResolver(usernameFormSchema),
@@ -43,12 +44,16 @@ const UsernameForm = () => {
   const watchedUsername = form.watch("username");
   // Debounce the username input to avoid excessive queries
   useEffect(() => {
+    if (!isEditing) {
+      setDebouncedUsername("");
+      return;
+    }
     const handler = setTimeout(() => {
       setDebouncedUsername(watchedUsername);
     }, 500); // 500ms delay;
 
     return () => clearTimeout(handler); // Cleanup on unmount or when watchedUsername changes
-  }, [watchedUsername]);
+  }, [watchedUsername, isEditing]);
 
   const currentSlug = useQuery(
     api.lib.usernames.getUserSlug,
@@ -70,6 +75,7 @@ const UsernameForm = () => {
   // - Returns "unavailable" if username is taken
 
   const getStatus = () => {
+    if (!isEditing) return currentSlug ? "current" : null;
     if (!debouncedUsername || debouncedUsername.length < 3) return null;
     if (debouncedUsername !== watchedUsername) return "checking";
     if (!availabilityCheck) return "checking";
@@ -81,7 +87,7 @@ const UsernameForm = () => {
 
   const hasCustomUsername = currentSlug && currentSlug !== user?.id;
   const isSubmitDisabled =
-    status !== "available" || form.formState.isSubmitting;
+    !isEditing || status !== "available" || form.formState.isSubmitting;
 
   const onSubmit = async (data: UsernameFormData) => {
     console.log("Form submitted with data:", data);
@@ -90,6 +96,7 @@ const UsernameForm = () => {
     try {
       const response = await setUsername({ username: data.username });
       if (response.success) {
+        setIsEditing(false);
         form.reset();
       } else {
         form.setError("username", {
@@ -105,6 +112,11 @@ const UsernameForm = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (!currentSlug || isEditing) return;
+    form.setValue("username", currentSlug, { shouldDirty: false });
+  }, [currentSlug, form, isEditing]);
 
   return (
     <div className="space-y-6">
@@ -133,10 +145,11 @@ const UsernameForm = () => {
                 {currentSlug}
               </span>
               <Link
-                className="text-green-600 transition-colors hover:text-green-700"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-green-600 transition-colors hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                 href={`/u/${currentSlug}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Open public profile"
               >
                 <ExternalLink className="size-5" />
               </Link>
@@ -168,7 +181,7 @@ const UsernameForm = () => {
               navigator.clipboard.writeText(`${getBaseUrl()}/u/${currentSlug}`);
               toast.success("Copied to clipboard!");
             }}
-            className="flex h-10 w-10 items-center justify-center border border-r bg-white transition-colors hover:bg-gray-50"
+            className="flex h-11 w-11 items-center justify-center border border-r bg-white transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 focus-visible:outline-none"
             title="Copy to clipboard"
             aria-label="Copy public URL"
           >
@@ -187,30 +200,51 @@ const UsernameForm = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="username">Username</FieldLabel>
-                  <div className="relative">
-                    <Input
-                      {...field}
-                      id="username"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Enter your username"
-                      autoComplete="off"
-                      className="pr-8"
-                    />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        {...field}
+                        id="username"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Enter your username"
+                        autoComplete="off"
+                        className="pr-8"
+                        disabled={!isEditing}
+                      />
 
-                    <div className="absolute top-1/2 right-3 -translate-y-1/2 transform">
-                      {status === "checking" && (
-                        <Loader2 className="size-4 animate-spin text-gray-400" />
-                      )}
-                      {status === "available" && (
-                        <CheckCircle className="size-4 text-green-500" />
-                      )}
-                      {status === "current" && (
-                        <User className="size-4 text-blue-500" />
-                      )}
-                      {status === "unavailable" && (
-                        <AlertCircle className="size-4 text-red-500" />
-                      )}
+                      <div className="absolute top-1/2 right-3 -translate-y-1/2 transform">
+                        {status === "checking" && (
+                          <Loader2 className="size-4 animate-spin text-gray-400" />
+                        )}
+                        {status === "available" && (
+                          <CheckCircle className="size-4 text-green-500" />
+                        )}
+                        {status === "current" && (
+                          <User className="size-4 text-blue-500" />
+                        )}
+                        {status === "unavailable" && (
+                          <AlertCircle className="size-4 text-red-500" />
+                        )}
+                      </div>
                     </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        if (isEditing) {
+                          setIsEditing(false);
+                          if (currentSlug) {
+                            form.setValue("username", currentSlug, {
+                              shouldDirty: false,
+                            });
+                          }
+                        } else {
+                          setIsEditing(true);
+                        }
+                      }}
+                    >
+                      {isEditing ? "Cancel" : "Edit"}
+                    </Button>
                   </div>
                 </Field>
               )}
@@ -222,9 +256,7 @@ const UsernameForm = () => {
               {status === "available" && (
                 <p className="text-sm text-green-600">Username is available!</p>
               )}
-              {status === "current" && (
-                <p className="text-sm text-blue-600">This is your username.</p>
-              )}
+              {status === "current" && null}
               {status === "unavailable" && (
                 <p className="text-sm text-red-600">
                   {availabilityCheck?.error || "This username is unavailable."}
@@ -243,7 +275,7 @@ const UsernameForm = () => {
 
         <Button
           type="submit"
-          className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
+          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
           disabled={isSubmitDisabled}
         >
           {form.formState.isSubmitting ? (

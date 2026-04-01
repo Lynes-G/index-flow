@@ -46,7 +46,13 @@ const SocialLinks = ({
             className="group inline-flex items-center gap-2 rounded-full border bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:bg-white"
             style={{ borderColor: `${accentColor}30` }}
           >
-            <span className="inline-flex" style={{ color: accentColor }}>
+            <span
+              className="inline-flex items-center justify-center rounded-full p-1"
+              style={{
+                color: accentColor,
+                backgroundColor: `${accentColor}22`,
+              }}
+            >
               <Icon className="size-3.5" />
             </span>
             {link.platform}

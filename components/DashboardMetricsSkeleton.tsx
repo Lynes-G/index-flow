@@ -2,7 +2,7 @@ const DashboardMetricsSkeleton = () => {
   return (
     <div className="mb-8 bg-slate-50/80 p-4 lg:p-8">
       <div className="mx-auto max-w-7xl">
-        <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8">
           <div className="mb-8">
             <div className="h-6 w-48 rounded-full bg-slate-200" />
             <div className="mt-3 h-4 w-64 rounded-full bg-slate-100" />

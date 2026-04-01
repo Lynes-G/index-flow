@@ -48,19 +48,19 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
   return (
     <div className="mb-8 bg-slate-50/80 p-4 lg:p-8">
       <div className="mx-auto max-w-7xl">
-        <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8">
           <div className="mb-8">
             <h2 className="mb-2 text-2xl font-bold text-gray-900">
               Analytics Overview
             </h2>
-            <p className="text-gray-600"> Last 30 days performance metrics</p>
+            <p className="text-gray-600">Last 30 days performance metrics</p>
           </div>
 
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-6">
             {/* Total clicks */}
-            <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50 to-blue-100 p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-blue-500 p-3">
+                <div className="rounded-xl bg-blue-600 p-3">
                   <MousePointer className="size-6 text-white" />
                 </div>
                 <div className="text-blue-600">
@@ -68,30 +68,30 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
                 </div>
               </div>
               <div>
-                <p className="mb-1 text-sm font-medium text-blue-700">
+                <p className="mb-1 text-sm font-medium text-slate-600">
                   Total Clicks
                 </p>
-                <p className="text-3xl font-bold text-blue-900">
+                <p className="text-3xl font-bold text-slate-900">
                   {analytics.totalClicks.toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* Unique visitors */}
-            <div className="rounded-2xl border border-purple-200 bg-linear-to-br from-purple-50 to-purple-100 p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-purple-500 p-3">
+                <div className="rounded-xl bg-indigo-600 p-3">
                   <Users className="size-6 text-white" />
                 </div>
-                <div className="text-purple-600">
+                <div className="text-indigo-600">
                   <TrendingUp className="size-6" />
                 </div>
               </div>
               <div>
-                <p className="mb-1 text-sm font-medium text-purple-700">
+                <p className="mb-1 text-sm font-medium text-slate-600">
                   Unique Visitors
                 </p>
-                <p className="text-3xl font-bold text-purple-900">
+                <p className="text-3xl font-bold text-slate-900">
                   {analytics.uniqueVisitors.toLocaleString()}
                 </p>
               </div>
@@ -100,40 +100,40 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
             <Protect
               plan="ultra"
               fallback={
-                <div className="rounded-2xl border border-green-200 bg-linear-to-br from-green-50 to-green-100 p-6 opacity-75">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 opacity-80 shadow-sm">
                   <div className="mb-4 flex items-center justify-between">
-                    <div className="rounded-xl bg-green-500 p-3">
+                    <div className="rounded-xl bg-emerald-600 p-3">
                       <Globe className="size-6 text-white" />
                     </div>
-                    <div className="text-green-600">
+                    <div className="text-emerald-600">
                       <Lock className="size-6" />
                     </div>
                   </div>
                   <div>
-                    <p className="mb-1 text-sm font-medium text-green-700">
+                    <p className="mb-1 text-sm font-medium text-slate-600">
                       Countries Reached
                     </p>
-                    <p className="text-3xl font-bold text-green-900">
+                    <p className="text-3xl font-bold text-slate-900">
                       Upgrade to Ultra
                     </p>
                   </div>
                 </div>
               }
             >
-              <div className="rounded-2xl border border-green-200 bg-linear-to-br from-green-50 to-green-100 p-6">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
-                  <div className="rounded-xl bg-green-500 p-3">
+                  <div className="rounded-xl bg-emerald-600 p-3">
                     <Globe className="size-6 text-white" />
                   </div>
-                  <div className="text-green-600">
+                  <div className="text-emerald-600">
                     <MapPin className="size-6" />
                   </div>
                 </div>
                 <div>
-                  <p className="mb-1 text-sm font-medium text-green-700">
+                  <p className="mb-1 text-sm font-medium text-slate-600">
                     Countries Reached
                   </p>
-                  <p className="text-3xl font-bold text-green-900">
+                  <p className="text-3xl font-bold text-slate-900">
                     {analytics.countriesReached.toLocaleString()}
                   </p>
                 </div>
@@ -141,47 +141,47 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
             </Protect>
 
             {/* Total links clicked */}
-            <div className="rounded-2xl border border-indigo-200 bg-linear-to-br from-indigo-50 to-indigo-100 p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-indigo-500 p-3">
+                <div className="rounded-xl bg-sky-600 p-3">
                   <Link className="size-6 text-white" />
                 </div>
-                <div className="text-indigo-600">
+                <div className="text-sky-600">
                   <ExternalLink className="size-6" />
                 </div>
               </div>
               <div>
-                <p className="mb-1 text-sm font-medium text-indigo-700">
+                <p className="mb-1 text-sm font-medium text-slate-600">
                   Links Clicked
                 </p>
-                <p className="text-3xl font-bold text-indigo-900">
+                <p className="text-3xl font-bold text-slate-900">
                   {analytics.totalLinksClicked.toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* QR scans */}
-            <div className="rounded-2xl border border-teal-200 bg-linear-to-br from-teal-50 to-teal-100 p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-teal-500 p-3">
+                <div className="rounded-xl bg-cyan-600 p-3">
                   <QrCode className="size-6 text-white" />
                 </div>
-                <div className="text-teal-600">
+                <div className="text-cyan-600">
                   <TrendingUp className="size-6" />
                 </div>
               </div>
               <div>
-                <p className="mb-1 text-sm font-medium text-teal-700">
+                <p className="mb-1 text-sm font-medium text-slate-600">
                   QR Scans
                 </p>
-                <p className="text-3xl font-bold text-teal-900">
+                <p className="text-3xl font-bold text-slate-900">
                   {analytics.qrScans.toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* Activity period */}
-            <div className="rounded-2xl border border-orange-200 bg-linear-to-br from-orange-50 to-orange-100 p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <div className="rounded-xl bg-orange-500 p-3">
                   <Calendar className="size-6 text-white" />
@@ -191,10 +191,10 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
                 </div>
               </div>
               <div>
-                <p className="mb-1 text-sm font-medium text-orange-700">
+                <p className="mb-1 text-sm font-medium text-slate-600">
                   Last Activity
                 </p>
-                <p className="text-3xl font-bold text-orange-900">
+                <p className="text-3xl font-bold text-slate-900">
                   {formDate({ dateString: analytics.lastClick })}
                 </p>
               </div>
@@ -217,7 +217,7 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Top performing link */}
               {analytics.topLinkTitle && (
-                <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-slate-50 to-slate-100 p-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="mb-3 flex items-center gap-3">
                     <div className="rounded-lg bg-slate-500 p-2">
                       <ExternalLink className="size-4 text-white" />
@@ -234,7 +234,7 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
 
               {/* Top Referrer */}
               {analytics.topReferrer && (
-                <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-slate-50 to-slate-100 p-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="mb-3 flex items-center gap-3">
                     <div className="rounded-lg bg-slate-500 p-2">
                       <Globe className="size-4 text-white" />

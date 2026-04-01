@@ -28,9 +28,9 @@ const NewLinkPage = async () => {
 
   if (!access.canCreate) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+      <div className="min-h-screen bg-slate-50 p-4 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="mb-4 text-2xl font-bold text-gray-900">
               Link Creation Limit Reached
             </h2>
@@ -42,7 +42,7 @@ const NewLinkPage = async () => {
             <div className="flex items-center gap-4">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 font-medium text-purple-600/75 transition-colors hover:text-purple-900"
+                className="inline-flex items-center gap-2 font-medium text-blue-600 transition-colors hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 <ArrowLeft className="size-4" />
                 Back to Dashboard
@@ -50,7 +50,7 @@ const NewLinkPage = async () => {
               {!hasUnlimitedLinks && (
                 <Link
                   href="/dashboard/billing"
-                  className="rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
+                  className="rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   Upgrade Plan
                 </Link>
@@ -67,14 +67,14 @@ const NewLinkPage = async () => {
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 font-medium text-purple-600/75 transition-colors hover:text-purple-900"
+          className="inline-flex items-center gap-2 font-medium text-blue-600 transition-colors hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <ArrowLeft className="size-4" />
           Back to Dashboard
         </Link>
       </div>
 
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+      <div className="min-h-screen bg-slate-50 p-4 lg:p-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16">
             {/* Left side - Title & Description */}
@@ -84,7 +84,7 @@ const NewLinkPage = async () => {
                   <h1 className="to-gray-900 text-4xl leading-tight font-bold lg:text-5xl">
                     Create New Link
                   </h1>
-                  <div className="mt-4 h-1 w-20 rounded-full bg-linear-to-r from-blue-500 to-purple-600" />
+                  <div className="mt-4 h-1 w-20 rounded-full bg-linear-to-r from-blue-500 to-orange-500" />
                 </div>
                 <p className="text-lg leading-relaxed text-gray-600">
                   Add a new link to you link-in-bio page. Your links will appear
@@ -101,7 +101,7 @@ const NewLinkPage = async () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="size-2 rounded-full bg-purple-500" />
+                    <div className="size-2 rounded-full bg-orange-500" />
                     <span className="text-gray-600">
                       Automatic URL validation
                     </span>
@@ -118,7 +118,7 @@ const NewLinkPage = async () => {
 
             {/* Right side - New Link Form */}
             <div className="lg:w-3/5">
-              <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+              <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
                 <div className="mb-6">
                   <h2 className="mb-2 text-xl font-semibold text-gray-900">
                     Link Details
