@@ -54,3 +54,25 @@ test("splitPublicProfileLinks falls back cleanly when the featured id is missing
     remainingLinks: links,
   });
 });
+
+test("splitPublicProfileLinks falls back cleanly when no featured link is configured", () => {
+  const links = [
+    {
+      _id: "one",
+      title: "Portfolio",
+      url: "https://example.com/portfolio",
+      order: 0,
+    },
+    {
+      _id: "two",
+      title: "Book a Call",
+      url: "https://example.com/book",
+      order: 1,
+    },
+  ];
+
+  assert.deepEqual(splitPublicProfileLinks(links), {
+    featuredLink: null,
+    remainingLinks: links,
+  });
+});
