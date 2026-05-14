@@ -3,16 +3,16 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { trackLinkClick } from "@/lib/analytics";
+import { LayoutStyle, LinkStyle } from "@/lib/themePresets";
+import { cn } from "@/lib/utils";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { LayoutStyle, LinkStyle } from "@/lib/themePresets";
 
 const layoutClassMap: Record<LayoutStyle, string> = {
-  stacked: "space-y-4",
-  cards: "space-y-4",
+  stacked: "space-y-4 lg:space-y-5",
+  cards: "space-y-4 lg:space-y-5",
   grid: "grid grid-cols-1 gap-4 sm:grid-cols-2",
 };
 
@@ -24,18 +24,24 @@ const linkStyleMap: Record<LinkStyle, string> = {
     "rounded-2xl border border-slate-200/40 bg-white/95 shadow-lg shadow-slate-900/5",
 };
 
-const Links = ({
-  preloadedLinks,
-  accentColor,
-  layoutStyle = "stacked",
-  linkStyle = "rounded",
-}: {
-  preloadedLinks: Preloaded<typeof api.lib.links.getLinksBySlug>;
+type LinksProps = {
+  preloadedLinks?: Preloaded<typeof api.lib.links.getLinksBySlug>;
+  links?: Doc<"links">[];
   accentColor: string;
   layoutStyle?: LayoutStyle;
   linkStyle?: LinkStyle;
-}) => {
-  const links = usePreloadedQuery(preloadedLinks);
+};
+
+type LinksListProps = Omit<LinksProps, "preloadedLinks"> & {
+  links: Doc<"links">[];
+};
+
+const LinksList = ({
+  links,
+  accentColor,
+  layoutStyle = "stacked",
+  linkStyle = "rounded",
+}: LinksListProps) => {
   const params = useParams();
   const username = params.username as string;
 
@@ -50,7 +56,7 @@ const Links = ({
 
   if (links.length === 0) {
     return (
-      <div className="py-20 text-center">
+      <div className="py-16 text-center">
         <div className="mb-6 text-slate-300">
           <ArrowUpRight className="mx-auto size-16" />
         </div>
@@ -76,7 +82,7 @@ const Links = ({
         >
           <div
             className={cn(
-              "relative p-5 transition-all duration-300 hover:-translate-y-0.5",
+              "relative px-5 py-4 transition-all duration-300 hover:-translate-y-0.5 lg:px-6 lg:py-5",
               linkStyleMap[linkStyle],
             )}
             style={{
@@ -90,18 +96,18 @@ const Links = ({
             <div className="absolute inset-0 rounded-[inherit] bg-linear-to-r from-transparent via-white/15 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
             <div className="relative flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <h3 className="mb-1 text-base font-semibold text-slate-900 transition-colors duration-200">
+                <h3 className="mb-1 text-[15px] font-semibold text-slate-900 transition-colors duration-200 lg:text-base">
                   {link.title}
                 </h3>
-                <p className="truncate text-xs font-normal text-slate-500 transition-colors duration-200">
+                <p className="truncate text-xs font-normal tracking-[0.01em] text-slate-500 transition-colors duration-200">
                   {link.url.replace(/^https?:\/\//, "")}
                 </p>
               </div>
               <div
-                className="ml-4 transition-all duration-200 group-hover:translate-x-1"
+                className="ml-4 rounded-full p-2 transition-all duration-200 group-hover:translate-x-1"
                 style={{ color: accentColor }}
               >
-                <ArrowUpRight className="size-5" />
+                <ArrowUpRight className="size-4" />
               </div>
             </div>
           </div>
@@ -109,6 +115,29 @@ const Links = ({
       ))}
     </div>
   );
+};
+
+const PreloadedLinksList = ({
+  preloadedLinks,
+  ...props
+}: LinksProps & {
+  preloadedLinks: Preloaded<typeof api.lib.links.getLinksBySlug>;
+}) => {
+  const links = usePreloadedQuery(preloadedLinks);
+
+  return <LinksList {...props} links={links} />;
+};
+
+const Links = ({ links, preloadedLinks, ...props }: LinksProps) => {
+  if (links !== undefined) {
+    return <LinksList {...props} links={links} />;
+  }
+
+  if (preloadedLinks) {
+    return <PreloadedLinksList {...props} preloadedLinks={preloadedLinks} />;
+  }
+
+  return <LinksList {...props} links={[]} />;
 };
 
 export default Links;

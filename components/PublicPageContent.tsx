@@ -1,14 +1,15 @@
 "use client";
 
 import { PublicPageContentProps } from "@/constants/constants";
-import { usePreloadedQuery } from "convex/react";
-import { User } from "lucide-react";
-import Image from "next/image";
-import Links from "./Links";
-import SocialLinks from "./SocialLinks";
-import PublicPageFooter from "./PublicPageFooter";
-import { QRCodeSVG } from "qrcode.react";
+import { splitPublicProfileLinks } from "@/lib/publicProfileLinks";
 import { getBaseUrl } from "@/lib/getBaseUrl";
+import { usePreloadedQuery } from "convex/react";
+import Links from "./Links";
+import FeaturedLinkCard from "./FeaturedLinkCard";
+import ProfileQrCard from "./ProfileQrCard";
+import PublicLinksSection from "./PublicLinksSection";
+import PublicPageFooter from "./PublicPageFooter";
+import PublicProfileHero from "./PublicProfileHero";
 import {
   AvatarShape,
   BackgroundType,
@@ -18,17 +19,12 @@ import {
   resolveThemePreset,
 } from "@/lib/themePresets";
 
-const avatarShapeMap: Record<AvatarShape, string> = {
-  circle: "rounded-full",
-  rounded: "rounded-2xl",
-  square: "rounded-none",
-};
-
 const PublicPageContent = ({
   username,
   preloadedLinks,
   preloadedCustomization,
 }: PublicPageContentProps) => {
+  const links = usePreloadedQuery(preloadedLinks);
   const customizations = usePreloadedQuery(preloadedCustomization);
   const preset = resolveThemePreset(customizations?.themePreset);
   const accentColor = customizations?.accentColor || preset.accentColor;
@@ -38,6 +34,7 @@ const PublicPageContent = ({
   const linkStyle =
     (customizations?.linkStyle as LinkStyle) || preset.linkStyle;
   const avatarShape = (customizations?.avatarShape as AvatarShape) || "circle";
+  const featuredLinkId = customizations?.featuredLinkId?.toString();
 
   const backgroundStyle = getBackgroundStyle({
     backgroundType: customizations?.backgroundType as BackgroundType,
@@ -51,6 +48,23 @@ const PublicPageContent = ({
     preset,
   });
 
+  const { featuredLink } = splitPublicProfileLinks(
+    links.map((link) => ({
+      _id: link._id.toString(),
+      title: link.title,
+      url: link.url,
+      order: link.order,
+    })),
+    featuredLinkId,
+  );
+  const featuredLinkDoc = featuredLink
+    ? links.find((link) => link._id.toString() === featuredLink._id) ?? null
+    : null;
+  const remainingLinkDocs = featuredLinkDoc
+    ? links.filter((link) => link._id !== featuredLinkDoc._id)
+    : links;
+  const shouldRenderLinksSection =
+    remainingLinkDocs.length > 0 || featuredLinkDoc === null;
   const profileUrl = `${getBaseUrl()}/q/${username}`;
 
   return (
@@ -59,114 +73,56 @@ const PublicPageContent = ({
       style={{ ...backgroundStyle, fontFamily }}
     >
       <div className="flex-1">
-        <div className="relative">
-          <div
-            className="relative h-48 sm:h-56"
-            style={
-              customizations?.bannerImageUrl
-                ? {
-                    backgroundImage: `url(${customizations.bannerImageUrl})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: `${customizations?.bannerImagePositionX ?? 50}% ${customizations?.bannerImagePositionY ?? 50}%`,
-                  }
-                : {
-                    background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}bb 100%)`,
-                  }
-            }
-          >
-            <div className="absolute inset-0 bg-black/10" />
-          </div>
-        </div>
+        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-4 sm:px-6 sm:pt-5 lg:px-8">
+          <PublicProfileHero
+            username={username}
+            accentColor={accentColor}
+            avatarShape={avatarShape}
+            profilePictureUrl={customizations?.profilePictureUrl}
+            description={customizations?.description}
+            profileFields={customizations?.profileFields || []}
+            socialLinks={customizations?.socialLinks || []}
+            bannerImageUrl={customizations?.bannerImageUrl}
+            bannerImagePositionX={customizations?.bannerImagePositionX}
+            bannerImagePositionY={customizations?.bannerImagePositionY}
+          />
 
-        <div className="relative mx-auto -mt-20 max-w-6xl px-6 pb-16">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
-            <div className="lg:w-96 lg:shrink-0">
-              <div className="rounded-3xl border border-white/40 bg-white/80 p-6 shadow-2xl shadow-slate-900/10 backdrop-blur-xl">
-                <div className="text-center lg:text-left">
-                  <div className="mt-8 mb-6 flex justify-center lg:justify-start">
-                    <div className="relative">
-                      {customizations?.profilePictureUrl ? (
-                        <div
-                          className={`size-28 bg-white p-1 shadow-lg ${avatarShapeMap[avatarShape]}`}
-                        >
-                          <div
-                            className={`h-full w-full overflow-hidden ${avatarShapeMap[avatarShape]}`}
-                          >
-                            <Image
-                              src={customizations.profilePictureUrl}
-                              alt={`${username}'s profile picture`}
-                              width={112}
-                              height={112}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          className={`flex size-28 items-center justify-center bg-white shadow-lg ${avatarShapeMap[avatarShape]}`}
-                        >
-                          <User className="size-12 text-gray-600" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <h1 className="text-3xl font-semibold text-slate-900 lg:text-4xl">
-                        @{username}
-                      </h1>
-                      {customizations?.description && (
-                        <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                          {customizations.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <SocialLinks
-                      socialLinks={customizations?.socialLinks || []}
-                      accentColor={accentColor}
-                    />
-                  </div>
-                </div>
-              </div>
+          {featuredLinkDoc && (
+            <div className="mx-auto mt-7 max-w-4xl sm:mt-8">
+              <FeaturedLinkCard
+                username={username}
+                link={featuredLinkDoc}
+                accentColor={accentColor}
+              />
             </div>
+          )}
 
-            <div className="min-w-0 flex-1">
-              <div className="rounded-3xl border border-white/30 bg-white/85 p-7 shadow-2xl shadow-slate-900/10 backdrop-blur-xl lg:p-9">
+          {shouldRenderLinksSection && (
+            <div className="mx-auto mt-5 max-w-4xl sm:mt-6">
+              <PublicLinksSection accentColor={accentColor}>
                 <Links
-                  preloadedLinks={preloadedLinks}
+                  links={remainingLinkDocs}
                   accentColor={accentColor}
-                  layoutStyle={layoutStyle}
-                  linkStyle={linkStyle}
+                  layoutStyle={layoutStyle === "grid" ? "grid" : "stacked"}
+                  linkStyle={linkStyle === "outline" ? "rounded" : linkStyle}
                 />
-              </div>
+              </PublicLinksSection>
             </div>
-          </div>
+          )}
 
-          <div className="mt-12 flex justify-center">
-            <div className="w-full max-w-md rounded-3xl border border-white/40 bg-white/85 p-6 text-center shadow-2xl shadow-slate-900/10 backdrop-blur-xl">
-              <p className="text-sm font-semibold text-slate-700">
-                Share this profile
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                Scan to open {username}&apos;s link hub
-              </p>
-              <div className="mt-4 flex justify-center">
-                <div className="rounded-2xl bg-white/90 p-4 shadow-inner">
-                  <QRCodeSVG value={profileUrl} size={150} />
-                </div>
-              </div>
-              <div className="mt-3 rounded-full bg-slate-100/80 px-4 py-2 text-xs text-slate-600">
-                {profileUrl}
-              </div>
-            </div>
+          <div className="mt-10 flex justify-center">
+            <ProfileQrCard
+              username={username}
+              profileUrl={profileUrl}
+              accentColor={accentColor}
+              className="max-w-md px-5 sm:px-6"
+            />
           </div>
         </div>
       </div>
 
       <div className="mt-auto px-6 pb-10">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-5xl">
           <PublicPageFooter
             accentColor={accentColor}
             backgroundType={customizations?.backgroundType as BackgroundType}
