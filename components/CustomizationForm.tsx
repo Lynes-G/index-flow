@@ -493,17 +493,14 @@ const CustomizationForm = () => {
         bannerImagePositionY: existingCustomization.bannerImagePositionY ?? 50,
         avatarShape: (existingCustomization.avatarShape ||
           "circle") as AvatarShape,
-        profileFields: applyPreferredPhoneCountry(
-          existingCustomization.profileFields || [],
-          preferredPhoneCountry,
-        ),
+        profileFields: existingCustomization.profileFields || [],
         socialLinks: existingCustomization.socialLinks || [],
       };
 
       setFormData(nextFormData);
       setSavedSnapshot(snapshotFromForm(nextFormData));
     }
-  }, [defaultPatternValue, existingCustomization, preferredPhoneCountry]);
+  }, [defaultPatternValue, existingCustomization]);
 
   useEffect(() => {
     setFormData((prev) => {
@@ -933,6 +930,39 @@ const CustomizationForm = () => {
       (userLinks || []).find((link) => link._id === formData.featuredLinkId) ??
       null
     );
+  }, [formData.featuredLinkId, userLinks]);
+
+  useEffect(() => {
+    if (userLinks === undefined || formData.featuredLinkId === null) {
+      return;
+    }
+
+    const featuredLinkStillExists = userLinks.some(
+      (link) => link._id === formData.featuredLinkId,
+    );
+
+    if (featuredLinkStillExists) {
+      return;
+    }
+
+    setFormData((prev) => {
+      if (prev.featuredLinkId === null) {
+        return prev;
+      }
+
+      const prevFeaturedLinkStillExists = userLinks.some(
+        (link) => link._id === prev.featuredLinkId,
+      );
+
+      if (prevFeaturedLinkStillExists) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        featuredLinkId: null,
+      };
+    });
   }, [formData.featuredLinkId, userLinks]);
 
   const sectionCardClass =
