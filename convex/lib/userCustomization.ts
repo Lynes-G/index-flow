@@ -3,6 +3,14 @@
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
 
+const profileFieldValidator = v.object({
+  id: v.string(),
+  type: v.union(v.literal("phone"), v.literal("email"), v.literal("freeText")),
+  title: v.optional(v.string()),
+  value: v.string(),
+  country: v.optional(v.string()),
+});
+
 // Get customizations by user ID
 export const getUserCustomizations = query({
   args: { userId: v.string() },
@@ -33,7 +41,9 @@ export const getUserCustomizations = query({
       bannerImageUrl: v.optional(v.string()),
       bannerImagePositionX: v.optional(v.number()),
       bannerImagePositionY: v.optional(v.number()),
+      featuredLinkId: v.optional(v.id("links")),
       avatarShape: v.optional(v.string()),
+      profileFields: v.optional(v.array(profileFieldValidator)),
       socialLinks: v.optional(
         v.array(
           v.object({
@@ -108,7 +118,9 @@ export const getCustomizationBySlug = query({
       bannerImageUrl: v.optional(v.string()),
       bannerImagePositionX: v.optional(v.number()),
       bannerImagePositionY: v.optional(v.number()),
+      featuredLinkId: v.optional(v.id("links")),
       avatarShape: v.optional(v.string()),
+      profileFields: v.optional(v.array(profileFieldValidator)),
       socialLinks: v.optional(
         v.array(
           v.object({
@@ -189,7 +201,9 @@ export const updateCustomizations = mutation({
     bannerImageStorageId: v.optional(v.id("_storage")),
     bannerImagePositionX: v.optional(v.number()),
     bannerImagePositionY: v.optional(v.number()),
+    featuredLinkId: v.optional(v.id("links")),
     avatarShape: v.optional(v.string()),
+    profileFields: v.optional(v.array(profileFieldValidator)),
     socialLinks: v.optional(
       v.array(
         v.object({
@@ -280,8 +294,14 @@ export const updateCustomizations = mutation({
         ...(args.bannerImagePositionY !== undefined && {
           bannerImagePositionY: args.bannerImagePositionY,
         }),
+        ...(args.featuredLinkId !== undefined && {
+          featuredLinkId: args.featuredLinkId,
+        }),
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
+        }),
+        ...(args.profileFields !== undefined && {
+          profileFields: args.profileFields,
         }),
         ...(args.socialLinks !== undefined && {
           socialLinks: args.socialLinks,
@@ -346,8 +366,14 @@ export const updateCustomizations = mutation({
         ...(args.bannerImagePositionY !== undefined && {
           bannerImagePositionY: args.bannerImagePositionY,
         }),
+        ...(args.featuredLinkId !== undefined && {
+          featuredLinkId: args.featuredLinkId,
+        }),
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
+        }),
+        ...(args.profileFields !== undefined && {
+          profileFields: args.profileFields,
         }),
         ...(args.socialLinks !== undefined && {
           socialLinks: args.socialLinks,

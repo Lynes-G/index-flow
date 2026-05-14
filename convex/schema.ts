@@ -42,7 +42,19 @@ export default defineSchema({
     bannerImageStorageId: v.optional(v.id("_storage")),
     bannerImagePositionX: v.optional(v.number()),
     bannerImagePositionY: v.optional(v.number()),
+    featuredLinkId: v.optional(v.id("links")),
     avatarShape: v.optional(v.string()),
+    profileFields: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          type: v.union(v.literal("phone"), v.literal("email"), v.literal("freeText")),
+          title: v.optional(v.string()),
+          value: v.string(),
+          country: v.optional(v.string()),
+        }),
+      ),
+    ),
     socialLinks: v.optional(
       v.array(
         v.object({
