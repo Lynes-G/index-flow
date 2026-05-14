@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import {
@@ -17,8 +18,18 @@ import {
   Square,
   User,
   GripVertical,
+  Plus,
+  ArrowUp,
+  ArrowDown,
+  MapPin,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
@@ -27,6 +38,27 @@ import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/getBaseUrl";
+import {
+  getSocialPlatformIcon,
+  socialPlatforms,
+  type SocialPlatform,
+} from "@/lib/socialPlatforms";
+import {
+  applyPreferredPhoneCountry,
+  resolveLocalePhoneCountry,
+} from "@/lib/profileFieldCountry";
+import { normalizeSocialUrl } from "@/lib/socialLinks";
+import ProfileQrCard from "@/components/ProfileQrCard";
+import ProfileDetails from "@/components/ProfileDetails";
+import {
+  formatPhoneDraft,
+  formatPhoneValue,
+  getCountryOptions,
+  type ProfileFieldInput,
+  type ProfileFieldType,
+  normalizeProfileFields,
+} from "@/lib/profileFields";
 import {
   BackgroundType,
   LinkStyle,
@@ -109,17 +141,66 @@ const patternOptions = [
   },
 ];
 
-const socialPlatforms = [
-  "Instagram",
-  "TikTok",
-  "YouTube",
-  "X",
-  "LinkedIn",
-  "GitHub",
-  "Twitch",
-  "Facebook",
-  "Website",
+const profileFieldTypeOptions: Array<{
+  value: ProfileFieldType;
+  label: string;
+}> = [
+  { value: "phone", label: "Phone" },
+  { value: "email", label: "Email" },
+  { value: "freeText", label: "Free text" },
 ];
+
+const createProfileFieldDraft = (
+  type: ProfileFieldType = "phone",
+  defaultCountry = "US",
+): ProfileFieldInput => ({
+  id:
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  type,
+  title: "",
+  value: "",
+  ...(type === "phone" ? { country: defaultCountry } : {}),
+});
+
+const detectCountryFromLocation = async () => {
+  if (typeof navigator === "undefined" || !navigator.geolocation) {
+    throw new Error("Geolocation is not supported on this device.");
+  }
+
+  const position = await new Promise<GeolocationPosition>((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: false,
+      timeout: 10000,
+      maximumAge: 300000,
+    }),
+  );
+
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=3&addressdetails=1`,
+    {
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Country lookup failed.");
+  }
+
+  const data = (await response.json()) as {
+    address?: { country_code?: string };
+  };
+  const countryCode = data.address?.country_code?.toUpperCase();
+
+  if (!countryCode) {
+    throw new Error("No country found for your location.");
+  }
+
+  return countryCode;
+};
 
 type CustomizationTab = "essentials" | "layout" | "media" | "bio";
 
@@ -204,12 +285,6 @@ const extractGradientColors = (value?: string) => {
   };
 };
 
-const normalizeUrl = (url: string) => {
-  if (!url) return url;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `https://${url}`;
-};
-
 const snapshotFromForm = (data: {
   description: string;
   accentColor: string;
@@ -217,6 +292,7 @@ const snapshotFromForm = (data: {
   fontFamily: string;
   layoutStyle: LayoutStyle;
   linkStyle: LinkStyle;
+  featuredLinkId: Id<"links"> | null;
   backgroundType: BackgroundType;
   backgroundValue?: string;
   backgroundSolidColor: string;
@@ -227,6 +303,7 @@ const snapshotFromForm = (data: {
   bannerImagePositionX: number;
   bannerImagePositionY: number;
   avatarShape: AvatarShape;
+  profileFields: ProfileFieldInput[];
   socialLinks: Array<{ platform: string; url: string }>;
 }) => {
   return JSON.stringify({
@@ -236,6 +313,7 @@ const snapshotFromForm = (data: {
     fontFamily: data.fontFamily,
     layoutStyle: data.layoutStyle,
     linkStyle: data.linkStyle,
+    featuredLinkId: data.featuredLinkId,
     backgroundType: data.backgroundType,
     backgroundValue: data.backgroundValue,
     backgroundSolidColor: data.backgroundSolidColor,
@@ -246,6 +324,7 @@ const snapshotFromForm = (data: {
     bannerImagePositionX: data.bannerImagePositionX,
     bannerImagePositionY: data.bannerImagePositionY,
     avatarShape: data.avatarShape,
+    profileFields: normalizeProfileFields(data.profileFields),
     socialLinks: data.socialLinks,
   });
 };
@@ -280,6 +359,14 @@ const CustomizationForm = () => {
     api.lib.userCustomization.getUserCustomizations,
     user ? { userId: user.id } : "skip",
   );
+  const userLinks = useQuery(
+    api.lib.links.getLinksByUserId,
+    user ? { userId: user.id } : "skip",
+  );
+  const currentSlug = useQuery(
+    api.lib.usernames.getUserSlug,
+    user ? { userId: user.id } : "skip",
+  );
 
   const defaultPreset = resolveThemePreset(defaultThemePresetKey);
   const defaultGradient = extractGradientColors(defaultPreset.background.value);
@@ -301,6 +388,7 @@ const CustomizationForm = () => {
     fontFamily: defaultPreset.fontFamily,
     layoutStyle: defaultPreset.layoutStyle,
     linkStyle: defaultPreset.linkStyle,
+    featuredLinkId: null as Id<"links"> | null,
     backgroundType: defaultBackgroundType,
     backgroundValue:
       defaultPreset.background.type === "gradient"
@@ -314,6 +402,7 @@ const CustomizationForm = () => {
     bannerImagePositionX: 50,
     bannerImagePositionY: 50,
     avatarShape: "circle" as AvatarShape,
+    profileFields: [] as ProfileFieldInput[],
     socialLinks: [] as Array<{ platform: string; url: string }>,
   };
 
@@ -322,17 +411,21 @@ const CustomizationForm = () => {
     snapshotFromForm(initialFormState),
   );
   const [previewCompact, setPreviewCompact] = useState(false);
-  const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<CustomizationTab>("essentials");
 
   const [gradientColors, setGradientColors] = useState(() =>
     extractGradientColors(defaultPreset.background.value),
   );
 
-  const [socialDraft, setSocialDraft] = useState({
+  const [socialDraft, setSocialDraft] = useState<{
+    platform: SocialPlatform;
+    url: string;
+  }>({
     platform: socialPlatforms[0],
     url: "",
   });
+  const [locationCountry, setLocationCountry] = useState<string | null>(null);
+  const [isLocatingCountry, setIsLocatingCountry] = useState(false);
 
   const [isLoading, startTransition] = useTransition();
   const [isUploading, startUploading] = useTransition();
@@ -341,6 +434,16 @@ const CustomizationForm = () => {
     const fonts = new Set(themePresetList.map((preset) => preset.fontFamily));
     return Array.from(fonts);
   }, []);
+  const countryOptions = useMemo(() => getCountryOptions(), []);
+  const localePhoneCountry = useMemo(() => {
+    if (typeof navigator === "undefined") return "US";
+
+    return resolveLocalePhoneCountry(
+      [navigator.language, ...(navigator.languages || [])],
+      countryOptions.map((country) => country.code),
+    );
+  }, [countryOptions]);
+  const preferredPhoneCountry = locationCountry || localePhoneCountry;
 
   useEffect(() => {
     if (existingCustomization) {
@@ -368,6 +471,7 @@ const CustomizationForm = () => {
           preset.layoutStyle) as LayoutStyle,
         linkStyle: (existingCustomization.linkStyle ||
           preset.linkStyle) as LinkStyle,
+        featuredLinkId: existingCustomization.featuredLinkId ?? null,
         backgroundType: isPatternLegacy
           ? "solid"
           : (loadedBackgroundType as BackgroundType),
@@ -389,22 +493,68 @@ const CustomizationForm = () => {
         bannerImagePositionY: existingCustomization.bannerImagePositionY ?? 50,
         avatarShape: (existingCustomization.avatarShape ||
           "circle") as AvatarShape,
+        profileFields: applyPreferredPhoneCountry(
+          existingCustomization.profileFields || [],
+          preferredPhoneCountry,
+        ),
         socialLinks: existingCustomization.socialLinks || [],
       };
 
       setFormData(nextFormData);
       setSavedSnapshot(snapshotFromForm(nextFormData));
     }
-  }, [existingCustomization]);
+  }, [defaultPatternValue, existingCustomization, preferredPhoneCountry]);
 
   useEffect(() => {
-    if (!previewSheetOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
+    setFormData((prev) => {
+      const hasMissingPhoneCountry = prev.profileFields.some(
+        (field) => field.type === "phone" && !field.country,
+      );
+
+      if (!hasMissingPhoneCountry) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        profileFields: applyPreferredPhoneCountry(
+          prev.profileFields,
+          preferredPhoneCountry,
+        ),
+      };
+    });
+  }, [preferredPhoneCountry]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const autofillCountryFromLocation = async () => {
+      try {
+        const detectedCountry = await detectCountryFromLocation();
+        if (isCancelled) return;
+
+        setLocationCountry(detectedCountry);
+        setFormData((prev) => ({
+          ...prev,
+          profileFields: prev.profileFields.map((field) => {
+            if (field.type !== "phone") return field;
+            if (field.country) return field;
+            return { ...field, country: detectedCountry };
+          }),
+        }));
+      } catch (error) {
+        if (!isCancelled) {
+          console.log("Automatic location country detection skipped", error);
+        }
+      }
     };
-  }, [previewSheetOpen]);
+
+    autofillCountryFromLocation();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const handleGradientChange = (key: "start" | "end", value: string) => {
     const nextColors = { ...gradientColors, [key]: value };
@@ -430,6 +580,7 @@ const CustomizationForm = () => {
           fontFamily: formData.fontFamily || undefined,
           layoutStyle: formData.layoutStyle || undefined,
           linkStyle: formData.linkStyle || undefined,
+          featuredLinkId: formData.featuredLinkId,
           backgroundType: formData.backgroundType || undefined,
           backgroundValue:
             formData.backgroundType === "gradient"
@@ -445,6 +596,7 @@ const CustomizationForm = () => {
           bannerImagePositionX: formData.bannerImagePositionX,
           bannerImagePositionY: formData.bannerImagePositionY,
           avatarShape: formData.avatarShape || undefined,
+          profileFields: normalizeProfileFields(formData.profileFields),
           socialLinks: formData.socialLinks,
         });
         setSavedSnapshot(snapshotFromForm(formData));
@@ -554,6 +706,97 @@ const CustomizationForm = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleProfileFieldChange = (
+    id: string,
+    updates: Partial<ProfileFieldInput>,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      profileFields: prev.profileFields.map((field) => {
+        if (field.id !== id) return field;
+
+        const nextField = { ...field, ...updates };
+
+        if (nextField.type !== "phone") {
+          delete nextField.country;
+        } else if (!nextField.country) {
+          nextField.country = preferredPhoneCountry;
+        }
+
+        if (
+          nextField.type === "phone" &&
+          (updates.value !== undefined || updates.country !== undefined)
+        ) {
+          nextField.value = formatPhoneDraft(
+            updates.value ?? nextField.value ?? "",
+            nextField.country || "US",
+          );
+        }
+
+        if (nextField.type === "email" && updates.value !== undefined) {
+          nextField.value = updates.value.trimStart();
+        }
+
+        return nextField;
+      }),
+    }));
+  };
+
+  const handleAddProfileField = (type: ProfileFieldType) => {
+    setFormData((prev) => ({
+      ...prev,
+      profileFields: [
+        ...prev.profileFields,
+        createProfileFieldDraft(type, preferredPhoneCountry),
+      ],
+    }));
+  };
+
+  const handleRemoveProfileField = (id: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      profileFields: prev.profileFields.filter((field) => field.id !== id),
+    }));
+  };
+
+  const handleMoveProfileField = (id: string, direction: "up" | "down") => {
+    setFormData((prev) => {
+      const index = prev.profileFields.findIndex((field) => field.id === id);
+      if (index === -1) return prev;
+
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.profileFields.length) {
+        return prev;
+      }
+
+      const nextFields = [...prev.profileFields];
+      const [item] = nextFields.splice(index, 1);
+      nextFields.splice(targetIndex, 0, item);
+
+      return {
+        ...prev,
+        profileFields: nextFields,
+      };
+    });
+  };
+
+  const handleUseLocationForPhone = (id: string) => {
+    startTransition(async () => {
+      setIsLocatingCountry(true);
+      try {
+        const country = await detectCountryFromLocation();
+        setLocationCountry(country);
+        handleProfileFieldChange(id, { country });
+        toast.success("Country updated from your location.");
+      } catch (error) {
+        console.log("Failed to detect country from location", error);
+        toast.error("Could not detect your country automatically.");
+      } finally {
+        setIsLocatingCountry(false);
+      }
+    });
+  };
+
   const dragStateRef = useRef<{
     type: "background" | "banner" | null;
     startX: number;
@@ -638,7 +881,10 @@ const CustomizationForm = () => {
 
   const handleAddSocialLink = () => {
     if (!socialDraft.url) return;
-    const formattedUrl = normalizeUrl(socialDraft.url);
+    const formattedUrl = normalizeSocialUrl(
+      socialDraft.url,
+      socialDraft.platform,
+    );
     setFormData((prev) => ({
       ...prev,
       socialLinks: [
@@ -673,19 +919,29 @@ const CustomizationForm = () => {
   });
   const previewName =
     user?.username || user?.firstName || user?.lastName || "Your Name";
+  const shareSlug = currentSlug || user?.id || "your-profile";
+  const qrProfileUrl = `${getBaseUrl()}/q/${shareSlug}`;
   const previewLinks = [
     { title: "Portfolio", url: "https://example.com" },
     { title: "Latest Work", url: "https://example.com" },
     { title: "Newsletter", url: "https://example.com" },
   ];
+  const selectedFeaturedLink = useMemo(() => {
+    if (!formData.featuredLinkId) return null;
+
+    return (
+      (userLinks || []).find((link) => link._id === formData.featuredLinkId) ??
+      null
+    );
+  }, [formData.featuredLinkId, userLinks]);
 
   const sectionCardClass =
-    "rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm sm:p-5 lg:p-6";
-  const sectionHeaderClass = "flex items-start gap-3";
-  const sectionTitleClass = "text-base font-semibold text-slate-900";
-  const sectionHelpClass = "text-xs text-slate-500";
+    "rounded-[26px] border border-slate-200/80 bg-white/95 p-5 shadow-sm sm:p-6 xl:p-7";
+  const sectionHeaderClass = "flex items-start gap-3 sm:gap-4";
+  const sectionTitleClass = "text-lg font-semibold text-slate-900";
+  const sectionHelpClass = "mt-1 text-sm leading-6 text-slate-500";
   const settingsGroupClass =
-    "rounded-xl border border-slate-200/80 bg-slate-50/80 p-4";
+    "rounded-2xl border border-slate-200/80 bg-slate-50/80 p-5 sm:p-6";
   const accentGradient = `linear-gradient(135deg, ${formData.accentColor} 0%, ${formData.accentColor}aa 100%)`;
   const accentButtonStyle = {
     backgroundColor: formData.accentColor,
@@ -697,7 +953,7 @@ const CustomizationForm = () => {
 
   const previewPanel = (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-slate-900">Live preview</p>
           <p className="text-xs text-slate-500">Mirrors the public page</p>
@@ -803,6 +1059,14 @@ const CustomizationForm = () => {
                 </div>
               </div>
 
+              <div className="mt-4">
+                <ProfileDetails
+                  profileFields={formData.profileFields}
+                  accentColor={formData.accentColor}
+                  compact
+                />
+              </div>
+
               {formData.socialLinks.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {formData.socialLinks.slice(0, 3).map((link, index) => (
@@ -819,6 +1083,35 @@ const CustomizationForm = () => {
             </div>
 
             <div className="rounded-2xl border border-white/60 bg-white/95 p-4 shadow-md">
+              {selectedFeaturedLink && (
+                <div
+                  className="mb-4 rounded-2xl border bg-white/95 p-4"
+                  style={{
+                    borderColor: `${formData.accentColor}55`,
+                    boxShadow: `0 10px 24px ${formData.accentColor}12`,
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
+                        Featured Link
+                      </p>
+                      <p className="truncate text-sm font-semibold text-slate-900">
+                        {selectedFeaturedLink.title}
+                      </p>
+                      <p className="truncate text-xs text-slate-500">
+                        {selectedFeaturedLink.url}
+                      </p>
+                    </div>
+                    <span
+                      className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold text-white"
+                      style={{ backgroundColor: formData.accentColor }}
+                    >
+                      Highlighted
+                    </span>
+                  </div>
+                </div>
+              )}
               <div className={cn(previewLayoutClassMap[formData.layoutStyle])}>
                 {previewLinks.map((link, index) => (
                   <div
@@ -840,26 +1133,70 @@ const CustomizationForm = () => {
     </div>
   );
 
+  const desktopQrPanel = (
+    <section className="hidden lg:block">
+      <div className="grid gap-6 rounded-3xl border border-slate-200/80 bg-slate-50/85 p-6 shadow-lg shadow-slate-900/5 xl:grid-cols-[minmax(0,1.1fr)_380px] xl:items-center xl:gap-8 xl:p-8">
+        <div className="space-y-4">
+          <div className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500 shadow-sm">
+            Share tools
+          </div>
+          <div className="max-w-2xl space-y-2">
+            <h3 className="text-2xl font-semibold text-slate-900">
+              Download your QR code
+            </h3>
+            <p className="text-sm leading-6 text-slate-600 sm:text-base">
+              Give this feature its own row so the page feels balanced. Your QR
+              code stays easy to find, and the layout no longer leaves an empty
+              gap beside it.
+            </p>
+          </div>
+          <div className="grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              Print it on cards, posters, or packaging for quick profile visits.
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              Share a tracked link so scans still count in your analytics flow.
+            </div>
+          </div>
+        </div>
+
+        <ProfileQrCard
+          username={shareSlug}
+          profileUrl={qrProfileUrl}
+          accentColor={formData.accentColor}
+          title="Download your QR code"
+          description="Export a tracked QR code with your username for print or sharing."
+          className="border-slate-200 bg-white/95 shadow-xl shadow-slate-900/5"
+        />
+      </div>
+    </section>
+  );
+
   return (
-    <div className="w-full rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+    <div className="w-full rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-7 lg:p-9">
+      <div className="mb-8 flex flex-col gap-4 border-b border-slate-200/80 pb-6 lg:mb-10 lg:flex-row lg:items-start lg:justify-between lg:pb-8">
+        <div className="flex items-start gap-4">
           <div
-            className="rounded-xl p-2"
+            className="rounded-2xl p-3"
             style={{ background: accentGradient }}
           >
             <Palette className="size-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">
+            <p className="mb-2 text-xs font-semibold tracking-[0.18em] text-orange-600 uppercase">
+              Customization Studio
+            </p>
+            <h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
               Customize your page
             </h2>
-            <p className="text-sm text-slate-600">
-              Shape the look and feel of your link-in-bio.
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+              Shape the look and feel of your link-in-bio with a calmer editing
+              workspace and a live preview that stays close to the controls
+              you&apos;re changing.
             </p>
           </div>
         </div>
-        <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 shadow-sm md:flex">
+        <div className="hidden items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-4 py-2 text-xs text-slate-500 shadow-sm md:flex">
           <span>Live preview</span>
           <span className="text-slate-300">•</span>
           <span>
@@ -868,41 +1205,40 @@ const CustomizationForm = () => {
         </div>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:gap-8"
-      >
-        <div className="space-y-6">
-          <div
-            className="flex flex-wrap gap-2"
-            role="tablist"
-            aria-label="Customization tabs"
-          >
-            {customizationTabs.map((tab) => {
-              const isActive = activeTab === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  role="tab"
-                  id={`tab-${tab.value}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab.value}`}
-                  className={cn(
-                    "rounded-full border px-4 py-2 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
-                    isActive
-                      ? "text-white focus-visible:ring-slate-900/30"
-                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 focus-visible:ring-slate-400",
-                  )}
-                  style={isActive ? accentButtonStyle : undefined}
-                  onClick={() => setActiveTab(tab.value)}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <div
+          className="flex flex-wrap gap-2 sm:gap-3"
+          role="tablist"
+          aria-label="Customization tabs"
+        >
+          {customizationTabs.map((tab) => {
+            const isActive = activeTab === tab.value;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                role="tab"
+                id={`tab-${tab.value}`}
+                aria-selected={isActive}
+                aria-controls={`panel-${tab.value}`}
+                className={cn(
+                  "rounded-full border px-4 py-2.5 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-5 sm:text-sm",
+                  isActive
+                    ? "text-white focus-visible:ring-slate-900/30"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 focus-visible:ring-slate-400",
+                )}
+                style={isActive ? accentButtonStyle : undefined}
+                onClick={() => setActiveTab(tab.value)}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
+        <div className="rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-3 shadow-lg shadow-slate-900/5 sm:p-4 lg:p-5">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] xl:gap-8 xl:items-start">
+            <div className="min-w-0 space-y-6">
           {activeTab === "essentials" && (
             <section
               id="panel-essentials"
@@ -1077,6 +1413,53 @@ const CustomizationForm = () => {
                         </Button>
                       ))}
                     </div>
+                  </div>
+                </div>
+                <div className={settingsGroupClass}>
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label
+                        htmlFor="featured-link"
+                        className="flex items-center gap-2"
+                      >
+                        <Sparkles className="size-4" />
+                        Featured Link
+                      </Label>
+                      <p className="text-sm text-slate-500">
+                        Pick one link to highlight at the top of your public
+                        page.
+                      </p>
+                    </div>
+                    <select
+                      id="featured-link"
+                      value={formData.featuredLinkId || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          featuredLinkId: e.target.value
+                            ? (e.target.value as Id<"links">)
+                            : null,
+                        }))
+                      }
+                      disabled={!userLinks}
+                      className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm"
+                    >
+                      <option value="">No featured link</option>
+                      {(userLinks || []).map((link) => (
+                        <option key={link._id} value={link._id}>
+                          {link.title}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-slate-500">
+                      {!userLinks
+                        ? "Loading your links..."
+                        : userLinks.length === 0
+                          ? "Add a link first, then you can feature it here."
+                          : selectedFeaturedLink
+                            ? `Previewing: ${selectedFeaturedLink.title}`
+                            : "Choose a link or keep the regular list only."}
+                    </p>
                   </div>
                 </div>
                 <div className={settingsGroupClass}>
@@ -1590,6 +1973,245 @@ const CustomizationForm = () => {
 
                 <div className={settingsGroupClass}>
                   <div className="space-y-4">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <Label className="flex items-center gap-2">
+                          Profile Fields
+                        </Label>
+                        <p className="mt-1 text-xs text-slate-500">
+                          Add repeatable phone, email, or free-text items above
+                          your social links.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {profileFieldTypeOptions.map((option) => (
+                          <Button
+                            key={option.value}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAddProfileField(option.value)}
+                            className="flex items-center gap-1"
+                          >
+                            <Plus className="size-4" />
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {formData.profileFields.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 px-4 py-6 text-sm text-slate-500">
+                        No profile fields yet. Add one to show contact details
+                        or extra info on the public page.
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {formData.profileFields.map((field, index) => {
+                          const phoneValidation =
+                            field.type === "phone" && field.value
+                              ? formatPhoneValue(field.value, field.country)
+                              : null;
+
+                          return (
+                            <div
+                              key={field.id}
+                              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                            >
+                              <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                                <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label>Field Type</Label>
+                                    <select
+                                      value={field.type}
+                                      onChange={(e) =>
+                                        handleProfileFieldChange(field.id, {
+                                          type: e.target
+                                            .value as ProfileFieldType,
+                                          value: "",
+                                        })
+                                      }
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm"
+                                    >
+                                      {profileFieldTypeOptions.map((option) => (
+                                        <option
+                                          key={option.value}
+                                          value={option.value}
+                                        >
+                                          {option.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                  <div className="min-w-0 space-y-2">
+                                    <Label>Title</Label>
+                                    <Input
+                                      value={field.title || ""}
+                                      onChange={(e) =>
+                                        handleProfileFieldChange(field.id, {
+                                          title: e.target.value,
+                                        })
+                                      }
+                                      placeholder="Optional label"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="flex shrink-0 items-center gap-1 self-end lg:self-start">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleMoveProfileField(field.id, "up")
+                                    }
+                                    disabled={index === 0}
+                                  >
+                                    <ArrowUp className="size-4" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleMoveProfileField(field.id, "down")
+                                    }
+                                    disabled={
+                                      index === formData.profileFields.length - 1
+                                    }
+                                  >
+                                    <ArrowDown className="size-4" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleRemoveProfileField(field.id)
+                                    }
+                                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                  >
+                                    <X className="size-4" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {field.type === "phone" && (
+                                <div className="space-y-3">
+                                  <div className="grid gap-3 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
+                                    <div className="min-w-0 space-y-2">
+                                      <Label>Country</Label>
+                                      <select
+                                        value={field.country || preferredPhoneCountry}
+                                        onChange={(e) =>
+                                          handleProfileFieldChange(field.id, {
+                                            country: e.target.value,
+                                          })
+                                        }
+                                        className="h-10 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm"
+                                      >
+                                        {countryOptions.map((country) => (
+                                          <option
+                                            key={country.code}
+                                            value={country.code}
+                                          >
+                                            {country.name} ({country.callingCode}
+                                            )
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div className="min-w-0 space-y-2">
+                                      <Label>Phone Number</Label>
+                                      <Input
+                                        type="tel"
+                                        value={field.value || ""}
+                                        onChange={(e) =>
+                                          handleProfileFieldChange(field.id, {
+                                            value: e.target.value,
+                                          })
+                                        }
+                                        placeholder="+1 555 123 4567"
+                                        className="w-full min-w-0"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-3">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleUseLocationForPhone(field.id)
+                                      }
+                                      disabled={isLocatingCountry}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <MapPin className="size-4" />
+                                      {isLocatingCountry
+                                        ? "Detecting..."
+                                        : "Use My Location"}
+                                    </Button>
+                                    {field.value && phoneValidation && (
+                                      <p
+                                        className={cn(
+                                          "text-xs",
+                                          phoneValidation.isValid
+                                            ? "text-emerald-600"
+                                            : "text-amber-700",
+                                        )}
+                                      >
+                                        {phoneValidation.isValid
+                                          ? `Valid number. Public display: ${phoneValidation.normalizedValue}`
+                                          : "Enter a valid phone number for the selected country."}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {field.type === "email" && (
+                                <div className="space-y-2">
+                                  <Label>Email Address</Label>
+                                  <Input
+                                    type="email"
+                                    value={field.value || ""}
+                                    onChange={(e) =>
+                                      handleProfileFieldChange(field.id, {
+                                        value: e.target.value,
+                                      })
+                                    }
+                                    placeholder="hello@example.com"
+                                  />
+                                </div>
+                              )}
+
+                              {field.type === "freeText" && (
+                                <div className="space-y-2">
+                                  <Label>Text Value</Label>
+                                  <Textarea
+                                    value={field.value || ""}
+                                    onChange={(e) =>
+                                      handleProfileFieldChange(field.id, {
+                                        value: e.target.value,
+                                      })
+                                    }
+                                    placeholder="Add a short note, role, or extra detail."
+                                    rows={3}
+                                    className="resize-vertical max-h-[200px] min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 focus-visible:border-transparent focus-visible:ring-2 focus-visible:outline-none"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className={settingsGroupClass}>
+                  <div className="space-y-4">
                     <Label className="flex items-center gap-2">
                       Social Links
                     </Label>
@@ -1599,7 +2221,7 @@ const CustomizationForm = () => {
                         onChange={(e) =>
                           setSocialDraft((prev) => ({
                             ...prev,
-                            platform: e.target.value,
+                            platform: e.target.value as SocialPlatform,
                           }))
                         }
                         className="h-10 rounded-md border border-slate-300 px-3 text-sm"
@@ -1637,13 +2259,26 @@ const CustomizationForm = () => {
                             key={`${link.platform}-${index}`}
                             className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-2"
                           >
-                            <div>
-                              <p className="text-sm font-medium text-slate-800">
-                                {link.platform}
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                {link.url}
-                              </p>
+                            <div className="flex min-w-0 items-center gap-3">
+                              {(() => {
+                                const Icon = getSocialPlatformIcon(
+                                  link.platform,
+                                );
+                                return (
+                                  <Icon
+                                    className="size-4 shrink-0 text-slate-700"
+                                    aria-hidden="true"
+                                  />
+                                );
+                              })()}
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-slate-800">
+                                  {link.platform}
+                                </p>
+                                <p className="truncate text-xs text-slate-500">
+                                  {link.url}
+                                </p>
+                              </div>
                             </div>
                             <Button
                               type="button"
@@ -1663,64 +2298,31 @@ const CustomizationForm = () => {
             </section>
           )}
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur">
-            <Button
-              type="submit"
-              disabled={isUploading || isLoading}
-              className="w-full text-white transition-opacity hover:opacity-90"
-              style={accentButtonStyle}
-            >
-              {isLoading ? "Saving..." : "Save Customizations"}
-            </Button>
-            {hasUnsavedChanges && !isLoading && (
-              <p className="mt-2 text-xs font-medium text-amber-700">
-                Unsaved changes
-              </p>
-            )}
-          </div>
-        </div>
-        <aside className="mt-8 hidden lg:sticky lg:top-6 lg:mt-0 lg:block lg:self-start">
-          {previewPanel}
-        </aside>
-      </form>
-      <button
-        type="button"
-        onClick={() => setPreviewSheetOpen(true)}
-        className="fixed right-4 bottom-4 z-30 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:opacity-90 md:hidden"
-        style={{ backgroundColor: formData.accentColor }}
-      >
-        Live preview
-      </button>
-      {previewSheetOpen && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center md:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setPreviewSheetOpen(false)}
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="relative w-full rounded-t-3xl bg-white p-4 shadow-2xl"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-900">
-                Live preview
-              </p>
-              <button
-                type="button"
-                onClick={() => setPreviewSheetOpen(false)}
-                className="rounded-full border border-slate-200 bg-white p-2 text-slate-500"
-                aria-label="Close preview"
-              >
-                <X className="size-4" />
-              </button>
             </div>
-            <div className="max-h-[75vh] overflow-auto pb-4">
+
+            <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
               {previewPanel}
-            </div>
+            </aside>
           </div>
         </div>
-      )}
+
+        <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
+          <Button
+            type="submit"
+            disabled={isUploading || isLoading}
+            className="w-full text-white transition-opacity hover:opacity-90"
+            style={accentButtonStyle}
+          >
+            {isLoading ? "Saving..." : "Save Customizations"}
+          </Button>
+          {hasUnsavedChanges && !isLoading && (
+            <p className="mt-2 text-xs font-medium text-amber-700">
+              Unsaved changes
+            </p>
+          )}
+        </div>
+      </form>
+      <div className="mt-6">{desktopQrPanel}</div>
     </div>
   );
 };
