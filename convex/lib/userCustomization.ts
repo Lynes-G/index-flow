@@ -191,7 +191,7 @@ export const updateCustomizations = mutation({
     bannerImageStorageId: v.optional(v.id("_storage")),
     bannerImagePositionX: v.optional(v.number()),
     bannerImagePositionY: v.optional(v.number()),
-    featuredLinkId: v.optional(v.id("links")),
+    featuredLinkId: v.optional(v.union(v.id("links"), v.null())),
     avatarShape: v.optional(v.string()),
     socialLinks: v.optional(
       v.array(
@@ -284,7 +284,7 @@ export const updateCustomizations = mutation({
           bannerImagePositionY: args.bannerImagePositionY,
         }),
         ...(args.featuredLinkId !== undefined && {
-          featuredLinkId: args.featuredLinkId,
+          featuredLinkId: args.featuredLinkId ?? undefined,
         }),
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
@@ -352,7 +352,7 @@ export const updateCustomizations = mutation({
         ...(args.bannerImagePositionY !== undefined && {
           bannerImagePositionY: args.bannerImagePositionY,
         }),
-        ...(args.featuredLinkId !== undefined && {
+        ...(args.featuredLinkId !== undefined && args.featuredLinkId !== null && {
           featuredLinkId: args.featuredLinkId,
         }),
         ...(args.avatarShape !== undefined && {
