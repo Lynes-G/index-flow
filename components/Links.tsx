@@ -27,6 +27,7 @@ const linkStyleMap: Record<LinkStyle, string> = {
 type LinksProps = {
   preloadedLinks?: Preloaded<typeof api.lib.links.getLinksBySlug>;
   links?: Doc<"links">[];
+  username?: string;
   accentColor: string;
   layoutStyle?: LayoutStyle;
   linkStyle?: LinkStyle;
@@ -38,12 +39,13 @@ type LinksListProps = Omit<LinksProps, "preloadedLinks"> & {
 
 const LinksList = ({
   links,
+  username: providedUsername,
   accentColor,
   layoutStyle = "stacked",
   linkStyle = "rounded",
 }: LinksListProps) => {
   const params = useParams();
-  const username = params.username as string;
+  const username = providedUsername ?? (params.username as string);
 
   const handleLinkClick = async (link: Doc<"links">) => {
     await trackLinkClick({

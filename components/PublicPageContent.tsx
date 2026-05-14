@@ -102,9 +102,10 @@ const PublicPageContent = ({
               <PublicLinksSection accentColor={accentColor}>
                 <Links
                   links={remainingLinkDocs}
+                  username={username}
                   accentColor={accentColor}
-                  layoutStyle={layoutStyle === "grid" ? "grid" : "stacked"}
-                  linkStyle={linkStyle === "outline" ? "rounded" : linkStyle}
+                  layoutStyle={layoutStyle}
+                  linkStyle={linkStyle}
                 />
               </PublicLinksSection>
             </div>
