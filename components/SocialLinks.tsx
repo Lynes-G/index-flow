@@ -1,60 +1,40 @@
 "use client";
 
+import { normalizeSocialUrl } from "@/lib/socialLinks";
+import { getSocialPlatformIcon } from "@/lib/socialPlatforms";
 import Link from "next/link";
-import type { ComponentType } from "react";
-import {
-  Instagram,
-  Youtube,
-  Twitter,
-  Linkedin,
-  Github,
-  Twitch,
-  Facebook,
-  Globe,
-  Music,
-} from "lucide-react";
-
-const platformIcons: Record<string, ComponentType<{ className?: string }>> = {
-  Instagram,
-  TikTok: Music,
-  YouTube: Youtube,
-  X: Twitter,
-  LinkedIn: Linkedin,
-  GitHub: Github,
-  Twitch,
-  Facebook,
-  Website: Globe,
-};
 
 const SocialLinks = ({
   socialLinks,
   accentColor,
+  compact = false,
 }: {
   socialLinks: Array<{ platform: string; url: string }>;
   accentColor: string;
+  compact?: boolean;
 }) => {
   if (socialLinks.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2.5 lg:justify-start">
+    <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-center">
       {socialLinks.map((link, index) => {
-        const Icon = platformIcons[link.platform] || Globe;
+        const Icon = getSocialPlatformIcon(link.platform);
+        const href = normalizeSocialUrl(link.url, link.platform);
         return (
           <Link
             key={`${link.platform}-${index}`}
-            href={link.url}
-            className="group inline-flex items-center gap-2 rounded-full border bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:bg-white"
-            style={{ borderColor: `${accentColor}30` }}
+            href={href}
+            className={`group inline-flex items-center rounded-full border border-white/70 text-slate-700 shadow-sm shadow-slate-950/5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white ${
+              compact
+                ? "gap-1.5 bg-white/80 px-2.5 py-1.5 text-[11px] font-medium"
+                : "gap-2 bg-white/80 px-3 py-1.5 text-xs font-semibold"
+            }`}
+            style={{ borderColor: `${accentColor}26` }}
           >
-            <span
-              className="inline-flex items-center justify-center rounded-full p-1"
-              style={{
-                color: accentColor,
-                backgroundColor: `${accentColor}22`,
-              }}
-            >
-              <Icon className="size-3.5" />
-            </span>
+            <Icon
+              className={`shrink-0 ${compact ? "size-3.5" : "size-4"}`}
+              style={{ color: accentColor }}
+            />
             {link.platform}
           </Link>
         );

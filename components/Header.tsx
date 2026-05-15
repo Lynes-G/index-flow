@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { CreditCard, Plus } from "lucide-react";
@@ -29,12 +30,20 @@ const Header = ({ isFixed = false }: { isFixed?: boolean }) => {
         isFixed && "fixed top-0 z-50",
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-4 xl:px-2">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-4 lg:px-8">
         <Link
           href="/dashboard"
-          className="text-2xl font-bold text-gray-900 dark:text-white"
+          className="flex items-center"
+          aria-label="IndexFlow home"
         >
-          IndexFlow
+          <Image
+            src="/indexflow-light.svg"
+            alt="IndexFlow"
+            width={150}
+            height={34}
+            className="h-6 w-auto"
+            priority
+          />
         </Link>
         <Authenticated>
           <div className="flex flex-nowrap items-center gap-2 rounded-lg border border-white/20 bg-white/50 p-2 backdrop-blur-sm">

@@ -183,7 +183,7 @@ export default async function Home() {
             <h2 className="mb-6 text-4xl font-bold text-gray-900 lg:text-5xl">
               Loved by Creators
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="mx-auto max-w-2xl text-xl text-gray-600">
               See what our users have to say about IndexFlow.
             </p>
           </div>
@@ -220,8 +220,8 @@ export default async function Home() {
 
       {/* CTA Section */}
       <section className="px-4 py-20 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <div className="rounded-3xl bg-linear-to-r from-blue-500 to-purple-600 p-12 text-center text-white shadow-2xl shadow-gray-200/50 lg:p-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-4xl rounded-3xl bg-linear-to-r from-blue-500 to-purple-600 p-12 text-center text-white shadow-2xl shadow-gray-200/50 lg:p-16">
             <h2 className="mb-6 text-4xl font-bold lg:text-5xl">
               Ready to get started?
             </h2>

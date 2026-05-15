@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getBaseUrl } from "@/lib/getBaseUrl";
@@ -177,7 +178,7 @@ const PublicPageFooter = ({
         : "";
 
   return (
-    <div
+    <footer
       className={cn(
         "mt-10 pt-8 text-center",
         footerTone === "dark"
@@ -185,26 +186,35 @@ const PublicPageFooter = ({
           : "border-t border-white/30",
       )}
     >
-      <p
+      <div
         className={cn(
-          "inline-flex items-center gap-1 text-sm",
+          "inline-flex min-w-[190px] flex-col items-center gap-2 px-4 text-sm sm:min-w-[280px]",
           footerTone === "dark" ? "text-white/70" : "text-slate-600",
           footerPillClass,
         )}
       >
-        Powered by{" "}
+        <span>Powered by:</span>
         <Link
           href={getBaseUrl() + "/"}
           className={cn(
-            "font-semibold hover:underline",
+            "inline-flex items-center justify-center font-semibold hover:underline",
             footerTone === "dark" ? "text-white" : "text-slate-900",
           )}
           style={footerTone === "dark" ? undefined : { color: accentColor }}
+          aria-label="Built by nullIsOne"
         >
-          IndexFlow
+          <span className="rounded-md bg-slate-950 p-1">
+            <Image
+              src="/nullIsOne2.svg"
+              alt="nullIsOne logo"
+              width={32}
+              height={32}
+              className="h-8 w-auto shrink-0"
+            />
+          </span>
         </Link>
-      </p>
-    </div>
+      </div>
+    </footer>
   );
 };
 

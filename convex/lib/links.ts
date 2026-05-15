@@ -1,5 +1,28 @@
 import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
+import { normalizeExternalUrl } from "../../lib/externalLinks";
+
+const normalizeLinkInput = (title: string, url: string) => {
+  const normalizedTitle = title.trim();
+  const normalizedUrl = normalizeExternalUrl(url);
+
+  if (!normalizedTitle) {
+    throw new Error("Title is required");
+  }
+
+  if (normalizedTitle.length > 100) {
+    throw new Error("Title must be less than 100 characters");
+  }
+
+  if (!normalizedUrl) {
+    throw new Error("Please enter a valid http or https URL");
+  }
+
+  return {
+    title: normalizedTitle,
+    url: normalizedUrl,
+  };
+};
 
 // 🔍 Get links by user slug (username or clerk ID)
 export const getLinksBySlug = query({
@@ -121,13 +144,14 @@ export const updateLink = mutation({
   handler: async ({ db, auth }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
+    const normalizedInput = normalizeLinkInput(args.title, args.url);
 
     const link = await db.get(args.linkId);
     if (!link || link.userId !== identity.subject) {
       throw new Error("Link not found or unauthorized");
     }
 
-    await db.patch(args.linkId, { title: args.title, url: args.url });
+    await db.patch(args.linkId, normalizedInput);
     return null;
   },
 });
@@ -152,6 +176,7 @@ export const createLink = mutation({
   handler: async ({ db, auth }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
+    const normalizedInput = normalizeLinkInput(args.title, args.url);
 
     // Determine the order for the new link
     const existingLinks = await db
@@ -163,9 +188,39 @@ export const createLink = mutation({
 
     return await db.insert("links", {
       userId: identity.subject,
-      title: args.title,
-      url: args.url,
+      title: normalizedInput.title,
+      url: normalizedInput.url,
       order: newOrder,
     });
+  },
+});
+
+export const getTrackableLink = query({
+  args: {
+    userId: v.string(),
+    linkId: v.string(),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      title: v.string(),
+      url: v.string(),
+    }),
+  ),
+  handler: async ({ db }, args) => {
+    const links = await db
+      .query("links")
+      .withIndex("by_user_and_order", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    const link = links.find((entry) => entry._id.toString() === args.linkId);
+    if (!link) {
+      return null;
+    }
+
+    return {
+      title: link.title,
+      url: link.url,
+    };
   },
 });

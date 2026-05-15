@@ -17,6 +17,7 @@ import { useState, useTransition } from "react";
 import { Input } from "./ui/input";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { normalizeExternalUrl } from "@/lib/externalLinks";
 import { toast } from "sonner";
 
 const SortableItem = ({
@@ -53,18 +54,16 @@ const SortableItem = ({
 
     startTransition(async () => {
       try {
-        let processedUrl = editUrl;
-        if (
-          !processedUrl.startsWith("https://") &&
-          !processedUrl.startsWith("http://")
-        ) {
-          processedUrl = "https://" + processedUrl;
+        const processedUrl = normalizeExternalUrl(editUrl);
+        if (!processedUrl) {
+          toast.error("Please enter a valid http or https URL.");
+          return;
         }
 
         await updateLink({
           linkId: id,
           title: editTitle.trim(),
-          url: processedUrl.trim(),
+          url: processedUrl,
         });
         setIsEditing(false);
         toast.success("Link updated successfully!");

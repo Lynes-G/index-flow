@@ -123,7 +123,7 @@ const DashboardPage = async () => {
         </div>
       </div>
       {/* Page customization section*/}
-      <div className="rounded-3xl bg-slate-50/80 p-3 sm:p-4 lg:p-8">
+      <div className="rounded-3xl bg-slate-50/80 p-3 sm:p-5 lg:p-10">
         <div className="mx-auto max-w-7xl">
           <CustomizationForm />
         </div>

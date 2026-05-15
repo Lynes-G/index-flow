@@ -121,3 +121,76 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .star-border-container {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: inherit;
+    isolation: isolate;
+  }
+
+  .star-border-halo {
+    position: absolute;
+    inset: -18%;
+    z-index: 0;
+    filter: blur(26px);
+    opacity: 0.9;
+    pointer-events: none;
+    animation-name: star-border-halo;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .star-border-orbit {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 2.5px;
+    animation-name: star-border-orbit;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.82))
+      drop-shadow(0 0 24px rgba(255, 255, 255, 0.46));
+    opacity: 0.96;
+    will-change: transform;
+  }
+}
+
+@keyframes star-border-halo {
+  0% {
+    transform: scale(0.985);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.025);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: scale(0.985);
+    opacity: 0.72;
+  }
+}
+
+@keyframes star-border-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

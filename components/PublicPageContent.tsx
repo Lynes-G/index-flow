@@ -93,6 +93,7 @@ const PublicPageContent = ({
                 username={username}
                 link={featuredLinkDoc}
                 accentColor={accentColor}
+                variant="star-border"
               />
             </div>
           )}

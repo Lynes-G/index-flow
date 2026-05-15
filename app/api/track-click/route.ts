@@ -3,15 +3,22 @@ import { geolocation } from "@vercel/functions";
 import { api } from "@/convex/_generated/api";
 import { ServerTrackingEvent, ClientTrackingData } from "@/lib/types";
 import { getClient } from "@/convex/lib/client";
+import { z } from "zod";
+
+const trackingEventSchema = z.object({
+  profileUsername: z.string().trim().min(1).max(100),
+  linkId: z.string().trim().min(1).max(128),
+  eventType: z.literal("link_click").optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
     let data: ClientTrackingData;
     try {
-      data = await request.json();
+      data = trackingEventSchema.parse(await request.json());
     } catch {
       return NextResponse.json(
-        { error: "Invalid JSON in request body" },
+        { error: "Invalid tracking payload" },
         { status: 400 },
       );
     }
@@ -25,27 +32,32 @@ export async function POST(request: NextRequest) {
 
     if (!userId)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const link = await convex.query(api.lib.links.getTrackableLink, {
+      userId,
+      linkId: data.linkId,
+    });
+
+    if (!link) {
+      return NextResponse.json({ error: "Link not found" }, { status: 404 });
+    }
 
     const trackingEvent: ServerTrackingEvent = {
-      ...data, // Client data
-      eventType: data.eventType || "link_click",
+      ...data,
+      eventType: "link_click",
+      linkTitle: link.title,
+      linkUrl: link.url,
 
-      // Server data
       timestamp: new Date().toISOString(),
       profileUserId: userId,
       location: {
         ...geo,
       },
-      userAgent:
-        data.userAgent || request.headers.get("user-agent") || "unknown",
+      userAgent: request.headers.get("user-agent") || "unknown",
+      referrer: request.headers.get("referer") || "direct",
     };
-
-    // Send to Tinybird Events API
-    console.log("Sending event to Tinybird:", trackingEvent);
 
     if (process.env.TINYBIRD_TOKEN && process.env.TINYBIRD_HOST) {
       try {
-        // Send location as nested object to match schema json paths
         const eventForTinybird = {
           timestamp: trackingEvent.timestamp,
           profileUsername: trackingEvent.profileUsername,
@@ -64,10 +76,6 @@ export async function POST(request: NextRequest) {
             longitude: trackingEvent.location.longitude || 0,
           },
         };
-        console.log(
-          "Sending event to Tinybird",
-          JSON.stringify(eventForTinybird, null, 2),
-        );
 
         const tinybirdResponse = await fetch(
           `${process.env.TINYBIRD_HOST}/v0/events?name=link_clicks`,
@@ -88,9 +96,6 @@ export async function POST(request: NextRequest) {
             tinybirdResponse.status,
             errorText,
           );
-        } else {
-          const responseBody = await tinybirdResponse.text();
-          console.log("Tinybird response body:", responseBody);
         }
       } catch (tinybirdErr) {
         console.error("Tinybird request failed:", tinybirdErr);

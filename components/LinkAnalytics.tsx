@@ -1,4 +1,5 @@
 import { LinkAnalyticsData } from "@/lib/fetchLinkAnalytics";
+import { normalizeExternalUrl } from "@/lib/externalLinks";
 import { Protect } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import {
@@ -21,6 +22,7 @@ interface LinkAnalyticsProps {
 const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
   const { has } = await auth();
   const hasAnalyticsAccess = has({ feature: "analytics" });
+  const analyticsLinkHref = normalizeExternalUrl(analytics.linkUrl);
 
   const formDate = ({ dateString }: { dateString: string | null }) => {
     if (!dateString) return "N/A";
@@ -32,7 +34,12 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
 
   const formatUrl = (url: string) => {
     try {
-      const urlObj = new URL(url);
+      const safeUrl = normalizeExternalUrl(url);
+      if (!safeUrl) {
+        return url;
+      }
+
+      const urlObj = new URL(safeUrl);
       return urlObj.hostname.replace("www.", "");
     } catch {
       return url;
@@ -110,13 +117,20 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
               <h1 className="mb-2 text-3xl font-bold text-gray-900">
                 {analytics.linkTitle}
               </h1>
-              <Link
-                href={analytics.linkUrl}
-                className="flex items-center gap-2 text-gray-600"
-              >
-                <ExternalLink className="size-4" />
-                <span className="text-sm">{formatUrl(analytics.linkUrl)}</span>
-              </Link>
+              {analyticsLinkHref ? (
+                <Link
+                  href={analyticsLinkHref}
+                  className="flex items-center gap-2 text-gray-600"
+                >
+                  <ExternalLink className="size-4" />
+                  <span className="text-sm">{formatUrl(analytics.linkUrl)}</span>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <ExternalLink className="size-4" />
+                  <span className="text-sm">{formatUrl(analytics.linkUrl)}</span>
+                </div>
+              )}
             </div>
 
             {/* Summary Metrics */}

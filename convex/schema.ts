@@ -1,6 +1,8 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+import { profileFieldsValidator } from "./lib/profileFieldsValidator";
+
 // The schema is entirely optional.
 // You can delete this file (schema.ts) and the
 // app will continue to work.
@@ -44,6 +46,7 @@ export default defineSchema({
     bannerImagePositionY: v.optional(v.number()),
     featuredLinkId: v.optional(v.id("links")),
     avatarShape: v.optional(v.string()),
+    profileFields: profileFieldsValidator,
     socialLinks: v.optional(
       v.array(
         v.object({

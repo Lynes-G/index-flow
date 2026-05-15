@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isSafeExternalUrl } from "@/lib/externalLinks";
 
 export const usernameFormSchema = z.object({
   username: z
@@ -17,6 +18,13 @@ export const createLinkFormSchema = z.object({
     .string()
     .min(1, "Title is required")
     .max(100, "Title must be less than 100 characters"),
-  url: z.url("Please enter a valid URL"),
+  url: z
+    .string()
+    .trim()
+    .min(1, "URL is required")
+    .refine(
+      (value) => isSafeExternalUrl(value),
+      "Please enter a valid http or https URL",
+    ),
 });
 export type CreateLinkFormData = z.infer<typeof createLinkFormSchema>;

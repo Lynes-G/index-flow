@@ -3,6 +3,8 @@
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
 
+import { profileFieldsValidator } from "./profileFieldsValidator";
+
 // Get customizations by user ID
 export const getUserCustomizations = query({
   args: { userId: v.string() },
@@ -35,6 +37,7 @@ export const getUserCustomizations = query({
       bannerImagePositionY: v.optional(v.number()),
       featuredLinkId: v.optional(v.id("links")),
       avatarShape: v.optional(v.string()),
+      profileFields: profileFieldsValidator,
       socialLinks: v.optional(
         v.array(
           v.object({
@@ -111,6 +114,7 @@ export const getCustomizationBySlug = query({
       bannerImagePositionY: v.optional(v.number()),
       featuredLinkId: v.optional(v.id("links")),
       avatarShape: v.optional(v.string()),
+      profileFields: profileFieldsValidator,
       socialLinks: v.optional(
         v.array(
           v.object({
@@ -193,6 +197,7 @@ export const updateCustomizations = mutation({
     bannerImagePositionY: v.optional(v.number()),
     featuredLinkId: v.optional(v.union(v.id("links"), v.null())),
     avatarShape: v.optional(v.string()),
+    profileFields: profileFieldsValidator,
     socialLinks: v.optional(
       v.array(
         v.object({
@@ -289,6 +294,9 @@ export const updateCustomizations = mutation({
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
         }),
+        ...(args.profileFields !== undefined && {
+          profileFields: args.profileFields,
+        }),
         ...(args.socialLinks !== undefined && {
           socialLinks: args.socialLinks,
         }),
@@ -357,6 +365,9 @@ export const updateCustomizations = mutation({
         }),
         ...(args.avatarShape !== undefined && {
           avatarShape: args.avatarShape,
+        }),
+        ...(args.profileFields !== undefined && {
+          profileFields: args.profileFields,
         }),
         ...(args.socialLinks !== undefined && {
           socialLinks: args.socialLinks,

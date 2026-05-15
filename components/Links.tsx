@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { trackLinkClick } from "@/lib/analytics";
+import { normalizeExternalUrl } from "@/lib/externalLinks";
 import { LayoutStyle, LinkStyle } from "@/lib/themePresets";
 import { cn } from "@/lib/utils";
 import { Preloaded, usePreloadedQuery } from "convex/react";
@@ -51,8 +52,6 @@ const LinksList = ({
     await trackLinkClick({
       profileUsername: username,
       linkId: link._id.toString(),
-      linkTitle: link.title,
-      linkUrl: link.url,
     });
   };
 
@@ -74,18 +73,14 @@ const LinksList = ({
 
   return (
     <div className={layoutClassMap[layoutStyle]}>
-      {links.map((link, index) => (
-        <Link
-          key={link._id}
-          href={link.url}
-          className="group block w-full"
-          style={{ animationDelay: `${index * 50}ms` }}
-          onClick={() => handleLinkClick(link)}
-        >
+      {links.map((link, index) => {
+        const safeHref = normalizeExternalUrl(link.url);
+        const card = (
           <div
             className={cn(
               "relative px-5 py-4 transition-all duration-300 hover:-translate-y-0.5 lg:px-6 lg:py-5",
               linkStyleMap[linkStyle],
+              safeHref ? "cursor-pointer" : "cursor-not-allowed opacity-70",
             )}
             style={{
               borderColor: `${accentColor}2e`,
@@ -113,8 +108,32 @@ const LinksList = ({
               </div>
             </div>
           </div>
-        </Link>
-      ))}
+        );
+
+        if (!safeHref) {
+          return (
+            <div
+              key={link._id}
+              className="group block w-full"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              {card}
+            </div>
+          );
+        }
+
+        return (
+          <Link
+            key={link._id}
+            href={safeHref}
+            className="group block w-full"
+            style={{ animationDelay: `${index * 50}ms` }}
+            onClick={() => handleLinkClick(link)}
+          >
+            {card}
+          </Link>
+        );
+      })}
     </div>
   );
 };

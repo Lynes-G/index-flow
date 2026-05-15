@@ -17,6 +17,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { normalizeExternalUrl } from "@/lib/externalLinks";
 
 const CreateLinkForm = () => {
   const [error, setError] = useState<string | null>(null);
@@ -37,9 +38,15 @@ const CreateLinkForm = () => {
     setError(null);
     startTransition(async () => {
       try {
+        const normalizedUrl = normalizeExternalUrl(data.url);
+        if (!normalizedUrl) {
+          setError("Please enter a valid http or https URL");
+          return;
+        }
+
         await createLink({
           title: data.title,
-          url: data.url,
+          url: normalizedUrl,
         });
         router.push("/dashboard");
       } catch (err) {

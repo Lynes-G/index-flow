@@ -4,18 +4,18 @@ import { Geo } from "@vercel/functions";
 export interface ClientTrackingData {
   profileUsername: string;
   linkId: string;
-  linkTitle: string;
-  linkUrl: string;
   eventType?: "link_click" | "qr_scan";
-  userAgent?: string;
-  referrer?: string;
 }
 
 // Complete server-side tracking event with additional data
 // Note: use profileUserId for queries as username can change
 export interface ServerTrackingEvent extends ClientTrackingData {
+  linkTitle: string;
+  linkUrl: string;
   profileUserId: string;
   location: Geo;
   timestamp: string;
   eventType: "link_click" | "qr_scan";
+  userAgent: string;
+  referrer: string;
 }
