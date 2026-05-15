@@ -53,6 +53,7 @@ CLAUDE.md
 .claude/
 .superpowers/
 .qa-dev.err
+.qa-dev.out
 eslint.config.mjs
 tmp-pnpm-dev-err.log
 tmp-pnpm-dev-out.log
