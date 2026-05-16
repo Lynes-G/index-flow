@@ -84,6 +84,25 @@ IndexFlow is a modern link-in-bio application that allows users to create person
 2. Add your Clerk publishable key and secret key to `.env.local`.
 3. Configure JWT issuer domain in Convex dashboard.
 
+### Invite Email Setup
+
+To use professional admin invite delivery with Resend, configure these environment variables:
+
+```env
+RESEND_API_KEY=re_...
+INVITE_FROM_EMAIL=noreply@mail.nullis.one
+NEXT_PUBLIC_APP_URL=https://indexflow.nullis.one
+ADMIN_USER_IDS=user_...
+CLERK_JWT_ISSUER_DOMAIN=https://your-clerk-domain.clerk.accounts.dev
+```
+
+Notes:
+
+- Verify `mail.nullis.one` inside Resend before sending from `noreply@mail.nullis.one`.
+- `ADMIN_USER_IDS` should contain your Clerk `user_...` id, not your email address.
+- `CLERK_JWT_ISSUER_DOMAIN` belongs in Convex environment variables.
+- `RESEND_API_KEY` and `INVITE_FROM_EMAIL` belong in your Next.js / Vercel server environment variables.
+
 ## Usage
 
 1. **Sign Up/Login**: Use Clerk to authenticate.

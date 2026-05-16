@@ -6,7 +6,7 @@ import UsernameForm from "@/components/UsernameForm";
 import { api } from "@/convex/_generated/api";
 import { fetchAnalytics } from "@/lib/fetchAnalytics";
 import { checkTinybirdConnection } from "@/lib/checkTinybirdConnection";
-import { Protect } from "@clerk/nextjs";
+import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
 import { currentUser } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { Lock } from "lucide-react";
@@ -20,6 +20,7 @@ const DashboardPage = async () => {
     userId: user!.id,
   });
 
+  const entitlements = await getCurrentUserEntitlements();
   const isDev = process.env.NODE_ENV === "development";
   const analytics = await fetchAnalytics(user!.id);
   const tinybirdStatus = isDev ? await checkTinybirdConnection(user!.id) : null;
@@ -39,9 +40,14 @@ const DashboardPage = async () => {
         </div>
       </div>
       {/* Analytics metrics */}
-      <Protect
-        feature="analytics"
-        fallback={
+      {entitlements.canAccessAnalytics ? (
+        <Suspense fallback={<DashboardMetricsSkeleton />}>
+          <DashboardMetrics
+            analytics={analytics}
+            canAccessUltraFeatures={entitlements.canAccessUltraFeatures}
+          />
+        </Suspense>
+      ) : (
           <div className="rounded-3xl bg-slate-50/80 p-3 sm:p-4 lg:p-8">
             <div className="mx-auto max-w-7xl">
               <div className="rounded-2xl border border-slate-200/70 bg-white/90 p-5 shadow-sm sm:p-6 lg:p-8">
@@ -87,12 +93,7 @@ const DashboardPage = async () => {
               </div>
             </div>
           </div>
-        }
-      >
-        <Suspense fallback={<DashboardMetricsSkeleton />}>
-          <DashboardMetrics analytics={analytics} />
-        </Suspense>
-      </Protect>
+      )}
       {/* Tinybird status (Dev only) */}
       {isDev && tinybirdStatus && (
         <div className="rounded-3xl bg-slate-50/80 p-3 sm:p-4 lg:p-8">

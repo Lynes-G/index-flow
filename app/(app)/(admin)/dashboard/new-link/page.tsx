@@ -1,28 +1,24 @@
 import CreateLinkForm from "@/components/CreateLinkForm";
 import { api } from "@/convex/_generated/api";
+import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
 import { auth } from "@clerk/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const NewLinkPage = async () => {
-  const { has, userId } = await auth();
-
-  const hasTenLinkCapacity = has({ feature: "pro_capacity" });
-  const hasUnlimitedLinks = has({ feature: "ultra_capacity" });
+  const { userId } = await auth();
+  const entitlements = await getCurrentUserEntitlements();
+  const hasUnlimitedLinks = entitlements.linkLimit === null;
 
   const linkCount = await fetchQuery(api.lib.links.getLinkCountByUserId, {
     userId: userId || "",
   });
 
-  //   Free = 3, pro = 10, ultra = unlimited
   const access = {
-    canCreate: hasUnlimitedLinks
-      ? true
-      : hasTenLinkCapacity
-        ? linkCount < 10
-        : linkCount < 3,
-    limit: hasUnlimitedLinks ? "unlimited" : hasTenLinkCapacity ? 10 : 3,
+    canCreate:
+      entitlements.linkLimit === null ? true : linkCount < entitlements.linkLimit,
+    limit: entitlements.linkLimit ?? "unlimited",
     currentCount: linkCount,
   };
 
