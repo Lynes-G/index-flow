@@ -5,22 +5,19 @@ const steps = [
   {
     number: "01",
     title: "Shape the page",
-    description:
-      "Choose the look, headline, and featured link that should carry the first impression.",
+    description: "Set the look, headline, and first link.",
     icon: Sparkles,
   },
   {
     number: "02",
     title: "Route every audience touchpoint",
-    description:
-      "Point socials, campaigns, QR codes, and direct messages to one destination that feels intentional.",
+    description: "Send socials, campaigns, and QR traffic to one clean page.",
     icon: Link2,
   },
   {
     number: "03",
     title: "Read the response and tighten it",
-    description:
-      "Use analytics to spot what earns attention, then adjust the order, copy, or spotlight for the next push.",
+    description: "Check what earns attention, then tighten the next pass.",
     icon: BarChart3,
   },
 ];
@@ -30,17 +27,16 @@ function ProcessStrip() {
     <div id="how-it-works" className="scroll-mt-24">
       <SectionShell
         eyebrow="How it works"
-        title="A tighter publishing loop for every launch."
-        description="The template's vertical workflow pattern translates well here: build, direct traffic, then tune the next iteration using actual click behavior."
+        title="Three moves. One sharper page."
+        description="Build it, send traffic, tune the next pass."
         className="relative"
       >
         <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
           <div className="space-y-5">
             <div className="template-card rounded-[2rem] p-6">
               <p className="text-sm leading-7 text-slate-600">
-                Think of IndexFlow as the control layer between your audience and
-                your offers, content, or updates. The page gets the visual polish,
-                and the analytics keep the loop honest.
+                IndexFlow gives you one place to present the page, direct the
+                click, and read the response.
               </p>
               <div className="mt-5 inline-flex rounded-full bg-[color:var(--brand-accent)] px-4 py-2 text-sm font-semibold text-[#111216]">
                 Product-focused workflow
