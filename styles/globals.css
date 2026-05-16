@@ -194,3 +194,14 @@
     transform: rotate(360deg);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .template-marquee,
+  .template-float,
+  .template-pulse,
+  .star-border-halo,
+  .star-border-orbit {
+    animation: none !important;
+    transform: none !important;
+  }
+}

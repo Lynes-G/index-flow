@@ -32,6 +32,7 @@ function EditorialHero() {
     <section className="template-shell template-noise relative overflow-hidden px-4 pt-10 pb-16 sm:px-6 lg:px-8 lg:pt-16 lg:pb-24">
       <div className="absolute inset-0 opacity-70">
         <RippleGrid
+          className="motion-reduce:hidden"
           gridColor="#f6c266"
           rippleIntensity={0.04}
           gridSize={19}
@@ -98,7 +99,7 @@ function EditorialHero() {
         </div>
 
         <div className="relative">
-          <div className="template-float editorial-surface relative overflow-hidden rounded-[2rem] p-4 sm:p-5">
+          <div className="template-float motion-reduce:animate-none editorial-surface relative overflow-hidden rounded-[2rem] p-4 sm:p-5">
             <div className="editorial-grid absolute inset-0 opacity-30" />
             <div className="relative overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-white shadow-[0_24px_90px_rgba(15,23,42,0.12)]">
               <div className="flex items-center justify-between border-b border-slate-200/80 px-4 py-4 sm:px-5">
@@ -287,7 +288,7 @@ function EditorialHero() {
       </div>
 
       <div className="relative mx-auto mt-10 max-w-6xl overflow-hidden">
-        <div className="template-marquee flex min-w-max gap-3">
+        <div className="template-marquee motion-reduce:animate-none flex min-w-max gap-3">
           {[...logos, ...logos].map((logo, index) => (
             <div
               key={`${logo}-${index}`}
