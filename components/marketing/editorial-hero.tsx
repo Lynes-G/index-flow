@@ -122,14 +122,14 @@ function EditorialHero() {
                     </p>
                   </div>
                 </div>
-                <div className="rounded-full bg-[rgba(251,176,59,0.12)] px-3 py-1 text-xs font-semibold text-[color:var(--brand-accent-strong)]">
+                <div className="rounded-full bg-[rgba(251,176,59,0.12)] px-3 py-1 text-xs font-semibold text-[color:var(--brand-accent-ink)]">
                   Live
                 </div>
               </div>
 
               <div className="grid gap-4 p-4 sm:grid-cols-[0.8fr_1.2fr] sm:p-5">
                 <div className="template-card relative rounded-[1.65rem] p-4 text-slate-900 sm:p-5">
-                  <div className="absolute top-4 right-4 rounded-full bg-[rgba(251,176,59,0.14)] px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[color:var(--brand-accent-strong)] uppercase">
+                  <div className="absolute top-4 right-4 rounded-full bg-[rgba(251,176,59,0.14)] px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[color:var(--brand-accent-ink)] uppercase">
                     Featured
                   </div>
                   <p className="text-xs tracking-[0.2em] text-slate-500 uppercase">
@@ -190,7 +190,7 @@ function EditorialHero() {
                 <div className="grid gap-4 content-start">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="rounded-[1.5rem] border border-slate-200/90 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.98))] p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-                      <div className="flex items-center gap-3 text-[color:var(--brand-accent-strong)]">
+                      <div className="flex items-center gap-3 text-[color:var(--brand-accent-ink)]">
                         <Palette className="size-4" />
                         <span className="text-sm font-semibold">
                           Theme switch
@@ -213,7 +213,7 @@ function EditorialHero() {
                     </div>
 
                     <div className="rounded-[1.5rem] border border-slate-200/90 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.98))] p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-                      <div className="flex items-center gap-3 text-[color:var(--brand-accent-strong)]">
+                      <div className="flex items-center gap-3 text-[color:var(--brand-accent-ink)]">
                         <BarChart3 className="size-4" />
                         <span className="text-sm font-semibold">
                           Live clicks
@@ -239,7 +239,7 @@ function EditorialHero() {
 
                   <div className="grid gap-4 sm:grid-cols-[0.95fr_1.05fr]">
                     <div className="rounded-[1.5rem] border border-slate-200/90 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.98))] p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-                      <div className="flex items-center gap-3 text-[color:var(--brand-accent-strong)]">
+                      <div className="flex items-center gap-3 text-[color:var(--brand-accent-ink)]">
                         <Globe2 className="size-4" />
                         <span className="text-sm font-semibold">
                           Audience pulse
