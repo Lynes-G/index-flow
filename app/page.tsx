@@ -15,7 +15,7 @@ export default async function Home() {
     <div className="template-shell min-h-screen text-slate-900">
       <Header isFixed={true} logoHref="/" />
 
-      <main className="overflow-hidden pt-20 sm:pt-24">
+      <main className="overflow-hidden">
         <EditorialHero />
         <FeatureStoryGrid />
         <ProcessStrip />

@@ -1,7 +1,5 @@
 import { LinkAnalyticsData } from "@/lib/fetchLinkAnalytics";
 import { normalizeExternalUrl } from "@/lib/externalLinks";
-import { Protect } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import {
   ArrowLeft,
   BarChart3,
@@ -17,11 +15,15 @@ import Link from "next/link";
 
 interface LinkAnalyticsProps {
   analytics: LinkAnalyticsData;
+  canAccessAnalytics: boolean;
+  canAccessUltraFeatures: boolean;
 }
 
-const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
-  const { has } = await auth();
-  const hasAnalyticsAccess = has({ feature: "analytics" });
+const LinkAnalytics = ({
+  analytics,
+  canAccessAnalytics,
+  canAccessUltraFeatures,
+}: LinkAnalyticsProps) => {
   const analyticsLinkHref = normalizeExternalUrl(analytics.linkUrl);
 
   const formDate = ({ dateString }: { dateString: string | null }) => {
@@ -46,7 +48,7 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
     }
   };
 
-  if (!hasAnalyticsAccess) {
+  if (!canAccessAnalytics) {
     return (
       <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
         <div className="mx-auto max-w-7xl">
@@ -171,27 +173,7 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
               </div>
 
               {/* Countries reached */}
-              <Protect
-                plan="ultra"
-                fallback={
-                  <div className="rounded-2xl border border-green-200 bg-linear-to-br from-green-50 to-green-100 p-6 opacity-75">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="rounded-xl bg-green-500 p-3">
-                        <Globe className="size-6 text-white" />
-                      </div>
-                      <div className="text-green-600">
-                        <Lock className="size-5" />
-                      </div>
-                    </div>
-                    <p className="mb-1 text-sm font-medium text-green-600">
-                      Countries
-                    </p>
-                    <p className="text-3xl font-bold text-green-900">
-                      Upgrade to Ultra
-                    </p>
-                  </div>
-                }
-              >
+              {canAccessUltraFeatures ? (
                 <div className="rounded-2xl border border-green-200 bg-linear-to-br from-green-50 to-green-100 p-6">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="rounded-xl bg-green-500 p-3">
@@ -208,7 +190,24 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
                     {analytics.countriesReached.toLocaleString()}
                   </p>
                 </div>
-              </Protect>
+              ) : (
+                  <div className="rounded-2xl border border-green-200 bg-linear-to-br from-green-50 to-green-100 p-6 opacity-75">
+                    <div className="mb-4 flex items-center justify-between">
+                      <div className="rounded-xl bg-green-500 p-3">
+                        <Globe className="size-6 text-white" />
+                      </div>
+                      <div className="text-green-600">
+                        <Lock className="size-5" />
+                      </div>
+                    </div>
+                    <p className="mb-1 text-sm font-medium text-green-600">
+                      Countries
+                    </p>
+                    <p className="text-3xl font-bold text-green-900">
+                      Upgrade to Ultra
+                    </p>
+                  </div>
+              )}
             </div>
           </div>
         </div>
@@ -281,38 +280,8 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
         </div>
       )}
       {/* Countries Analytics */}
-      <Protect
-        plan="ultra"
-        fallback={
-          <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
-            <div className="mx-auto max-w-7xl">
-              <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="rounded-xl bg-gray-400 p-3">
-                    <Globe className="size-6 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Countries
-                  </h2>
-                  <p className="text-gray-600">
-                    🔒 Upgrade to Ultra to unlock country analytics
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center">
-                <div className="w-full rounded-lg bg-gray-100 p-4 text-center">
-                  <p className="text-gray-500">
-                    This feature is available on the Ultra plan.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-      >
-        {analytics.countryData.length > 0 && (
+      {canAccessUltraFeatures ? (
+        analytics.countryData.length > 0 && (
           <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
             <div className="mx-auto max-w-7xl">
               <div className="rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
@@ -376,8 +345,33 @@ const LinkAnalytics = async ({ analytics }: LinkAnalyticsProps) => {
               </div>
             </div>
           </div>
-        )}
-      </Protect>
+        )
+      ) : (
+        <div className="mb-8 bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white/80 p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="rounded-xl bg-gray-400 p-3">
+                  <Globe className="size-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Countries</h2>
+                <p className="text-gray-600">
+                  🔒 Upgrade to Ultra to unlock country analytics
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center">
+              <div className="w-full rounded-lg bg-gray-100 p-4 text-center">
+                <p className="text-gray-500">
+                  This feature is available on the Ultra plan.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* No data state */}
       {analytics.dailyData.length === 0 && (
         <div className="bg-linear-to-br from-gray-50 to-gray-100 p-4 lg:p-8">

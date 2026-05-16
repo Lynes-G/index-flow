@@ -56,4 +56,42 @@ export default defineSchema({
       ),
     ),
   }).index("by_user_id", ["userId"]),
+
+  planInvites: defineTable({
+    email: v.string(),
+    invitedPlan: v.union(v.literal("pro"), v.literal("ultra")),
+    token: v.optional(v.string()),
+    tokenHash: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("draft"),
+      v.literal("sent"),
+      v.literal("accepted"),
+      v.literal("revoked"),
+    ),
+    createdByUserId: v.string(),
+    acceptedByUserId: v.optional(v.string()),
+    createdAt: v.number(),
+    sentAt: v.optional(v.number()),
+    lastSentAt: v.optional(v.number()),
+    sendCount: v.optional(v.number()),
+    acceptedAt: v.optional(v.number()),
+    revokedAt: v.optional(v.number()),
+  })
+    .index("by_token_hash", ["tokenHash"])
+    .index("by_email", ["email"])
+    .index("by_created_by", ["createdByUserId"]),
+
+  planGrants: defineTable({
+    userId: v.string(),
+    email: v.string(),
+    plan: v.union(v.literal("pro"), v.literal("ultra")),
+    source: v.literal("admin_invite"),
+    inviteId: v.id("planInvites"),
+    grantedByUserId: v.string(),
+    grantedAt: v.number(),
+    active: v.boolean(),
+  })
+    .index("by_user_id", ["userId"])
+    .index("by_invite_id", ["inviteId"]),
 });

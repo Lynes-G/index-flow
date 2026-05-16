@@ -1,5 +1,6 @@
 import LinkAnalytics from "@/components/LinkAnalytics";
 import { fetchLinkAnalytics } from "@/lib/fetchLinkAnalytics";
+import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/dist/client/components/navigation";
 
@@ -15,6 +16,7 @@ const LinkAnalyticsPage = async ({ params }: LinkAnalyticsPageProps) => {
 
   if (!user) notFound();
 
+  const entitlements = await getCurrentUserEntitlements();
   const analytics = await fetchLinkAnalytics(user.id, id);
 
   if (!analytics) {
@@ -28,10 +30,22 @@ const LinkAnalyticsPage = async ({ params }: LinkAnalyticsPageProps) => {
       dailyData: [],
       countryData: [],
     };
-    return <LinkAnalytics analytics={emptyAnalytics} />;
+    return (
+      <LinkAnalytics
+        analytics={emptyAnalytics}
+        canAccessAnalytics={entitlements.canAccessAnalytics}
+        canAccessUltraFeatures={entitlements.canAccessUltraFeatures}
+      />
+    );
   }
 
-  return <LinkAnalytics analytics={analytics} />;
+  return (
+    <LinkAnalytics
+      analytics={analytics}
+      canAccessAnalytics={entitlements.canAccessAnalytics}
+      canAccessUltraFeatures={entitlements.canAccessUltraFeatures}
+    />
+  );
 };
 
 export default LinkAnalyticsPage;
