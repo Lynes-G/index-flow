@@ -1,4 +1,7 @@
-const LOCALHOST_APP_URL = "http://localhost:3000";
+const getLocalhostAppUrl = () => {
+  const port = process.env.PORT?.trim() || "3000";
+  return `http://localhost:${port}`;
+};
 
 const normalizeConfiguredUrl = (value: string) => {
   const trimmedValue = value.trim();
@@ -25,6 +28,10 @@ const normalizeConfiguredUrl = (value: string) => {
 };
 
 export function getAppUrl() {
+  if (process.env.NODE_ENV !== "production") {
+    return getLocalhostAppUrl();
+  }
+
   const configuredUrl =
     normalizeConfiguredUrl(process.env.NEXT_PUBLIC_APP_URL ?? "") ??
     normalizeConfiguredUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "") ??
@@ -32,10 +39,6 @@ export function getAppUrl() {
 
   if (configuredUrl) {
     return configuredUrl;
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    return LOCALHOST_APP_URL;
   }
 
   throw new Error(

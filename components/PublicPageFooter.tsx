@@ -207,7 +207,7 @@ const PublicPageFooter = ({
             <Image
               src="/nullIsOne2.svg"
               alt="nullIsOne logo"
-              width={32}
+              width={140}
               height={32}
               className="h-8 w-auto shrink-0"
             />
