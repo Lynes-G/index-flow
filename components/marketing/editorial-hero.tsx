@@ -45,7 +45,7 @@ function InsightCard({
   return (
     <div className={`${bentoCardClassName} ${className}`}>
       <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(251,176,59,0.55),transparent)] opacity-60" />
-      <div className="flex items-center gap-3 text-[color:var(--brand-accent-ink)]">
+      <div className="flex items-center gap-3 text-(--brand-accent-ink)">
         {icon}
         <span className="text-sm font-semibold">{title}</span>
       </div>
@@ -82,7 +82,7 @@ function EditorialHero() {
             <div className="space-y-5">
               <h1 className="max-w-3xl font-['Sora',sans-serif] text-5xl leading-[0.94] font-semibold tracking-[-0.07em] text-slate-900 sm:text-6xl lg:text-[4.75rem]">
                 Build a bio page
-                <span className="block text-[color:var(--brand-accent)]">
+                <span className="block text-(--brand-accent)">
                   people want to tap.
                 </span>
               </h1>
@@ -97,7 +97,7 @@ function EditorialHero() {
             <Button
               asChild
               size="lg"
-              className="h-auto rounded-full bg-[color:var(--brand-accent)] px-6 py-4 text-base font-semibold text-[#111216] shadow-[0_18px_40px_rgba(251,176,59,0.28)] hover:bg-[#ffc868]"
+              className="h-auto rounded-full bg-(--brand-accent) px-6 py-4 text-base font-semibold text-[#111216] shadow-[0_18px_40px_rgba(251,176,59,0.28)] hover:bg-[#ffc868]"
             >
               <Link href="/dashboard">
                 Start your page
@@ -108,7 +108,7 @@ function EditorialHero() {
               asChild
               size="lg"
               variant="outline"
-              className="h-auto rounded-full border-slate-200 bg-white px-6 py-4 text-base font-semibold text-slate-700 hover:border-[color:var(--brand-accent)] hover:bg-[rgba(251,176,59,0.08)] hover:text-slate-900"
+              className="h-auto rounded-full border-slate-200 bg-white px-6 py-4 text-base font-semibold text-slate-700 hover:border-(--brand-accent) hover:bg-[rgba(251,176,59,0.08)] hover:text-slate-900"
             >
               <Link href="#how-it-works">See how it works</Link>
             </Button>
@@ -128,7 +128,7 @@ function EditorialHero() {
 
         <div className="mt-14 lg:mt-20">
           <div className="mx-auto max-w-3xl text-left lg:text-center">
-            <p className="text-xs font-semibold tracking-[0.24em] text-[color:var(--brand-accent-ink)] uppercase">
+            <p className="text-xs font-semibold tracking-[0.24em] text-(--brand-accent-ink) uppercase">
               Dashboard showcase
             </p>
             <h2 className="mt-4 font-['Sora',sans-serif] text-3xl font-semibold tracking-[-0.06em] text-slate-900 sm:text-4xl">
@@ -163,14 +163,14 @@ function EditorialHero() {
                     </p>
                   </div>
                 </div>
-                <div className="rounded-full bg-[rgba(251,176,59,0.12)] px-3 py-1 text-xs font-semibold text-[color:var(--brand-accent-ink)]">
+                <div className="rounded-full bg-[rgba(251,176,59,0.12)] px-3 py-1 text-xs font-semibold text-(--brand-accent-ink)">
                   Live
                 </div>
               </div>
 
               <div className="grid gap-6 p-5 lg:grid-cols-[1.05fr_0.95fr] lg:gap-7 lg:p-7">
-                <div className="template-card relative rounded-[1.9rem] p-5 text-slate-900 shadow-[0_28px_70px_rgba(15,23,42,0.08)] transition-transform duration-300 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-6 lg:min-h-[34rem]">
-                  <div className="absolute top-5 right-5 rounded-full bg-[rgba(251,176,59,0.14)] px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[color:var(--brand-accent-ink)] uppercase">
+                <div className="template-card relative rounded-[1.9rem] p-5 text-slate-900 shadow-[0_28px_70px_rgba(15,23,42,0.08)] transition-transform duration-300 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-6 lg:min-h-136">
+                  <div className="absolute top-5 right-5 rounded-full bg-[rgba(251,176,59,0.14)] px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-(--brand-accent-ink) uppercase">
                     Featured
                   </div>
                   <p className="text-xs tracking-[0.2em] text-slate-500 uppercase">

@@ -1,8 +1,9 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
-import { useEffect, useMemo, useState } from "react";
+import { Preloaded, useMutation, usePreloadedQuery, useQuery } from "convex/react";
+import { useUser } from "@clerk/nextjs";
+import { CSSProperties, useEffect, useMemo, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -24,14 +25,54 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import SortableItem from "./SortableItem";
 import { Id } from "@/convex/_generated/dataModel";
+import { defaultThemePresetKey, resolveThemePreset } from "@/lib/themePresets";
+
+const hexToRgb = (hex: string) => {
+  const normalized = hex.replace("#", "");
+
+  if (normalized.length === 3) {
+    const [r, g, b] = normalized.split("");
+    return {
+      r: parseInt(`${r}${r}`, 16),
+      g: parseInt(`${g}${g}`, 16),
+      b: parseInt(`${b}${b}`, 16),
+    };
+  }
+
+  if (normalized.length === 6) {
+    return {
+      r: parseInt(normalized.slice(0, 2), 16),
+      g: parseInt(normalized.slice(2, 4), 16),
+      b: parseInt(normalized.slice(4, 6), 16),
+    };
+  }
+
+  return null;
+};
+
+const getAccentForeground = (accentColor: string) => {
+  const rgb = hexToRgb(accentColor);
+
+  if (!rgb) return "#ffffff";
+
+  const luminance =
+    (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+
+  return luminance > 0.62 ? "#0f172a" : "#ffffff";
+};
 
 const ManageLinks = ({
   preloadedLinks,
 }: {
   preloadedLinks: Preloaded<typeof api.lib.links.getLinksByUserId>;
 }) => {
+  const { user } = useUser();
   const links = usePreloadedQuery(preloadedLinks);
   const updateLinkOrder = useMutation(api.lib.links.updateLinkOrder);
+  const existingCustomization = useQuery(
+    api.lib.userCustomization.getUserCustomizations,
+    user ? { userId: user.id } : "skip",
+  );
 
   const [items, setItems] = useState(links.map((link) => link._id));
 
@@ -70,6 +111,10 @@ const ManageLinks = ({
 
   // ---------------------------------------------------------------
   const hasLinks = items.length > 0;
+  const defaultAccentColor =
+    resolveThemePreset(defaultThemePresetKey).accentColor;
+  const accentColor = existingCustomization?.accentColor || defaultAccentColor;
+  const accentForeground = getAccentForeground(accentColor);
 
   return (
     <>
@@ -104,7 +149,15 @@ const ManageLinks = ({
       )}
       <Button
         variant="outline"
-        className="mt-4 w-full border-blue-600 text-blue-700 transition-all duration-200 hover:border-blue-700 hover:bg-blue-600 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="mt-4 w-full border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none"
+        style={
+          {
+            "--accent-color": accentColor,
+            "--accent-foreground": accentForeground,
+            "--accent-soft": `${accentColor}12`,
+            "--accent-ring": `${accentColor}55`,
+          } as CSSProperties
+        }
         asChild
       >
         <Link

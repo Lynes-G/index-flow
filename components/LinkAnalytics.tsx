@@ -62,8 +62,8 @@ const LinkAnalytics = ({
                   Link Analytics
                 </h2>
                 <p className="text-gray-600">
-                  Upgrade your plan to access detailed analytics and insights
-                  about your link performance.
+                  Detailed analytics are available on Pro and above while
+                  billing remains paused.
                 </p>
               </div>
             </div>
@@ -83,15 +83,10 @@ const LinkAnalytics = ({
             </div>
             <div className="mt-8 rounded-lg bg-gray-50 p-4 text-center">
               <p className="text-gray-500">
-                Get detailed link analytics including total clicks, unique
-                visitors, and geographic data by upgrading your plan.
+                New accounts stay on Free by default. Pro and Ultra access
+                currently come from admin-issued invites rather than direct
+                checkout.
               </p>
-              <Link
-                href="/dashboard/billing"
-                className="mt-4 inline-block rounded-lg bg-linear-to-r from-purple-500 to-purple-600 px-6 py-2 font-medium text-white transition-opacity hover:opacity-90"
-              >
-                Upgrade Now
-              </Link>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 
 import { api } from "@/convex/_generated/api";
+import { isAdminUserId } from "@/lib/admin";
 import {
   canAccessAnalytics,
   canAccessUltraFeatures,
@@ -41,6 +42,7 @@ export const getCurrentUserEntitlements = async () => {
   const effectivePlan = resolveEffectivePlan({
     paidPlan,
     grantedPlan,
+    isAdmin: isAdminUserId(userId),
   });
 
   return {

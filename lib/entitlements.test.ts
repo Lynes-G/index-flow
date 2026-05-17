@@ -15,6 +15,13 @@ test("paid ultra stays ultra even without an admin grant", () => {
   assert.equal(resolveEffectivePlan({ paidPlan: "ultra", grantedPlan: null }), "ultra");
 });
 
+test("admin users resolve to ultra even without a paid plan or invite grant", () => {
+  assert.equal(
+    resolveEffectivePlan({ paidPlan: "free", grantedPlan: null, isAdmin: true }),
+    "ultra",
+  );
+});
+
 test("analytics is available from pro and above", () => {
   assert.equal(canAccessAnalytics("free"), false);
   assert.equal(canAccessAnalytics("pro"), true);

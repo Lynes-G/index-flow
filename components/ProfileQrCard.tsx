@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { ChevronDown, Download } from "lucide-react";
+import { CSSProperties, useEffect, useId, useRef, useState } from "react";
+import { Check, ChevronDown, Copy, Download } from "lucide-react";
 import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,40 @@ const loadImage = (src: string) =>
 const buildFileName = (username: string, format: DownloadFormat) =>
   `${username}-qr-code.${format}`;
 
+const hexToRgb = (hex: string) => {
+  const normalized = hex.replace("#", "");
+
+  if (normalized.length === 3) {
+    const [r, g, b] = normalized.split("");
+    return {
+      r: parseInt(`${r}${r}`, 16),
+      g: parseInt(`${g}${g}`, 16),
+      b: parseInt(`${b}${b}`, 16),
+    };
+  }
+
+  if (normalized.length === 6) {
+    return {
+      r: parseInt(normalized.slice(0, 2), 16),
+      g: parseInt(normalized.slice(2, 4), 16),
+      b: parseInt(normalized.slice(4, 6), 16),
+    };
+  }
+
+  return null;
+};
+
+const getAccentForeground = (accentColor: string) => {
+  const rgb = hexToRgb(accentColor);
+
+  if (!rgb) return "#ffffff";
+
+  const luminance =
+    (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+
+  return luminance > 0.62 ? "#0f172a" : "#ffffff";
+};
+
 const ProfileQrCard = ({
   username,
   profileUrl,
@@ -57,9 +91,17 @@ const ProfileQrCard = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [activeFormat, setActiveFormat] = useState<DownloadFormat | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const titleId = useId();
   const cardDescription = description || `Scan to open ${username}'s link hub`;
+  const accentForeground = getAccentForeground(accentColor);
+  const accentButtonStyle = {
+    "--accent-color": accentColor,
+    "--accent-foreground": accentForeground,
+    "--accent-soft": `${accentColor}12`,
+    "--accent-ring": `${accentColor}55`,
+  } as CSSProperties;
 
   useEffect(() => {
     if (!isDropdownOpen) return;
@@ -76,6 +118,18 @@ const ProfileQrCard = ({
       document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [isDropdownOpen]);
+
+  useEffect(() => {
+    if (!isCopied) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isCopied]);
 
   const exportRaster = async (format: "png" | "jpg") => {
     const sourceCanvas = canvasRef.current;
@@ -198,6 +252,17 @@ const ProfileQrCard = ({
     }
   };
 
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setIsCopied(true);
+      toast.success("Profile URL copied to clipboard");
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not copy the profile URL");
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -232,8 +297,31 @@ const ProfileQrCard = ({
         </div>
       </div>
 
-      <div className="mt-3 rounded-full bg-slate-100/80 px-4 py-2 text-xs text-slate-600">
-        {profileUrl}
+      <div className="mt-3 relative rounded-full bg-slate-100/80 px-12 py-2 text-xs text-slate-600">
+        <span
+          className="block truncate text-center"
+          title={profileUrl}
+        >
+          {profileUrl}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => void handleCopyUrl()}
+          className={cn(
+            "absolute right-1 top-1/2 size-8 -translate-y-1/2 rounded-full border-[var(--accent-color)] bg-white/90 p-0 text-[var(--accent-color)] shadow-none transition-all duration-300 hover:bg-[var(--accent-soft)] hover:text-[var(--accent-color)] focus-visible:ring-[var(--accent-ring)]",
+            isCopied &&
+              "bg-[var(--accent-color)] text-[var(--accent-foreground)] shadow-[0_0_0_6px_var(--accent-soft)]",
+          )}
+          style={accentButtonStyle}
+          aria-label={isCopied ? "URL copied" : "Copy URL to clipboard"}
+        >
+          {isCopied ? (
+            <Check className="size-3.5" />
+          ) : (
+            <Copy className="size-3.5" />
+          )}
+        </Button>
       </div>
 
       <div ref={dropdownRef} className="relative mt-4 flex justify-center">
@@ -241,10 +329,10 @@ const ProfileQrCard = ({
           type="button"
           onClick={() => setIsDropdownOpen((prev) => !prev)}
           disabled={activeFormat !== null}
-          className="min-w-36 text-white"
+          className="min-w-36 border-[var(--accent-color)] bg-[var(--accent-color)] text-[var(--accent-foreground)] hover:opacity-90 focus-visible:ring-[var(--accent-ring)]"
           aria-haspopup="menu"
           aria-expanded={isDropdownOpen}
-          style={{ backgroundColor: accentColor, borderColor: accentColor }}
+          style={accentButtonStyle}
         >
           <Download className="size-4" />
           {activeFormat

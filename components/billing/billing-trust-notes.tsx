@@ -1,15 +1,15 @@
 const trustNotes = [
   {
-    title: "Secure checkout",
-    body: "Plan changes stay in Clerk's hosted billing flow rather than a custom payment form.",
+    title: "Free by default",
+    body: "New sign-ups keep Free access unless an admin invite grants Pro or Ultra.",
   },
   {
     title: "Clear access context",
-    body: "Your effective plan and any admin-granted access stay visible before you compare options.",
+    body: "Your effective plan and any admin-granted access stay visible in one place.",
   },
   {
-    title: "Separate admin controls",
-    body: "Invite-based grants live in their own area so standard billing decisions stay easier to follow.",
+    title: "Admin-controlled upgrades",
+    body: "Invite-based grants are the only upgrade path while billing is temporarily disabled.",
   },
 ];
 
@@ -24,11 +24,10 @@ export default function BillingTrustNotes() {
           id="billing-trust-notes-heading"
           className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900"
         >
-          Billing assurances
+          Access notes
         </h2>
         <p className="max-w-2xl text-sm leading-6 text-slate-600">
-          A quick summary of what stays clear and protected while you review
-          billing options.
+          A quick summary of how access works while paid billing is paused.
         </p>
       </div>
 

@@ -33,7 +33,8 @@ const NewLinkPage = async () => {
             <p className="mb-4 text-gray-600">
               You have reached your link creation limit of links (
               {access.currentCount}/{access.limit}).
-              {!hasUnlimitedLinks && " Upgrade to Ultra for unlimited links!"}
+              {!hasUnlimitedLinks &&
+                " Ultra access is currently available only through an admin invite."}
             </p>
             <div className="flex items-center gap-4">
               <Link
@@ -43,14 +44,6 @@ const NewLinkPage = async () => {
                 <ArrowLeft className="size-4" />
                 Back to Dashboard
               </Link>
-              {!hasUnlimitedLinks && (
-                <Link
-                  href="/dashboard/billing"
-                  className="rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                  Upgrade Plan
-                </Link>
-              )}
             </div>
           </div>
         </div>

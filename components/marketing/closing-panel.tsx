@@ -28,7 +28,7 @@ function ClosingPanel() {
                   "Live click tracking",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
-                    <CheckCircle2 className="size-4 text-[color:var(--brand-accent)]" />
+                    <CheckCircle2 className="size-4 text-(--brand-accent)" />
                     <span>{item}</span>
                   </div>
                 ))}
@@ -38,7 +38,7 @@ function ClosingPanel() {
             <Button
               asChild
               size="lg"
-              className="h-auto rounded-full bg-[color:var(--brand-accent)] px-6 py-4 text-base font-semibold text-[#111216] hover:bg-[#ffc868]"
+              className="h-auto rounded-full bg-(--brand-accent) px-6 py-4 text-base font-semibold text-[#111216] hover:bg-[#ffc868]"
             >
               <Link href="/dashboard">
                 Start your page

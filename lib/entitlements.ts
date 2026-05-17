@@ -9,10 +9,16 @@ const planRank: Record<Plan, number> = {
 export const resolveEffectivePlan = ({
   paidPlan,
   grantedPlan,
+  isAdmin = false,
 }: {
   paidPlan: Plan;
   grantedPlan: Plan | null;
+  isAdmin?: boolean;
 }): Plan => {
+  if (isAdmin) {
+    return "ultra";
+  }
+
   if (!grantedPlan) {
     return paidPlan;
   }

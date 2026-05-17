@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { CreditCard, Plus } from "lucide-react";
+import { ShieldCheck, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
@@ -76,7 +76,7 @@ const Header = ({
               variant="outline"
               className="hidden min-h-10 rounded-full border-slate-200 bg-white px-3 text-xs text-slate-700 transition-all duration-200 hover:border-[color:var(--brand-accent)] hover:bg-[rgba(251,176,59,0.08)] hover:text-slate-900 sm:inline-flex sm:min-h-11 sm:px-4 sm:text-sm"
             >
-              <Link href="/dashboard/billing">Billing</Link>
+              <Link href="/dashboard/billing">Access</Link>
             </Button>
 
             <UserButton
@@ -95,8 +95,8 @@ const Header = ({
                 {isMobile && (
                   <UserButton.Link
                     href="/dashboard/billing"
-                    label="Billing"
-                    labelIcon={<CreditCard className="size-4" />}
+                    label="Access"
+                    labelIcon={<ShieldCheck className="size-4" />}
                   />
                 )}
               </UserButton.MenuItems>

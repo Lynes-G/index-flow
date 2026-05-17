@@ -12,7 +12,6 @@ import { preloadQuery } from "convex/nextjs";
 import { Lock } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import Link from "next/link";
 
 const DashboardPage = async () => {
   const { userId } = await auth();
@@ -65,15 +64,16 @@ const DashboardPage = async () => {
                       Analytics Overview
                     </h2>
                     <p className="text-gray-600">
-                      Upgrade your plan to access detailed analytics and
-                      insights about your link performance.
+                      Detailed analytics unlock on Pro and above, but billing is
+                      currently paused.
                     </p>
                   </div>
                 </div>
                 <div className="mt-4 rounded-lg bg-gray-50 p-4">
                   <p className="text-gray-600">
-                    Get detailed analytics including total clicks, unique
-                    visitors, top links, and more by upgrading your plan.
+                    New accounts stay on Free by default. Pro and Ultra access
+                    currently come from admin-issued invites rather than direct
+                    checkout.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-600">
                     <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
@@ -85,14 +85,6 @@ const DashboardPage = async () => {
                     <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
                       Countries
                     </span>
-                  </div>
-                  <div className="mt-5">
-                    <Link
-                      href="/dashboard/billing"
-                      className="inline-flex items-center justify-center rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    >
-                      Upgrade plan
-                    </Link>
                   </div>
                 </div>
               </div>

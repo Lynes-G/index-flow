@@ -1,5 +1,5 @@
 import { type Plan } from "@/lib/entitlements";
-import { CreditCard, ShieldCheck, Sparkles } from "lucide-react";
+import { ShieldCheck, Sparkles } from "lucide-react";
 
 type BillingOverviewProps = {
   effectivePlan: Plan;
@@ -29,12 +29,12 @@ export default function BillingOverview({
               Billing overview
             </p>
             <h1 className="max-w-3xl font-['Sora',sans-serif] text-3xl leading-tight font-semibold tracking-[-0.06em] text-slate-900 sm:text-4xl">
-              Manage your plan inside the same lighter product language.
+              Review your account access while billing is paused.
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-              Review your current access, then compare pricing without losing
-              context. Plan changes still route through Clerk&apos;s hosted flow
-              when you decide to act.
+              Your current plan still determines what the dashboard unlocks, but
+              paid upgrades are temporarily disabled. Admin invite grants remain
+              active and can still raise account access.
             </p>
           </div>
 
@@ -67,15 +67,12 @@ export default function BillingOverview({
 
         <aside className="template-card rounded-[1.75rem] p-5">
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-[rgba(251,176,59,0.12)] p-3 text-[color:var(--brand-accent)]">
-              <CreditCard aria-hidden="true" className="size-5" />
-            </div>
             <div>
               <p className="text-sm font-medium text-slate-500">
-                Hosted billing flow
+                Access status
               </p>
               <p className="text-lg font-semibold text-slate-900">
-                Secure plan changes
+                Invite-only upgrades
               </p>
             </div>
           </div>
@@ -87,8 +84,8 @@ export default function BillingOverview({
                 className="mt-0.5 size-4 shrink-0 text-[color:var(--brand-accent)]"
               />
               <p>
-                Pricing and checkout still live inside Clerk&apos;s hosted
-                experience instead of a custom payment form on this page.
+                Checkout is disabled for now, so this page only reports your
+                current access and any invite-based grant on the account.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -97,9 +94,9 @@ export default function BillingOverview({
                 className="mt-0.5 size-4 shrink-0 text-[color:var(--brand-accent)]"
               />
               <p>
-                The surface is lighter and sharper, but the goal stays the same:
-                understand your access first, then make a change only when it
-                feels straightforward.
+                If an admin sends a Pro or Ultra invite to your email address,
+                claiming that invite will update your access without a paid
+                subscription.
               </p>
             </div>
           </div>

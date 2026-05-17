@@ -13,7 +13,7 @@ const marqueeItems = [
 
 function MarqueeChip({ label }: { label: string }) {
   return (
-    <div className="rounded-full border border-slate-200/80 bg-white/92 px-5 py-3 text-slate-700 shadow-[0_14px_35px_rgba(15,23,42,0.07)]">
+    <div className="rounded-full border border-slate-200/80 bg-white/92 px-5 py-3 text-slate-700 shadow-md">
       <span className="text-sm font-medium tracking-[0.01em]">{label}</span>
     </div>
   );
@@ -54,7 +54,7 @@ export default function LogoCloud({
             </div>
 
             <div className="relative min-w-0 flex-1 py-2">
-              <InfiniteSlider speedOnHover={20} speed={40} gap={20}>
+              <InfiniteSlider speed={40} gap={20} className="py-2">
                 {marqueeItems.map((item, index) => (
                   <MarqueeChip key={`${item}-${index}`} label={item} />
                 ))}
@@ -62,11 +62,11 @@ export default function LogoCloud({
 
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white via-white/80 to-transparent"
+                className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-linear-to-r from-white via-white/80 to-transparent"
               />
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white via-white/80 to-transparent"
+                className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-white via-white/80 to-transparent"
               />
               <ProgressiveBlur
                 className="pointer-events-none absolute top-0 left-0 h-full w-16"
