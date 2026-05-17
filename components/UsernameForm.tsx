@@ -1,7 +1,7 @@
 "use client";
 
 import { usernameFormSchema, UsernameFormData } from "@/schemas/formSchema";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
