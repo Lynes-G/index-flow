@@ -341,14 +341,16 @@ export const revokeInvite = mutation({
       throw new Error("Invite not found");
     }
 
-    if (invite.status === "accepted") {
-      throw new Error("Accepted invites cannot be revoked");
+    const relatedGrants = await db
+      .query("planGrants")
+      .withIndex("by_invite_id", (q) => q.eq("inviteId", invite._id))
+      .collect();
+
+    for (const grant of relatedGrants) {
+      await db.delete(grant._id);
     }
 
-    await db.patch(invite._id, {
-      status: "revoked",
-      revokedAt: Date.now(),
-    });
+    await db.delete(invite._id);
 
     return null;
   },

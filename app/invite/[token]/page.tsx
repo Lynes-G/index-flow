@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 
 import { Button } from "@/components/ui/button";
@@ -146,16 +146,25 @@ const InvitePage = async ({ params }: InvitePageProps) => {
   const claimInvite = async () => {
     "use server";
 
+    const { userId, getToken } = await auth();
     const signedInUser = await currentUser();
     const signedInEmail = signedInUser?.primaryEmailAddress?.emailAddress;
 
-    if (!signedInUser || !signedInEmail) {
+    if (!userId || !signedInUser || !signedInEmail) {
       redirect(`/sign-in?redirect_url=${encodeURIComponent(invitePath)}`);
+    }
+
+    const convexToken = await getToken({ template: "convex" });
+
+    if (!convexToken) {
+      throw new Error("Unable to authenticate invite claim.");
     }
 
     await fetchMutation(api.lib.planEntitlements.acceptPlanInvite, {
       tokenHash,
       email: normalizeInviteEmail(signedInEmail),
+    }, {
+      token: convexToken,
     });
 
     redirect("/dashboard/billing");

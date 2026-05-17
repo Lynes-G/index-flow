@@ -211,7 +211,7 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
 
       try {
         await revokeInvite({ inviteId: inviteId as never });
-        toast.success("Invite revoked.");
+        toast.success("Invite deleted.");
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Failed to revoke invite.";
@@ -322,10 +322,7 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
                   isPending && activeAction === `${prefix}:${invite._id}`;
                 const canCopy = !invite.isLegacy && isInviteActive(invite.status);
                 const canSend = !invite.isLegacy && shouldShowSendAction(invite.status);
-                const canRevoke =
-                  !invite.isLegacy &&
-                  invite.status !== "accepted" &&
-                  invite.status !== "revoked";
+                const canRevoke = !invite.isLegacy;
 
                 return (
                   <tr key={invite._id}>
@@ -400,7 +397,7 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
                             onClick={() => handleRevokeInvite(invite._id as string)}
                           >
                             <Ban className="size-4" />
-                            Revoke
+                            Delete
                           </Button>
                         )}
                         {invite.isLegacy && (
