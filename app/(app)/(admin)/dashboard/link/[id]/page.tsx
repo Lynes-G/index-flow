@@ -1,7 +1,7 @@
 import LinkAnalytics from "@/components/LinkAnalytics";
 import { fetchLinkAnalytics } from "@/lib/fetchLinkAnalytics";
 import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/dist/client/components/navigation";
 
 interface LinkAnalyticsPageProps {
@@ -12,12 +12,12 @@ interface LinkAnalyticsPageProps {
 
 const LinkAnalyticsPage = async ({ params }: LinkAnalyticsPageProps) => {
   const { id } = await params;
-  const user = await currentUser();
+  const { userId } = await auth();
 
-  if (!user) notFound();
+  if (!userId) notFound();
 
   const entitlements = await getCurrentUserEntitlements();
-  const analytics = await fetchLinkAnalytics(user.id, id);
+  const analytics = await fetchLinkAnalytics(userId, id);
 
   if (!analytics) {
     const emptyAnalytics = {

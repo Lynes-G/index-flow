@@ -7,23 +7,28 @@ import { api } from "@/convex/_generated/api";
 import { fetchAnalytics } from "@/lib/fetchAnalytics";
 import { checkTinybirdConnection } from "@/lib/checkTinybirdConnection";
 import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { Lock } from "lucide-react";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 
 const DashboardPage = async () => {
-  const user = await currentUser();
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
   const preloadedLinks = await preloadQuery(api.lib.links.getLinksByUserId, {
-    userId: user!.id,
+    userId,
   });
 
   const entitlements = await getCurrentUserEntitlements();
   const isDev = process.env.NODE_ENV === "development";
-  const analytics = await fetchAnalytics(user!.id);
-  const tinybirdStatus = isDev ? await checkTinybirdConnection(user!.id) : null;
+  const analytics = await fetchAnalytics(userId);
+  const tinybirdStatus = isDev ? await checkTinybirdConnection(userId) : null;
 
   return (
     <div className="space-y-6 pb-10">
