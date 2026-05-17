@@ -8,7 +8,6 @@ export type AdminInviteSummary<TId = unknown> = {
   _id: TId;
   email: string;
   invitedPlan: "pro" | "ultra";
-  token?: string;
   status: "draft" | "sent" | "accepted" | "revoked";
   createdAt: number;
   sentAt?: number;
@@ -23,7 +22,6 @@ export const toAdminInviteSummary = <TId>(invite: {
   _creationTime?: number;
   email: string;
   invitedPlan: "pro" | "ultra";
-  token?: string;
   status: InviteStatus;
   createdAt: number;
   sentAt?: number;
@@ -34,12 +32,11 @@ export const toAdminInviteSummary = <TId>(invite: {
   _id: invite._id,
   email: invite.email,
   invitedPlan: invite.invitedPlan,
-  token: invite.token,
   status: normalizeInviteStatus(invite.status),
   createdAt: invite.createdAt,
   sentAt: invite.sentAt,
   lastSentAt: invite.lastSentAt,
   sendCount: invite.sendCount ?? 0,
   acceptedAt: invite.acceptedAt,
-  isLegacy: isLegacyInvite({ status: invite.status, token: invite.token }),
+  isLegacy: isLegacyInvite({ status: invite.status }),
 });

@@ -1,3 +1,10 @@
+import {
+  buildTinybirdPipeUrl,
+  getTinybirdHeaders,
+  isTinybirdConfigured,
+} from "@/lib/server/tinybird";
+import { fetchWithTimeout, readResponseText } from "@/lib/server/http";
+
 export interface TinybirdConnectionStatus {
   ok: boolean;
   message: string;
@@ -6,7 +13,7 @@ export interface TinybirdConnectionStatus {
 export async function checkTinybirdConnection(
   profileUserId: string,
 ): Promise<TinybirdConnectionStatus> {
-  if (!process.env.TINYBIRD_TOKEN || !process.env.TINYBIRD_HOST) {
+  if (!isTinybirdConfigured()) {
     return {
       ok: false,
       message: "Missing TINYBIRD_TOKEN or TINYBIRD_HOST",
@@ -14,18 +21,20 @@ export async function checkTinybirdConnection(
   }
 
   try {
-    const response = await fetch(
-      `${process.env.TINYBIRD_HOST}/v0/pipes/profile_summary.json?profileUserId=${profileUserId}&days_back=30`,
+    const response = await fetchWithTimeout(
+      buildTinybirdPipeUrl("profile_summary", {
+        profileUserId,
+        days_back: 30,
+      }),
       {
-        headers: {
-          Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
-        },
+        headers: getTinybirdHeaders(),
         next: { revalidate: 0 },
       },
+      5000,
     );
 
     if (!response.ok) {
-      const text = await response.text();
+      const text = await readResponseText(response);
       return {
         ok: false,
         message: `Tinybird error ${response.status}: ${text}`,

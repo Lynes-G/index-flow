@@ -7,6 +7,20 @@ import { isInviteActive, isLegacyInvite } from "../../lib/inviteManagement";
 import { toAdminInviteSummary } from "../../lib/planInvites";
 
 const planGrantValidator = v.union(v.literal("pro"), v.literal("ultra"));
+const createInviteToken = () => {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+};
+
+const hashInviteToken = async (token: string) => {
+  const encodedToken = new TextEncoder().encode(token);
+  const buffer = await crypto.subtle.digest("SHA-256", encodedToken);
+
+  return Array.from(new Uint8Array(buffer), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+};
 export const getActivePlanGrantForUser = query({
   args: { userId: v.string() },
   returns: v.union(
@@ -51,7 +65,6 @@ export const getInviteByTokenHash = query({
       _id: v.id("planInvites"),
       email: v.string(),
       invitedPlan: planGrantValidator,
-      token: v.optional(v.string()),
       status: v.union(
         v.literal("draft"),
         v.literal("sent"),
@@ -81,7 +94,6 @@ export const getInviteByTokenHash = query({
       _id: invite._id,
       email: invite.email,
       invitedPlan: invite.invitedPlan,
-      token: invite.token,
       status: invite.status === "pending" ? "draft" : invite.status,
       acceptedByUserId: invite.acceptedByUserId,
       createdAt: invite.createdAt,
@@ -89,7 +101,7 @@ export const getInviteByTokenHash = query({
       lastSentAt: invite.lastSentAt,
       sendCount: invite.sendCount ?? 0,
       acceptedAt: invite.acceptedAt,
-      isLegacy: !invite.token || invite.status === "pending",
+      isLegacy: isLegacyInvite({ status: invite.status }),
     };
   },
 });
@@ -101,7 +113,6 @@ export const listAdminInvites = query({
       _id: v.id("planInvites"),
       email: v.string(),
       invitedPlan: planGrantValidator,
-      token: v.optional(v.string()),
       status: v.union(
         v.literal("draft"),
         v.literal("sent"),
@@ -131,11 +142,10 @@ export const createAdminPlanInvite = mutation({
   args: {
     email: v.string(),
     invitedPlan: planGrantValidator,
-    token: v.string(),
-    tokenHash: v.string(),
   },
   returns: v.object({
     inviteId: v.id("planInvites"),
+    token: v.string(),
   }),
   handler: async ({ db, auth }, args) => {
     const identity = await auth.getUserIdentity();
@@ -157,6 +167,8 @@ export const createAdminPlanInvite = mutation({
       .collect();
 
     const now = Date.now();
+    const token = createInviteToken();
+    const tokenHash = await hashInviteToken(token);
 
     for (const invite of existingInvites) {
       if (
@@ -173,15 +185,95 @@ export const createAdminPlanInvite = mutation({
     const inviteId = await db.insert("planInvites", {
       email: normalizedEmail,
       invitedPlan: args.invitedPlan,
-      token: args.token,
-      tokenHash: args.tokenHash,
+      tokenHash,
       status: "draft",
       createdByUserId: userId,
       createdAt: now,
       sendCount: 0,
     });
 
-    return { inviteId };
+    return { inviteId, token };
+  },
+});
+
+export const summarizeInviteSecurityState = query({
+  args: {},
+  returns: v.object({
+    totalInvites: v.number(),
+    invitesWithStoredRawTokens: v.number(),
+    legacyPendingInvites: v.number(),
+    activeInvites: v.number(),
+    acceptedInvites: v.number(),
+    revokedInvites: v.number(),
+  }),
+  handler: async ({ db, auth }) => {
+    const identity = await auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!isAdminUserId(identity.subject)) {
+      throw new Error("Forbidden");
+    }
+
+    const invites = await db.query("planInvites").collect();
+
+    return {
+      totalInvites: invites.length,
+      invitesWithStoredRawTokens: invites.filter(
+        (invite) => typeof (invite as { token?: unknown }).token === "string",
+      ).length,
+      legacyPendingInvites: invites.filter((invite) =>
+        isLegacyInvite({ status: invite.status }),
+      ).length,
+      activeInvites: invites.filter((invite) => isInviteActive(invite.status)).length,
+      acceptedInvites: invites.filter((invite) => invite.status === "accepted").length,
+      revokedInvites: invites.filter((invite) => invite.status === "revoked").length,
+    };
+  },
+});
+
+export const issueAdminInviteToken = mutation({
+  args: {
+    inviteId: v.id("planInvites"),
+  },
+  returns: v.object({
+    token: v.string(),
+  }),
+  handler: async ({ db, auth }, args) => {
+    const identity = await auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!isAdminUserId(identity.subject)) {
+      throw new Error("Forbidden");
+    }
+
+    const invite = await db.get(args.inviteId);
+
+    if (!invite) {
+      throw new Error("Invite not found");
+    }
+
+    if (invite.status === "accepted" || invite.status === "revoked") {
+      throw new Error("Invite can no longer issue a link");
+    }
+
+    if (isLegacyInvite({ status: invite.status })) {
+      throw new Error("Legacy invite cannot issue a link. Create a new draft instead.");
+    }
+
+    const token = createInviteToken();
+    const tokenHash = await hashInviteToken(token);
+
+    await db.patch(invite._id, {
+      tokenHash,
+    });
+
+    return { token };
   },
 });
 
@@ -211,7 +303,7 @@ export const markInviteSent = mutation({
       throw new Error("Invite can no longer be sent");
     }
 
-    if (!invite.token) {
+    if (isLegacyInvite({ status: invite.status })) {
       throw new Error("Legacy invite cannot be sent. Create a new draft instead.");
     }
 
@@ -284,7 +376,7 @@ export const revokeLegacyInvites = mutation({
 
     for (const invite of invites) {
       if (
-        isLegacyInvite({ status: invite.status, token: invite.token }) &&
+        isLegacyInvite({ status: invite.status }) &&
         invite.status !== "accepted" &&
         invite.status !== "revoked"
       ) {
@@ -297,6 +389,60 @@ export const revokeLegacyInvites = mutation({
     }
 
     return { revokedCount };
+  },
+});
+
+export const cleanStoredInviteTokens = mutation({
+  args: {},
+  returns: v.object({
+    rawTokensRemoved: v.number(),
+    legacyInvitesRevoked: v.number(),
+  }),
+  handler: async ({ db, auth }) => {
+    const identity = await auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!isAdminUserId(identity.subject)) {
+      throw new Error("Forbidden");
+    }
+
+    const invites = await db.query("planInvites").collect();
+    const now = Date.now();
+    let rawTokensRemoved = 0;
+    let legacyInvitesRevoked = 0;
+
+    for (const invite of invites) {
+      const patch: Record<string, unknown> = {};
+      const hasStoredRawToken =
+        typeof (invite as { token?: unknown }).token === "string";
+
+      if (hasStoredRawToken) {
+        patch.token = undefined;
+        rawTokensRemoved += 1;
+      }
+
+      if (
+        isLegacyInvite({ status: invite.status }) &&
+        invite.status !== "accepted" &&
+        invite.status !== "revoked"
+      ) {
+        patch.status = "revoked";
+        patch.revokedAt = invite.revokedAt ?? now;
+        legacyInvitesRevoked += 1;
+      }
+
+      if (Object.keys(patch).length > 0) {
+        await db.patch(invite._id, patch);
+      }
+    }
+
+    return {
+      rawTokensRemoved,
+      legacyInvitesRevoked,
+    };
   },
 });
 
@@ -337,10 +483,6 @@ export const acceptPlanInvite = mutation({
       }
 
       throw new Error("Invite has already been accepted");
-    }
-
-    if (!invite.token) {
-      throw new Error("Legacy invite is no longer claimable");
     }
 
     if (!isInviteActive(invite.status)) {

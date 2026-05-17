@@ -1,3 +1,5 @@
+import { fetchWithTimeout, readResponseText } from "./http";
+
 export const buildInviteEmailPayload = ({
   email,
   invitedPlan,
@@ -85,17 +87,21 @@ export const sendInviteEmail = async ({
     fromEmail,
   });
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json",
+  const response = await fetchWithTimeout(
+    "https://api.resend.com/emails",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+    7000,
+  );
 
   if (!response.ok) {
-    const bodyText = await response.text();
+    const bodyText = await readResponseText(response);
     throw new Error(
       getResendErrorMessage({
         status: response.status,

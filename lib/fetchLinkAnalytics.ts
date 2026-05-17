@@ -1,3 +1,10 @@
+import {
+  buildTinybirdPipeUrl,
+  getTinybirdHeaders,
+  isTinybirdConfigured,
+} from "@/lib/server/tinybird";
+import { fetchWithTimeout, readResponseText } from "@/lib/server/http";
+
 export interface LinkAnalyticsData {
   linkId: string;
   linkTitle: string;
@@ -39,7 +46,7 @@ export async function fetchLinkAnalytics(
   linkId: string,
   daysBack: number = 30,
 ): Promise<LinkAnalyticsData> {
-  if (!process.env.TINYBIRD_TOKEN || !process.env.TINYBIRD_HOST) {
+  if (!isTinybirdConfigured()) {
     return {
       linkId,
       linkTitle: "Sample Link",
@@ -53,31 +60,38 @@ export async function fetchLinkAnalytics(
   }
 
   try {
-    // Try fast materialized endpoint first
-    let tinybirdResponse = await fetch(
-      `${process.env.TINYBIRD_HOST}/v0/pipes/fast_link_analytics.json?profileUserId=${userId}&linkId=${linkId}&days_back=${daysBack}`,
+    let tinybirdResponse = await fetchWithTimeout(
+      buildTinybirdPipeUrl("fast_link_analytics", {
+        profileUserId: userId,
+        linkId,
+        days_back: daysBack,
+      }),
       {
-        headers: {
-          Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
-        },
+        headers: getTinybirdHeaders(),
         next: { revalidate: 0 },
       },
+      5000,
     );
 
-    // Fallback to original endpoint if fast one fails
     if (!tinybirdResponse.ok) {
-      tinybirdResponse = await fetch(
-        `${process.env.TINYBIRD_HOST}/v0/pipes/link_analytics.json?profileUserId=${userId}&linkId=${linkId}&days_back=${daysBack}`,
+      tinybirdResponse = await fetchWithTimeout(
+        buildTinybirdPipeUrl("link_analytics", {
+          profileUserId: userId,
+          linkId,
+          days_back: daysBack,
+        }),
         {
-          headers: {
-            Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
-          },
+          headers: getTinybirdHeaders(),
           next: { revalidate: 0 },
         },
+        5000,
       );
     }
     if (!tinybirdResponse.ok) {
-      console.error("Tinybird response not ok:", await tinybirdResponse.text());
+      console.error(
+        "Tinybird response not ok:",
+        await readResponseText(tinybirdResponse),
+      );
       throw new Error("Failed to fetch link analytics data from Tinybird");
     }
 
@@ -129,14 +143,17 @@ export async function fetchLinkAnalytics(
     }> = [];
 
     try {
-      const countryResponse = await fetch(
-        `${process.env.TINYBIRD_HOST}/v0/pipes/link_country_analytics.json?profileUserId=${userId}&linkId=${linkId}&days_back=${daysBack}`,
+      const countryResponse = await fetchWithTimeout(
+        buildTinybirdPipeUrl("link_country_analytics", {
+          profileUserId: userId,
+          linkId,
+          days_back: daysBack,
+        }),
         {
-          headers: {
-            Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
-          },
+          headers: getTinybirdHeaders(),
           next: { revalidate: 0 },
         },
+        5000,
       );
 
       if (countryResponse.ok) {

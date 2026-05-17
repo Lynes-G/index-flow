@@ -16,11 +16,9 @@ export const normalizeInviteStatus = (status: InviteStatus) =>
 
 export const isLegacyInvite = ({
   status,
-  token,
 }: {
   status: InviteStatus;
-  token?: string;
-}) => !token || status === "pending";
+}) => status === "pending";
 
 export const buildInviteLink = ({
   appUrl,
@@ -28,4 +26,4 @@ export const buildInviteLink = ({
 }: {
   appUrl: string;
   token: string;
-}) => `${appUrl.replace(/\/$/, "")}/invite/${token}`;
+}) => `${appUrl.replace(/\/$/, "")}/invite/${encodeURIComponent(token)}`;

@@ -18,20 +18,6 @@ import {
 
 type InvitePlan = "pro" | "ultra";
 
-const generateToken = () => {
-  const bytes = new Uint8Array(24);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-};
-
-const hashToken = async (token: string) => {
-  const encoder = new TextEncoder();
-  const buffer = await crypto.subtle.digest("SHA-256", encoder.encode(token));
-  return Array.from(new Uint8Array(buffer), (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
-};
-
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 const formatDate = (timestamp: number | undefined) => {
@@ -82,6 +68,9 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
     createdByUserId: currentUserId,
   });
   const createInvite = useMutation(api.lib.planEntitlements.createAdminPlanInvite);
+  const issueInviteToken = useMutation(
+    api.lib.planEntitlements.issueAdminInviteToken,
+  );
   const markInviteSent = useMutation(api.lib.planEntitlements.markInviteSent);
   const revokeInvite = useMutation(api.lib.planEntitlements.revokeInvite);
   const revokeLegacyInvites = useMutation(
@@ -91,7 +80,31 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
   const [email, setEmail] = useState("");
   const [invitedPlan, setInvitedPlan] = useState<InvitePlan>("ultra");
   const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [issuedTokens, setIssuedTokens] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
+
+  const cacheIssuedToken = (inviteId: string, token: string) => {
+    setIssuedTokens((current) => ({
+      ...current,
+      [inviteId]: token,
+    }));
+  };
+
+  const getInviteToken = async ({
+    inviteId,
+    rotate,
+  }: {
+    inviteId: string;
+    rotate: boolean;
+  }) => {
+    if (!rotate && issuedTokens[inviteId]) {
+      return issuedTokens[inviteId];
+    }
+
+    const result = await issueInviteToken({ inviteId: inviteId as never });
+    cacheIssuedToken(inviteId, result.token);
+    return result.token;
+  };
 
   const handleCreateInvite = () => {
     const normalizedEmail = normalizeEmail(email);
@@ -105,15 +118,11 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
       setActiveAction("create");
 
       try {
-        const token = generateToken();
-        const tokenHash = await hashToken(token);
-
-        await createInvite({
+        const result = await createInvite({
           email: normalizedEmail,
           invitedPlan,
-          token,
-          tokenHash,
         });
+        cacheIssuedToken(result.inviteId as string, result.token);
 
         setEmail("");
         toast.success("Draft invite created.");
@@ -127,28 +136,43 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
     });
   };
 
-  const handleCopyLink = async (token: string) => {
-    await navigator.clipboard.writeText(getInviteLink(token));
-    toast.success("Invite link copied.");
+  const handleCopyLink = (inviteId: string) => {
+    startTransition(async () => {
+      setActiveAction(`copy:${inviteId}`);
+
+      try {
+        const token = await getInviteToken({ inviteId, rotate: false });
+        await navigator.clipboard.writeText(getInviteLink(token));
+        toast.success("Invite link copied.");
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Failed to copy invite link.";
+        toast.error(message);
+      } finally {
+        setActiveAction(null);
+      }
+    });
   };
 
   const handleSendInvite = ({
     inviteId,
     email,
     invitedPlan,
-    token,
     mode,
   }: {
     inviteId: string;
     email: string;
     invitedPlan: InvitePlan;
-    token: string;
     mode: "send" | "resend";
   }) => {
     startTransition(async () => {
       setActiveAction(`${mode}:${inviteId}`);
 
       try {
+        const token = await getInviteToken({
+          inviteId,
+          rotate: mode === "resend",
+        });
         const response = await fetch("/api/admin/send-invite", {
           method: "POST",
           headers: {
@@ -166,7 +190,11 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
         }
 
         await markInviteSent({ inviteId: inviteId as never });
-        toast.success(mode === "send" ? "Invite email sent." : "Invite email resent.");
+        toast.success(
+          mode === "send"
+            ? "Invite email sent."
+            : "Invite email resent. Older invite links were replaced.",
+        );
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Failed to send invite email.";
@@ -229,7 +257,8 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Create a draft first, then copy, send, resend, or revoke it later.
             The invited person still has to sign up with the exact email
-            address you enter here.
+            address you enter here. Resending rotates the invite link and
+            disables older links.
           </p>
         </div>
       </div>
@@ -291,14 +320,8 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
               {(invites ?? []).map((invite) => {
                 const isRowBusy = (prefix: string) =>
                   isPending && activeAction === `${prefix}:${invite._id}`;
-                const canCopy =
-                  Boolean(invite.token) &&
-                  !invite.isLegacy &&
-                  isInviteActive(invite.status);
-                const canSend =
-                  Boolean(invite.token) &&
-                  !invite.isLegacy &&
-                  shouldShowSendAction(invite.status);
+                const canCopy = !invite.isLegacy && isInviteActive(invite.status);
+                const canSend = !invite.isLegacy && shouldShowSendAction(invite.status);
                 const canRevoke =
                   !invite.isLegacy &&
                   invite.status !== "accepted" &&
@@ -333,7 +356,8 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => handleCopyLink(invite.token!)}
+                            disabled={isRowBusy("copy")}
+                            onClick={() => handleCopyLink(invite._id as string)}
                           >
                             <Copy className="size-4" />
                             Copy
@@ -350,7 +374,6 @@ const AdminInviteManager = ({ currentUserId }: { currentUserId: string }) => {
                                 inviteId: invite._id as string,
                                 email: invite.email,
                                 invitedPlan: invite.invitedPlan,
-                                token: invite.token!,
                                 mode: invite.status === "draft" ? "send" : "resend",
                               })
                             }

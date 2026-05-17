@@ -3,9 +3,10 @@ import "@/styles/globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { getAppUrl } from "@/lib/server/appUrl";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://indexflow.app"),
+  metadataBase: new URL(getAppUrl()),
   title: {
     default: "IndexFlow",
     template: "%s | IndexFlow",

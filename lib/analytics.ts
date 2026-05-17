@@ -10,6 +10,8 @@ const trackLinkClick = async (event: ClientTrackingData) => {
 
     await fetch("/api/track-click", {
       method: "POST",
+      cache: "no-store",
+      keepalive: true,
       headers: {
         "Content-Type": "application/json",
       },

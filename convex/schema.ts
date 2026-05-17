@@ -60,7 +60,6 @@ export default defineSchema({
   planInvites: defineTable({
     email: v.string(),
     invitedPlan: v.union(v.literal("pro"), v.literal("ultra")),
-    token: v.optional(v.string()),
     tokenHash: v.string(),
     status: v.union(
       v.literal("pending"),

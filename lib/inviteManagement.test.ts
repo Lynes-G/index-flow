@@ -38,8 +38,8 @@ test("legacy pending status is normalized to draft for display", () => {
   assert.equal(normalizeInviteStatus("pending"), "draft");
 });
 
-test("legacy invites are detected from missing token or pending status", () => {
-  assert.equal(isLegacyInvite({ status: "pending", token: undefined }), true);
-  assert.equal(isLegacyInvite({ status: "draft", token: undefined }), true);
-  assert.equal(isLegacyInvite({ status: "draft", token: "abc" }), false);
+test("legacy invites are detected from pending status", () => {
+  assert.equal(isLegacyInvite({ status: "pending" }), true);
+  assert.equal(isLegacyInvite({ status: "draft" }), false);
+  assert.equal(isLegacyInvite({ status: "sent" }), false);
 });

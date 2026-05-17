@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { geolocation } from "@vercel/functions";
 import { api } from "@/convex/_generated/api";
 import { getClient } from "@/convex/lib/client";
+import { isTinybirdConfigured, sendTinybirdEvent } from "@/lib/server/tinybird";
 
 export async function GET(
   request: NextRequest,
@@ -20,7 +21,7 @@ export async function GET(
       return NextResponse.redirect(new URL(`/u/${username}`, request.url));
     }
 
-    if (process.env.TINYBIRD_TOKEN && process.env.TINYBIRD_HOST) {
+    if (isTinybirdConfigured()) {
       const eventForTinybird = {
         timestamp: new Date().toISOString(),
         profileUsername: username,
@@ -40,18 +41,13 @@ export async function GET(
         },
       };
 
-      try {
-        await fetch(`${process.env.TINYBIRD_HOST}/v0/events?name=link_clicks`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(eventForTinybird),
-        });
-      } catch (err) {
-        console.error("Tinybird QR ingest failed:", err);
-      }
+      after(async () => {
+        try {
+          await sendTinybirdEvent(eventForTinybird);
+        } catch (err) {
+          console.error("Tinybird QR ingest failed:", err);
+        }
+      });
     }
   } catch (err) {
     console.error("QR tracking error:", err);

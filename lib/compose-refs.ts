@@ -55,8 +55,10 @@ function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
  * Accepts callback refs and RefObject(s)
  */
 function useComposedRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
-  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to memoize by all values
-  return React.useCallback(composeRefs(...refs), refs);
+  // The hook accepts a variadic list of refs, so the refs array itself is the
+  // dependency list we want React to compare between renders.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return React.useMemo(() => composeRefs(...refs), refs);
 }
 
 export { composeRefs, useComposedRefs };

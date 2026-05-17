@@ -1,3 +1,10 @@
+import {
+  buildTinybirdPipeUrl,
+  getTinybirdHeaders,
+  isTinybirdConfigured,
+} from "@/lib/server/tinybird";
+import { fetchWithTimeout, readResponseText } from "@/lib/server/http";
+
 export interface AnalyticsData {
   totalClicks: number;
   uniqueVisitors: number;
@@ -14,9 +21,7 @@ export async function fetchAnalytics(
   userId: string,
   daysBack: number = 30,
 ): Promise<AnalyticsData> {
-  // Check if Tinybird API key is set
-  if (!process.env.TINYBIRD_TOKEN || !process.env.TINYBIRD_HOST) {
-    // Return default analytics data if Tinybird is not configured
+  if (!isTinybirdConfigured()) {
     return {
       totalClicks: 0,
       uniqueVisitors: 0,
@@ -31,19 +36,23 @@ export async function fetchAnalytics(
   }
 
   try {
-    // Use original profile_summary endpoint to keep topK functionality
-    const tinybirdResponse = await fetch(
-      `${process.env.TINYBIRD_HOST}/v0/pipes/profile_summary.json?profileUserId=${userId}&days_back=${daysBack}`,
+    const tinybirdResponse = await fetchWithTimeout(
+      buildTinybirdPipeUrl("profile_summary", {
+        profileUserId: userId,
+        days_back: daysBack,
+      }),
       {
-        headers: {
-          Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
-        },
-        next: { revalidate: 0 }, // Cache disabled for real-time data
+        headers: getTinybirdHeaders(),
+        next: { revalidate: 0 },
       },
+      5000,
     );
 
     if (!tinybirdResponse.ok) {
-      console.error("Tinybird response not ok:", await tinybirdResponse.text());
+      console.error(
+        "Tinybird response not ok:",
+        await readResponseText(tinybirdResponse),
+      );
       throw new Error("Failed to fetch analytics data from Tinybird");
     }
 
