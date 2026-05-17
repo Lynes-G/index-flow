@@ -15,8 +15,6 @@ test("toAdminInviteSummary strips Convex document metadata fields", () => {
     lastSentAt: undefined,
     sendCount: 0,
     acceptedAt: undefined,
-    createdByUserId: "user_123",
-    tokenHash: "secret",
   });
 
   assert.deepEqual(summary, {

@@ -75,7 +75,16 @@ test("revokeInvite deletes an accepted invite and its grants", async () => {
     grants: [{ _id: "grant_123", inviteId: "invite_123" }],
   });
 
-  await revokeInvite._handler(ctx as never, { inviteId: "invite_123" as never });
+  const revokeInviteHandler = (
+    revokeInvite as typeof revokeInvite & {
+      _handler: (
+        ctx: unknown,
+        args: { inviteId: string },
+      ) => Promise<null>;
+    }
+  )._handler;
+
+  await revokeInviteHandler(ctx, { inviteId: "invite_123" });
 
   assert.deepEqual(deletedIds, ["grant_123", "invite_123"]);
 });
