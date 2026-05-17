@@ -1,5 +1,4 @@
 import { AnalyticsData } from "@/lib/fetchAnalytics";
-import { Protect } from "@clerk/nextjs";
 import {
   Calendar,
   Clock,
@@ -17,9 +16,13 @@ import {
 interface DashboardMetricsProps {
   // Define props here as needed, e.g. analytics data
   analytics: AnalyticsData;
+  canAccessUltraFeatures: boolean;
 }
 
-const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
+const DashboardMetrics = ({
+  analytics,
+  canAccessUltraFeatures,
+}: DashboardMetricsProps) => {
   const formDate = ({ dateString }: { dateString: string | null }) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -97,29 +100,7 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
               </div>
             </div>
             {/* Countries reached */}
-            <Protect
-              plan="ultra"
-              fallback={
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 opacity-80 shadow-sm">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="rounded-xl bg-emerald-600 p-3">
-                      <Globe className="size-6 text-white" />
-                    </div>
-                    <div className="text-emerald-600">
-                      <Lock className="size-6" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="mb-1 text-sm font-medium text-slate-600">
-                      Countries Reached
-                    </p>
-                    <p className="text-3xl font-bold text-slate-900">
-                      Upgrade to Ultra
-                    </p>
-                  </div>
-                </div>
-              }
-            >
+            {canAccessUltraFeatures ? (
               <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                   <div className="rounded-xl bg-emerald-600 p-3">
@@ -138,7 +119,26 @@ const DashboardMetrics = ({ analytics }: DashboardMetricsProps) => {
                   </p>
                 </div>
               </div>
-            </Protect>
+            ) : (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 opacity-80 shadow-sm">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="rounded-xl bg-emerald-600 p-3">
+                      <Globe className="size-6 text-white" />
+                    </div>
+                    <div className="text-emerald-600">
+                      <Lock className="size-6" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="mb-1 text-sm font-medium text-slate-600">
+                      Countries Reached
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      Upgrade to Ultra
+                    </p>
+                  </div>
+                </div>
+            )}
 
             {/* Total links clicked */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

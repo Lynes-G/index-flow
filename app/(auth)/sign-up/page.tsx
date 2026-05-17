@@ -1,9 +1,15 @@
 import { SignUp } from "@clerk/nextjs";
 
-const page = () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_url?: string }>;
+}) => {
+  const { redirect_url: redirectUrl } = await searchParams;
+
   return (
     <div>
-      <SignUp />
+      <SignUp forceRedirectUrl={redirectUrl} />
     </div>
   );
 };
