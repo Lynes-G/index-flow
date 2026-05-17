@@ -194,7 +194,11 @@
 
   .editorial-surface {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98)),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(248, 250, 252, 0.98)
+      ),
       var(--brand-sand);
     border: 1px solid rgba(15, 23, 42, 0.08);
     border: 1px solid color-mix(in srgb, #0f172a 8%, transparent);
@@ -226,15 +230,30 @@
 
   .template-shell {
     background:
-      radial-gradient(circle at top center, rgba(251, 176, 59, 0.2), transparent 24%),
-      radial-gradient(circle at 15% 20%, rgba(251, 176, 59, 0.12), transparent 18%),
-      radial-gradient(circle at 85% 18%, rgba(255, 255, 255, 0.75), transparent 16%),
+      radial-gradient(
+        circle at top center,
+        rgba(251, 176, 59, 0.2),
+        transparent 24%
+      ),
+      radial-gradient(
+        circle at 15% 20%,
+        rgba(251, 176, 59, 0.12),
+        transparent 18%
+      ),
+      radial-gradient(
+        circle at 85% 18%,
+        rgba(255, 255, 255, 0.75),
+        transparent 16%
+      ),
       linear-gradient(180deg, #fffdf8 0%, #f8fafc 42%, #f4efe4 100%);
   }
 
   .template-card {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.98));
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(248, 250, 252, 0.98)
+    );
     border: 1px solid rgba(15, 23, 42, 0.08);
     box-shadow:
       0 22px 60px rgba(15, 23, 42, 0.08),
@@ -242,8 +261,11 @@
   }
 
   .template-accent-card {
-    background:
-      linear-gradient(180deg, rgba(251, 176, 59, 0.94), rgba(226, 143, 18, 0.98));
+    background: linear-gradient(
+      180deg,
+      rgba(251, 176, 59, 0.94),
+      rgba(226, 143, 18, 0.98)
+    );
     color: #111216;
     box-shadow:
       0 24px 50px rgba(251, 176, 59, 0.22),
@@ -255,9 +277,21 @@
     position: absolute;
     inset: 0;
     background-image:
-      radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.35) 0, transparent 24%),
-      radial-gradient(circle at 80% 18%, rgba(251, 176, 59, 0.12) 0, transparent 20%),
-      radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.22) 0, transparent 18%);
+      radial-gradient(
+        circle at 20% 25%,
+        rgba(255, 255, 255, 0.35) 0,
+        transparent 24%
+      ),
+      radial-gradient(
+        circle at 80% 18%,
+        rgba(251, 176, 59, 0.12) 0,
+        transparent 20%
+      ),
+      radial-gradient(
+        circle at 50% 80%,
+        rgba(255, 255, 255, 0.22) 0,
+        transparent 18%
+      );
     mix-blend-mode: soft-light;
     opacity: 0.5;
     pointer-events: none;
@@ -265,6 +299,36 @@
 
   .template-marquee {
     animation: template-marquee 24s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-left {
+    animation: marquee-left var(--marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-right {
+    animation: marquee-right var(--marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-left-rtl {
+    animation: marquee-right var(--marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-right-rtl {
+    animation: marquee-left var(--marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-up {
+    animation: marquee-up var(--marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-down {
+    animation: marquee-down var(--marquee-duration) linear infinite;
     will-change: transform;
   }
 
@@ -383,6 +447,46 @@
   }
 }
 
+@keyframes marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(calc(-100% - var(--marquee-gap)), 0, 0);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translate3d(calc(-100% - var(--marquee-gap)), 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes marquee-up {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, calc(-100% - var(--marquee-gap)), 0);
+  }
+}
+
+@keyframes marquee-down {
+  0% {
+    transform: translate3d(0, calc(-100% - var(--marquee-gap)), 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes template-float {
   0%,
   100% {
@@ -409,6 +513,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .template-marquee,
+  .animate-marquee-left,
+  .animate-marquee-right,
+  .animate-marquee-left-rtl,
+  .animate-marquee-right-rtl,
+  .animate-marquee-up,
+  .animate-marquee-down,
   .template-float,
   .template-pulse,
   .star-border-halo,

@@ -20,6 +20,6 @@
   },
   "registries": {
     "@tailark": "https://tailark.com/r/{name}.json",
-    "@motion-primitives": "https://tailark.com/r/{name}.json"
+    "@motion-primitives": "https://motion-primitives.com/c/{name}.json"
   }
 }

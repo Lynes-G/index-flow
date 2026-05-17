@@ -1,3 +1,4 @@
+import LogoCloud from "@/components/logo-cloud";
 import { AccentPill } from "@/components/marketing/accent-pill";
 import RippleGrid from "@/components/marketing/ripple-grid";
 import { Button } from "@/components/ui/button";
@@ -12,15 +13,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode } from "react";
-
-const logos = [
-  "Creator Stack",
-  "Studio Grid",
-  "Launchboard",
-  "Signal Loop",
-  "Campaign Kit",
-  "Audience Lab",
-];
 
 const trustChips = ["Custom themes", "Featured links", "Live analytics"];
 
@@ -75,10 +67,10 @@ function EditorialHero() {
           fadeDistance={0.2}
           vignetteStrength={4.4}
           glowIntensity={4.8}
-          opacity={0.25}
+          opacity={0.05}
           gridRotation={0}
           mouseInteraction
-          mouseInteractionRadius={2.1}
+          mouseInteractionRadius={8.1}
           enableRainbow
         />
       </div>
@@ -320,18 +312,7 @@ function EditorialHero() {
           </div>
         </div>
 
-        <div className="relative mx-auto mt-10 max-w-6xl overflow-hidden lg:mt-14">
-          <div className="template-marquee flex min-w-max gap-3 motion-reduce:animate-none">
-            {[...logos, ...logos].map((logo, index) => (
-              <div
-                key={`${logo}-${index}`}
-                className="template-card rounded-full px-5 py-2.5 text-sm font-medium text-slate-700"
-              >
-                {logo}
-              </div>
-            ))}
-          </div>
-        </div>
+        <LogoCloud embedded className="mx-auto mt-10 max-w-6xl lg:mt-14" />
       </div>
     </section>
   );
