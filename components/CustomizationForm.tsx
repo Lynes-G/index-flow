@@ -30,13 +30,14 @@ import {
   useState,
   useTransition,
 } from "react";
-import type { ComponentType, ReactNode } from "react";
+import type { CSSProperties, ComponentType, ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { getAccentForeground } from "@/lib/accentColor";
 import { cn } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/getBaseUrl";
 import {
@@ -973,10 +974,22 @@ const CustomizationForm = () => {
   const settingsGroupClass =
     "rounded-2xl border border-slate-200/80 bg-slate-50/80 p-5 sm:p-6";
   const accentGradient = `linear-gradient(135deg, ${formData.accentColor} 0%, ${formData.accentColor}aa 100%)`;
+  const accentForeground = getAccentForeground(formData.accentColor);
   const accentButtonStyle = {
     backgroundColor: formData.accentColor,
     borderColor: formData.accentColor,
+    color: accentForeground,
   };
+  const accentBadgeStyle = {
+    backgroundColor: formData.accentColor,
+    color: accentForeground,
+  };
+  const accentControlVars = {
+    "--accent-color": formData.accentColor,
+    "--accent-foreground": accentForeground,
+    "--accent-soft": `${formData.accentColor}12`,
+    "--accent-ring": `${formData.accentColor}55`,
+  } as CSSProperties;
   const hasUnsavedChanges = useMemo(() => {
     return snapshotFromForm(formData) !== savedSnapshot;
   }, [formData, savedSnapshot]);
@@ -1134,8 +1147,8 @@ const CustomizationForm = () => {
                       </p>
                     </div>
                     <span
-                      className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold text-white"
-                      style={{ backgroundColor: formData.accentColor }}
+                      className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                      style={accentBadgeStyle}
                     >
                       Highlighted
                     </span>
@@ -1208,9 +1221,9 @@ const CustomizationForm = () => {
         <div className="flex items-start gap-4">
           <div
             className="rounded-2xl p-3"
-            style={{ background: accentGradient }}
+            style={{ background: accentGradient, color: accentForeground }}
           >
-            <Palette className="size-5 text-white" />
+            <Palette className="size-5" />
           </div>
           <div>
             <p className="mb-2 text-xs font-semibold tracking-[0.18em] text-orange-600 uppercase">
@@ -1254,10 +1267,14 @@ const CustomizationForm = () => {
                 className={cn(
                   "rounded-full border px-4 py-2.5 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-5 sm:text-sm",
                   isActive
-                    ? "text-white focus-visible:ring-slate-900/30"
+                    ? "text-[color:var(--accent-foreground)] focus-visible:ring-slate-900/30"
                     : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 focus-visible:ring-slate-400",
                 )}
-                style={isActive ? accentButtonStyle : undefined}
+                style={
+                  isActive
+                    ? { ...accentControlVars, ...accentButtonStyle }
+                    : undefined
+                }
                 onClick={() => setActiveTab(tab.value)}
               >
                 {tab.label}
@@ -1280,9 +1297,9 @@ const CustomizationForm = () => {
                 <div className={sectionHeaderClass}>
                   <div
                     className="rounded-lg p-2"
-                    style={{ backgroundColor: formData.accentColor }}
+                    style={accentBadgeStyle}
                   >
-                    <Sparkles className="size-4 text-white" />
+                    <Sparkles className="size-4" />
                   </div>
                   <div>
                     <p className={sectionTitleClass}>Essentials</p>
@@ -1352,9 +1369,9 @@ const CustomizationForm = () => {
                 <div className={sectionHeaderClass}>
                   <div
                     className="rounded-lg p-2"
-                    style={{ backgroundColor: formData.accentColor }}
+                    style={accentBadgeStyle}
                   >
-                    <LayoutGrid className="size-4 text-white" />
+                    <LayoutGrid className="size-4" />
                   </div>
                   <div>
                     <p className={sectionTitleClass}>Layout & Links</p>
@@ -1390,11 +1407,11 @@ const CustomizationForm = () => {
                           className={cn(
                             "flex items-center gap-2",
                             formData.layoutStyle === option.value &&
-                              "text-white",
+                              "text-[color:var(--accent-foreground)]",
                           )}
                           style={
                             formData.layoutStyle === option.value
-                              ? accentButtonStyle
+                              ? { ...accentControlVars, ...accentButtonStyle }
                               : undefined
                           }
                         >
@@ -1430,12 +1447,12 @@ const CustomizationForm = () => {
                           }
                           className={
                             formData.linkStyle === option.value
-                              ? "text-white"
+                              ? "text-[color:var(--accent-foreground)]"
                               : ""
                           }
                           style={
                             formData.linkStyle === option.value
-                              ? accentButtonStyle
+                              ? { ...accentControlVars, ...accentButtonStyle }
                               : undefined
                           }
                         >
@@ -1517,11 +1534,11 @@ const CustomizationForm = () => {
                           className={cn(
                             "flex items-center gap-2",
                             formData.avatarShape === option.value &&
-                              "text-white",
+                              "text-[color:var(--accent-foreground)]",
                           )}
                           style={
                             formData.avatarShape === option.value
-                              ? accentButtonStyle
+                              ? { ...accentControlVars, ...accentButtonStyle }
                               : undefined
                           }
                         >
@@ -1547,9 +1564,9 @@ const CustomizationForm = () => {
                 <div className={sectionHeaderClass}>
                   <div
                     className="rounded-lg p-2"
-                    style={{ backgroundColor: formData.accentColor }}
+                    style={accentBadgeStyle}
                   >
-                    <ImageIcon className="size-4 text-white" />
+                    <ImageIcon className="size-4" />
                   </div>
                   <div>
                     <p className={sectionTitleClass}>Media</p>
@@ -1588,12 +1605,12 @@ const CustomizationForm = () => {
                           }
                           className={
                             formData.backgroundType === option.value
-                              ? "text-white"
+                              ? "text-[color:var(--accent-foreground)]"
                               : ""
                           }
                           style={
                             formData.backgroundType === option.value
-                              ? accentButtonStyle
+                              ? { ...accentControlVars, ...accentButtonStyle }
                               : undefined
                           }
                         >
@@ -1967,9 +1984,9 @@ const CustomizationForm = () => {
                 <div className={sectionHeaderClass}>
                   <div
                     className="rounded-lg p-2"
-                    style={{ backgroundColor: formData.accentColor }}
+                    style={accentBadgeStyle}
                   >
-                    <LinkIcon className="size-4 text-white" />
+                    <LinkIcon className="size-4" />
                   </div>
                   <div>
                     <p className={sectionTitleClass}>Bio & Social</p>
@@ -2276,7 +2293,7 @@ const CustomizationForm = () => {
                       <Button
                         type="button"
                         onClick={handleAddSocialLink}
-                        className="w-full text-white"
+                        className="w-full"
                         style={accentButtonStyle}
                       >
                         Add Link
@@ -2340,7 +2357,7 @@ const CustomizationForm = () => {
           <Button
             type="submit"
             disabled={isUploading || isLoading}
-            className="w-full text-white transition-opacity hover:opacity-90"
+            className="w-full transition-opacity hover:opacity-90"
             style={accentButtonStyle}
           >
             {isLoading ? "Saving..." : "Save Customizations"}
