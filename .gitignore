@@ -57,6 +57,7 @@ AGENTS.md
 CLAUDE.md
 .agents/
 .claude/
+.worktrees/
 .superpowers/
 .qa-dev.err
 .qa-dev.out
