@@ -6,7 +6,12 @@ const featureNotes = [
   "Click tracking analytics for every link",
 ];
 
-const CreateLinkPanel = () => {
+type CreateLinkPanelProps = {
+  submitLabel?: string;
+  onSuccess?: () => void | Promise<void>;
+};
+
+const CreateLinkPanel = ({ submitLabel, onSuccess }: CreateLinkPanelProps) => {
   return (
     <div className="space-y-8">
       <div className="space-y-4">
@@ -41,7 +46,7 @@ const CreateLinkPanel = () => {
           </p>
         </div>
 
-        <CreateLinkForm />
+        <CreateLinkForm submitLabel={submitLabel} onSuccess={onSuccess} />
       </div>
     </div>
   );
