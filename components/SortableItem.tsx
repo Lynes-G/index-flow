@@ -158,6 +158,7 @@ const SortableItem = ({
               variant="outline"
               size="icon"
               className="size-9 rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50"
+              aria-label={`View analytics for ${link.title}`}
               asChild
             >
               <Link href={`/dashboard/link/${id}`}>
@@ -169,6 +170,7 @@ const SortableItem = ({
               variant="outline"
               size="icon"
               className="size-9 rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50"
+              aria-label={`Edit ${link.title}`}
               onClick={() => setIsEditing(true)}
             >
               <Pencil className="size-3.5" />
@@ -179,6 +181,7 @@ const SortableItem = ({
               variant="destructive"
               size="icon"
               className="size-9 rounded-2xl"
+              aria-label={`Delete ${link.title}`}
               onClick={(e) => {
                 e.stopPropagation();
                 const isConfirmed = confirm(
