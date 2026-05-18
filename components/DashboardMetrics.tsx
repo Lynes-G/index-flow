@@ -49,24 +49,25 @@ const DashboardMetrics = ({
     analytics.qrScans > 0;
 
   return (
-    <div className="mb-8 bg-slate-50/80 p-4 lg:p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8">
+    <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
+        <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8">
           <div className="mb-8">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">
+            <h2 className="mb-2 text-2xl font-semibold text-slate-900">
               Analytics Overview
             </h2>
-            <p className="text-gray-600">Last 30 days performance metrics</p>
+            <p className="text-sm text-slate-600 sm:text-base">
+              Last 30 days performance metrics
+            </p>
           </div>
 
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-6">
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {/* Total clicks */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-blue-600 p-3">
-                  <MousePointer className="size-6 text-white" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+                  <MousePointer className="size-6" />
                 </div>
-                <div className="text-blue-600">
+                <div className="text-blue-200">
                   <TrendingUp className="size-6" />
                 </div>
               </div>
@@ -74,19 +75,19 @@ const DashboardMetrics = ({
                 <p className="mb-1 text-sm font-medium text-slate-600">
                   Total Clicks
                 </p>
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
                   {analytics.totalClicks.toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* Unique visitors */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-indigo-600 p-3">
-                  <Users className="size-6 text-white" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
+                  <Users className="size-6" />
                 </div>
-                <div className="text-indigo-600">
+                <div className="text-indigo-200">
                   <TrendingUp className="size-6" />
                 </div>
               </div>
@@ -94,19 +95,19 @@ const DashboardMetrics = ({
                 <p className="mb-1 text-sm font-medium text-slate-600">
                   Unique Visitors
                 </p>
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
                   {analytics.uniqueVisitors.toLocaleString()}
                 </p>
               </div>
             </div>
             {/* Countries reached */}
             {canAccessUltraFeatures ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="rounded-xl bg-emerald-600 p-3">
-                    <Globe className="size-6 text-white" />
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-5 flex items-center justify-between">
+                  <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
+                    <Globe className="size-6" />
                   </div>
-                  <div className="text-emerald-600">
+                  <div className="text-emerald-200">
                     <MapPin className="size-6" />
                   </div>
                 </div>
@@ -114,18 +115,18 @@ const DashboardMetrics = ({
                   <p className="mb-1 text-sm font-medium text-slate-600">
                     Countries Reached
                   </p>
-                  <p className="text-3xl font-bold text-slate-900">
+                  <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
                     {analytics.countriesReached.toLocaleString()}
                   </p>
                 </div>
               </div>
             ) : (
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 opacity-80 shadow-sm">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="rounded-xl bg-emerald-600 p-3">
-                      <Globe className="size-6 text-white" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 opacity-80 shadow-sm">
+                  <div className="mb-5 flex items-center justify-between">
+                    <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
+                      <Globe className="size-6" />
                     </div>
-                    <div className="text-emerald-600">
+                    <div className="text-emerald-300">
                       <Lock className="size-6" />
                     </div>
                   </div>
@@ -133,20 +134,23 @@ const DashboardMetrics = ({
                     <p className="mb-1 text-sm font-medium text-slate-600">
                       Countries Reached
                     </p>
-                    <p className="text-3xl font-bold text-slate-900">
+                    <div className="mt-2 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">
                       Upgrade to Ultra
+                    </div>
+                    <p className="mt-3 text-sm text-slate-500">
+                      Unlock country-level reach insights.
                     </p>
                   </div>
                 </div>
             )}
 
             {/* Total links clicked */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-sky-600 p-3">
-                  <Link className="size-6 text-white" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="rounded-xl bg-sky-50 p-3 text-sky-600">
+                  <Link className="size-6" />
                 </div>
-                <div className="text-sky-600">
+                <div className="text-sky-200">
                   <ExternalLink className="size-6" />
                 </div>
               </div>
@@ -154,19 +158,19 @@ const DashboardMetrics = ({
                 <p className="mb-1 text-sm font-medium text-slate-600">
                   Links Clicked
                 </p>
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
                   {analytics.totalLinksClicked.toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* QR scans */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-cyan-600 p-3">
-                  <QrCode className="size-6 text-white" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="rounded-xl bg-cyan-50 p-3 text-cyan-600">
+                  <QrCode className="size-6" />
                 </div>
-                <div className="text-cyan-600">
+                <div className="text-cyan-200">
                   <TrendingUp className="size-6" />
                 </div>
               </div>
@@ -174,19 +178,19 @@ const DashboardMetrics = ({
                 <p className="mb-1 text-sm font-medium text-slate-600">
                   QR Scans
                 </p>
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
                   {analytics.qrScans.toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* Activity period */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="rounded-xl bg-orange-500 p-3">
-                  <Calendar className="size-6 text-white" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="rounded-xl bg-orange-50 p-3 text-orange-600">
+                  <Calendar className="size-6" />
                 </div>
-                <div className="text-orange-600">
+                <div className="text-orange-200">
                   <Clock className="size-6" />
                 </div>
               </div>
@@ -194,7 +198,7 @@ const DashboardMetrics = ({
                 <p className="mb-1 text-sm font-medium text-slate-600">
                   Last Activity
                 </p>
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
                   {formDate({ dateString: analytics.lastClick })}
                 </p>
               </div>
@@ -251,7 +255,6 @@ const DashboardMetrics = ({
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 };

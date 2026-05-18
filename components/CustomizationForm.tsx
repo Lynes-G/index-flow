@@ -31,6 +31,22 @@ import {
   useTransition,
 } from "react";
 import type { CSSProperties, ComponentType, ReactNode } from "react";
+import {
+  Button as AriaButton,
+  ColorArea,
+  ColorField,
+  ColorPicker as AriaColorPicker,
+  ColorSlider,
+  ColorThumb,
+  Dialog,
+  DialogTrigger,
+  Input as AriaInput,
+  Label as AriaLabel,
+  Popover,
+  SliderTrack,
+  parseColor,
+  type Color,
+} from "react-aria-components";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -212,37 +228,118 @@ const customizationTabs: Array<{ value: CustomizationTab; label: string }> = [
   { value: "bio", label: "Bio & Social" },
 ];
 
-type ColorSelectorProps = {
-  id: string;
+type ReactAriaColorPickerProps = {
   label: string;
   value: string;
   onChange: (value: string) => void;
   helperText?: string;
-  className?: string;
-  inputClassName?: string;
+  dialogTitle?: string;
+  dialogDescription?: string;
+  triggerTitle?: string;
 };
 
-const ColorSelector = ({
-  id,
+const ReactAriaColorPicker = ({
   label,
   value,
   onChange,
   helperText,
-  className,
-  inputClassName,
-}: ColorSelectorProps) => (
-  <div className={cn("space-y-2", className)}>
-    {label ? <Label htmlFor={id}>{label}</Label> : null}
-    <Input
-      id={id}
-      type="color"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={cn("h-12 w-full cursor-pointer", inputClassName)}
-    />
-    {helperText ? <p className="text-xs text-slate-500">{helperText}</p> : null}
-  </div>
-);
+  dialogTitle = "Choose color",
+  dialogDescription = "Saturation means how vivid the color is. Brightness means how light or dark it feels.",
+  triggerTitle = "Open color picker",
+}: ReactAriaColorPickerProps) => {
+  const parsedColor = useMemo(() => parseColor(value), [value]);
+
+  const handleColorChange = (nextColor: Color) => {
+    onChange(nextColor.toString("hex"));
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <AriaColorPicker value={parsedColor} onChange={handleColorChange}>
+          <DialogTrigger>
+            <AriaButton className="group flex h-12 w-full items-center justify-between rounded-2xl border border-slate-300 bg-white px-3 text-left shadow-sm transition hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15">
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  className="size-6 rounded-xl border border-slate-200 shadow-inner"
+                  style={{ backgroundColor: value }}
+                />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-slate-900">
+                    {triggerTitle}
+                  </p>
+                  <p className="truncate text-xs text-slate-500">{value}</p>
+                </div>
+              </div>
+              <Palette className="size-4 text-slate-400 transition group-hover:text-slate-600" />
+            </AriaButton>
+            <Popover
+              placement="bottom start"
+              offset={10}
+              className="w-[min(92vw,360px)] rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_30px_90px_rgba(15,23,42,0.18)]"
+            >
+              <Dialog className="space-y-4 outline-none">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {dialogTitle}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {dialogDescription}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-600">
+                    Saturation and brightness
+                  </p>
+                  <ColorArea
+                    colorSpace="hsb"
+                    xChannel="saturation"
+                    yChannel="brightness"
+                    className="relative block h-48 w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner"
+                  >
+                    <ColorThumb className="block size-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(15,23,42,0.18),0_4px_14px_rgba(15,23,42,0.2)] focus:outline-none" />
+                  </ColorArea>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-slate-600">Hue</p>
+                    <span className="text-xs text-slate-500">{value}</span>
+                  </div>
+                  <ColorSlider
+                    colorSpace="hsb"
+                    channel="hue"
+                    className="w-full"
+                  >
+                    <SliderTrack
+                      className="relative block h-4 w-full rounded-full border border-slate-200"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
+                      }}
+                    >
+                      <ColorThumb className="top-1/2 block size-4 -translate-y-1/2 rounded-full border-2 border-white bg-white shadow-[0_0_0_1px_rgba(15,23,42,0.18),0_4px_14px_rgba(15,23,42,0.2)] focus:outline-none" />
+                    </SliderTrack>
+                  </ColorSlider>
+                </div>
+
+                <ColorField className="space-y-2">
+                  <AriaLabel className="text-xs font-medium text-slate-600">
+                    Hex
+                  </AriaLabel>
+                  <AriaInput className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-900/10" />
+                </ColorField>
+              </Dialog>
+            </Popover>
+          </DialogTrigger>
+        </AriaColorPicker>
+      </div>
+      {helperText ? <p className="text-xs text-slate-500">{helperText}</p> : null}
+    </div>
+  );
+};
 
 type UploadImageCardProps = {
   title: string;
@@ -1188,9 +1285,8 @@ const CustomizationForm = () => {
               Download your QR code
             </h3>
             <p className="text-sm leading-6 text-slate-600 sm:text-base">
-              Give this feature its own row so the page feels balanced. Your QR
-              code stays easy to find, and the layout no longer leaves an empty
-              gap beside it.
+              Export a clean QR code for print, packaging, or quick sharing
+              without leaving the dashboard.
             </p>
           </div>
           <div className="grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
@@ -1283,8 +1379,7 @@ const CustomizationForm = () => {
           })}
         </div>
 
-        <div className="rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-3 shadow-lg shadow-slate-900/5 sm:p-4 lg:p-5">
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] xl:gap-8 xl:items-start">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] xl:gap-8 xl:items-start">
             <div className="min-w-0 space-y-6">
           {activeTab === "essentials" && (
             <section
@@ -1311,24 +1406,22 @@ const CustomizationForm = () => {
               </div>
               <div className="space-y-8">
                 <div className={settingsGroupClass}>
-                  <div className="space-y-3">
-                    <ColorSelector
-                      id="accentColor"
-                      label="Accent Color"
-                      value={formData.accentColor}
-                      onChange={(value) =>
-                        handleInputChange("accentColor", value)
-                      }
-                      className="max-w-[220px]"
-                    />
-                    <p
-                      className="text-sm font-semibold"
-                      style={{ color: formData.accentColor }}
-                    >
-                      {formData.accentColor}
-                    </p>
+                  <div className="space-y-4">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <ReactAriaColorPicker
+                        label="Accent Color"
+                        value={formData.accentColor}
+                        onChange={(value) =>
+                          handleInputChange("accentColor", value)
+                        }
+                        helperText="Choose the main brand color used for buttons, highlights, and emphasis across your page."
+                        dialogTitle="Accent color"
+                        triggerTitle="Pick accent color"
+                      />
+                    </div>
+
                     <p className="text-sm font-medium text-slate-700">
-                      Use this for buttons and accents
+                      Use this for buttons and accents.
                     </p>
                   </div>
                 </div>
@@ -1603,110 +1696,132 @@ const CustomizationForm = () => {
                                   : undefined,
                             }))
                           }
-                          className={
-                            formData.backgroundType === option.value
-                              ? "text-[color:var(--accent-foreground)]"
-                              : ""
-                          }
                           style={
                             formData.backgroundType === option.value
                               ? { ...accentControlVars, ...accentButtonStyle }
                               : undefined
                           }
+                          className={cn(
+                            "min-w-20",
+                            formData.backgroundType === option.value
+                              ? "text-[color:var(--accent-foreground)]"
+                              : "",
+                          )}
                         >
                           {option.label}
                         </Button>
                       ))}
                     </div>
 
-                    <div className="space-y-4">
-                      <ColorSelector
-                        id="backgroundSolidColor"
-                        label="Solid Color"
-                        value={formData.backgroundSolidColor}
-                        onChange={(value) =>
-                          handleInputChange("backgroundSolidColor", value)
-                        }
-                      />
-                      <div className="space-y-2">
-                        <Label>Pattern Overlay</Label>
-                        <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
-                          <div>
-                            <p className="text-sm font-medium text-slate-700">
-                              Enable overlay
+                    {formData.backgroundType !== "image" && (
+                      <div className="space-y-4 pt-2">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                          <div className="mb-4 space-y-1">
+                            <p className="text-sm font-semibold text-slate-900">
+                              Base color
                             </p>
                             <p className="text-xs text-slate-500">
-                              Add subtle texture to the background
+                              This anchors the overall background mood before
+                              any gradient blend or texture is added.
                             </p>
                           </div>
-                          <button
-                            id="patternOverlayEnabled"
-                            type="button"
-                            role="switch"
-                            aria-checked={formData.patternOverlayEnabled}
-                            disabled={formData.backgroundType === "image"}
-                            onClick={() =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                patternOverlayEnabled:
-                                  !prev.patternOverlayEnabled,
-                                patternOverlayValue:
-                                  !prev.patternOverlayEnabled &&
-                                  !prev.patternOverlayValue
-                                    ? patternOptions[0]?.value
-                                    : prev.patternOverlayValue,
-                              }))
-                            }
-                            className={cn(
-                              "relative inline-flex h-6 w-11 items-center rounded-full border transition",
-                              formData.patternOverlayEnabled
-                                ? "border-transparent"
-                                : "border-slate-200 bg-slate-100",
-                              formData.backgroundType === "image" &&
-                                "opacity-60",
-                            )}
-                            style={
-                              formData.patternOverlayEnabled
-                                ? { backgroundColor: formData.accentColor }
-                                : undefined
-                            }
-                          >
-                            <span
-                              className={cn(
-                                "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition",
-                                formData.patternOverlayEnabled &&
-                                  "translate-x-6",
-                              )}
+                            <ReactAriaColorPicker
+                              label="Solid Color"
+                              value={formData.backgroundSolidColor}
+                              onChange={(value) =>
+                                handleInputChange("backgroundSolidColor", value)
+                              }
+                              dialogTitle="Background solid color"
+                              triggerTitle="Pick solid background color"
                             />
-                          </button>
                         </div>
-                        {formData.backgroundType === "image" && (
-                          <p className="text-xs text-slate-500">
-                            Pattern overlays are available for solid or gradient
-                            backgrounds.
-                          </p>
-                        )}
+
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                          <div className="space-y-2">
+                            <Label>Pattern Overlay</Label>
+                            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-3">
+                              <div>
+                                <p className="text-sm font-medium text-slate-700">
+                                  Enable overlay
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  Add subtle texture to the background
+                                </p>
+                              </div>
+                              <button
+                                id="patternOverlayEnabled"
+                                type="button"
+                                role="switch"
+                                aria-checked={formData.patternOverlayEnabled}
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    patternOverlayEnabled:
+                                      !prev.patternOverlayEnabled,
+                                    patternOverlayValue:
+                                      !prev.patternOverlayEnabled &&
+                                      !prev.patternOverlayValue
+                                        ? patternOptions[0]?.value
+                                        : prev.patternOverlayValue,
+                                  }))
+                                }
+                                className={cn(
+                                  "relative inline-flex h-6 w-11 items-center rounded-full border transition",
+                                  formData.patternOverlayEnabled
+                                    ? "border-transparent"
+                                    : "border-slate-200 bg-slate-100",
+                                )}
+                                style={
+                                  formData.patternOverlayEnabled
+                                    ? { backgroundColor: formData.accentColor }
+                                    : undefined
+                                }
+                              >
+                                <span
+                                  className={cn(
+                                    "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition",
+                                    formData.patternOverlayEnabled &&
+                                      "translate-x-6",
+                                  )}
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {formData.backgroundType === "gradient" && (
-                      <div className="space-y-4">
-                        <ColorSelector
-                          id="gradientStart"
-                          label="Gradient Start"
-                          value={gradientColors.start}
-                          onChange={(value) =>
-                            handleGradientChange("start", value)
-                          }
-                        />
-                        <ColorSelector
-                          id="gradientEnd"
-                          label="Gradient End"
-                          value={gradientColors.end}
-                          onChange={(value) =>
-                            handleGradientChange("end", value)
-                          }
-                        />
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <div className="mb-4 space-y-1">
+                          <p className="text-sm font-semibold text-slate-900">
+                            Gradient blend
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            Pick the two colors that fade into each other across
+                            the background.
+                          </p>
+                        </div>
+                        <div className="space-y-4">
+                          <ReactAriaColorPicker
+                            label="Gradient Start"
+                            value={gradientColors.start}
+                            onChange={(value) =>
+                              handleGradientChange("start", value)
+                            }
+                            dialogTitle="Gradient start color"
+                            triggerTitle="Pick gradient start color"
+                          />
+                          <ReactAriaColorPicker
+                            label="Gradient End"
+                            value={gradientColors.end}
+                            onChange={(value) =>
+                              handleGradientChange("end", value)
+                            }
+                            dialogTitle="Gradient end color"
+                            triggerTitle="Pick gradient end color"
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -2350,7 +2465,6 @@ const CustomizationForm = () => {
             <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
               {previewPanel}
             </aside>
-          </div>
         </div>
 
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">

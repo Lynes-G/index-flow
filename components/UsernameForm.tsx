@@ -275,7 +275,7 @@ const UsernameForm = () => {
 
         <Button
           type="submit"
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
+          className="bg-brand-primary hover:bg-brand-primary-strong text-brand-ink w-full disabled:opacity-50"
           disabled={isSubmitDisabled}
         >
           {form.formState.isSubmitting ? (

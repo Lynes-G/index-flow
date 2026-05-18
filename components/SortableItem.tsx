@@ -80,7 +80,7 @@ const SortableItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-lg border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
     >
       {isEditing ? (
         <div className="space-y-3">
@@ -127,15 +127,17 @@ const SortableItem = ({
             {...attributes}
             {...listeners}
             aria-describedby={`link-${id}`}
-            className="shrink-0 cursor-move rounded p-1 hover:bg-gray-100"
+            className="shrink-0 cursor-move rounded-lg p-1 hover:bg-slate-100"
           >
-            <GripVertical className="size-4 text-gray-400" />
+            <GripVertical className="size-4 text-slate-400" />
           </div>
 
           {/* Link Content */}
           <div className="min-w-0 flex-1 pr-3">
-            <h3 className="truncate text-lg font-semibold">{link.title}</h3>
-            <p className="truncate text-sm text-gray-600">{link.url}</p>
+            <h3 className="truncate text-base font-semibold text-slate-900">
+              {link.title}
+            </h3>
+            <p className="truncate text-sm text-slate-600">{link.url}</p>
           </div>
 
           {/* Action Buttons */}

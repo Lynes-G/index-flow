@@ -68,3 +68,4 @@ tmp-pnpm-dev-out.log
 # Misc
 /docs
 /design-system
+*-dev-preview-*.*

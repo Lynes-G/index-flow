@@ -42,6 +42,11 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-brand-primary: var(--brand-accent);
+  --color-brand-primary-strong: var(--brand-accent-strong);
+  --color-brand-primary-ink: var(--brand-accent-ink);
+  --color-brand-primary-soft: var(--brand-accent-soft);
+  --color-brand-ink: var(--brand-ink);
 }
 
 :root {
