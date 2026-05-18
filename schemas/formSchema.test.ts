@@ -34,6 +34,6 @@ test("createLinkFormSchema explains valid URL requirements clearly", () => {
   assert.equal(result.success, false);
   assert.equal(
     result.error.issues[0]?.message,
-    "Enter a full link URL starting with http:// or https://",
+    "Enter a full URL or a domain like example.com",
   );
 });

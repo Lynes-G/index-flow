@@ -25,7 +25,7 @@ export const createLinkFormSchema = z.object({
     .min(1, "URL is required")
     .refine(
       (value) => isSafeExternalUrl(value),
-      "Enter a full link URL starting with http:// or https://",
+      "Enter a full URL or a domain like example.com",
     ),
 });
 export type CreateLinkFormData = z.infer<typeof createLinkFormSchema>;

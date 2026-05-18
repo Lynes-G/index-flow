@@ -47,7 +47,7 @@ const CreateLinkForm = ({
       try {
         const normalizedUrl = normalizeExternalUrl(data.url);
         if (!normalizedUrl) {
-          setError("Enter a full link URL starting with http:// or https://");
+          setError("Enter a full URL or a domain like example.com");
           return;
         }
 
@@ -113,7 +113,8 @@ const CreateLinkForm = ({
                   autoComplete="off"
                 />
                 <FieldDescription>
-                  This is the destination URL for your link.
+                  Paste a full URL or a domain like example.com. We&apos;ll
+                  handle the rest.
                 </FieldDescription>
                 <FieldError>{fieldState.error?.message}</FieldError>
               </Field>

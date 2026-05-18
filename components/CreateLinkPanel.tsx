@@ -42,7 +42,8 @@ const CreateLinkPanel = ({ submitLabel, onSuccess }: CreateLinkPanelProps) => {
         <div className="mb-6 space-y-2">
           <h2 className="text-xl font-semibold text-slate-900">Link details</h2>
           <p className="text-sm leading-6 text-slate-500 sm:text-base">
-            Give your link a clear name and paste the full destination URL.
+            Give your link a clear name and paste a full URL or a domain like
+            example.com.
           </p>
         </div>
 
