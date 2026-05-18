@@ -80,43 +80,54 @@ const SortableItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+      className="rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md sm:p-5"
     >
       {isEditing ? (
-        <div className="space-y-3">
-          <div className="space-y-2">
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+            <p className="text-sm font-semibold text-slate-900">Edit link</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Update the title and destination, then save to refresh this link
+              on your page.
+            </p>
+          </div>
+          <div className="space-y-3">
             <Input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               placeholder="Link title"
-              className="font-semibold"
+              className="h-11 border-slate-200 bg-white font-semibold text-slate-900 placeholder:text-slate-400"
             />
             <Input
               value={editUrl}
               onChange={(e) => setEditUrl(e.target.value)}
               placeholder="https://example.com"
-              className="text-sm"
+              className="h-11 border-slate-200 bg-white text-sm text-slate-700 placeholder:text-slate-400"
             />
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
             <Button
               variant="outline"
               onClick={handleCancel}
               size="sm"
               disabled={isUpdating}
+              className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             >
               <X className="size-4" />
+              Cancel
             </Button>
             <Button
               size="sm"
               onClick={handleSave}
               disabled={isUpdating || !editTitle.trim() || !editUrl.trim()}
+              className="rounded-xl"
             >
               {isUpdating ? (
                 <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <Check className="size-4" />
               )}
+              Save changes
             </Button>
           </div>
         </div>
@@ -127,7 +138,7 @@ const SortableItem = ({
             {...attributes}
             {...listeners}
             aria-describedby={`link-${id}`}
-            className="shrink-0 cursor-move rounded-lg p-1 hover:bg-slate-100"
+            className="shrink-0 cursor-move rounded-2xl border border-transparent bg-slate-50 p-2 transition-colors hover:border-slate-200 hover:bg-slate-100"
           >
             <GripVertical className="size-4 text-slate-400" />
           </div>
@@ -141,9 +152,14 @@ const SortableItem = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="flex shrink-0 items-center gap-2">
             {/* Analyitcs button */}
-            <Button variant="outline" size="icon" className="size-8" asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-9 rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50"
+              asChild
+            >
               <Link href={`/dashboard/link/${id}`}>
                 <BarChart3 className="size-3.5 text-green-500" />
               </Link>
@@ -152,7 +168,7 @@ const SortableItem = ({
             <Button
               variant="outline"
               size="icon"
-              className="size-8"
+              className="size-9 rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50"
               onClick={() => setIsEditing(true)}
             >
               <Pencil className="size-3.5" />
@@ -162,7 +178,7 @@ const SortableItem = ({
             <Button
               variant="destructive"
               size="icon"
-              className="size-8"
+              className="size-9 rounded-2xl"
               onClick={(e) => {
                 e.stopPropagation();
                 const isConfirmed = confirm(

@@ -22,7 +22,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
+import { Link2, Plus } from "lucide-react";
 import SortableItem from "./SortableItem";
 import { Id } from "@/convex/_generated/dataModel";
 import { getAccentForeground } from "@/lib/accentColor";
@@ -102,15 +102,20 @@ const ManageLinks = ({
           </SortableContext>
         </DndContext>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
-          <p className="text-sm font-semibold text-slate-900">No links yet</p>
-          <p className="mt-1 text-sm text-slate-600">
+        <div className="rounded-3xl border border-slate-200/80 bg-slate-50/90 p-8 text-center shadow-sm">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm">
+            <Link2 className="size-6" />
+          </div>
+          <p className="mt-4 text-base font-semibold text-slate-900">
+            No links yet
+          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             Add your first link to start building your page.
           </p>
         </div>
       )}
       {hasLinks && (
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-4 text-xs font-medium text-slate-500">
           Tip: Press space to lift a link, use arrow keys to move, then press
           space to drop.
         </p>
@@ -119,7 +124,7 @@ const ManageLinks = ({
         variant="outline"
         type="button"
         onClick={openCreateLinkSheet}
-        className="mt-4 w-full border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="mt-5 h-12 w-full rounded-2xl border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none"
         style={
           {
             "--accent-color": accentColor,
@@ -130,7 +135,7 @@ const ManageLinks = ({
         }
       >
         <span className="flex items-center justify-center gap-2">
-          <Plus className="mr-2 size-4" />
+          <Plus className="size-4" />
           Add New Link
         </span>
       </Button>
