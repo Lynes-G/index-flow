@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
+import { useLinkCreationSheet } from "@/components/LinkCreationSheetProvider";
 import { Preloaded, useMutation, usePreloadedQuery, useQuery } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { CSSProperties, useEffect, useMemo, useState } from "react";
@@ -21,7 +22,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Button } from "./ui/button";
-import Link from "next/link";
 import { Plus } from "lucide-react";
 import SortableItem from "./SortableItem";
 import { Id } from "@/convex/_generated/dataModel";
@@ -34,6 +34,7 @@ const ManageLinks = ({
   preloadedLinks: Preloaded<typeof api.lib.links.getLinksByUserId>;
 }) => {
   const { user } = useUser();
+  const { openCreateLinkSheet } = useLinkCreationSheet();
   const links = usePreloadedQuery(preloadedLinks);
   const updateLinkOrder = useMutation(api.lib.links.updateLinkOrder);
   const existingCustomization = useQuery(
@@ -116,6 +117,8 @@ const ManageLinks = ({
       )}
       <Button
         variant="outline"
+        type="button"
+        onClick={openCreateLinkSheet}
         className="mt-4 w-full border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none"
         style={
           {
@@ -125,15 +128,11 @@ const ManageLinks = ({
             "--accent-ring": `${accentColor}55`,
           } as CSSProperties
         }
-        asChild
       >
-        <Link
-          href="/dashboard/new-link"
-          className="flex items-center justify-center gap-2"
-        >
+        <span className="flex items-center justify-center gap-2">
           <Plus className="mr-2 size-4" />
           Add New Link
-        </Link>
+        </span>
       </Button>
     </>
   );

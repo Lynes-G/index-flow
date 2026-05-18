@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { LinkCreationSheetProvider } from "@/components/LinkCreationSheetProvider";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,12 +10,14 @@ export const metadata: Metadata = {
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <div>
-      <Header />
-      <main className="max-w-7xl px-4 pt-10 lg:mx-auto xl:px-0">
-        {children}
-      </main>
-    </div>
+    <LinkCreationSheetProvider>
+      <div>
+        <Header />
+        <main className="max-w-7xl px-4 pt-10 lg:mx-auto xl:px-0">
+          {children}
+        </main>
+      </div>
+    </LinkCreationSheetProvider>
   );
 };
 

@@ -13,6 +13,7 @@ import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { Eye, Lock } from "lucide-react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Suspense } from "react";
 
 const emptyAnalytics: AnalyticsData = {
@@ -292,12 +293,13 @@ const DashboardPage = async ({
                 </div>
               ))}
             </div>
-            <button
-              type="button"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600"
+            <Link
+              href="/dashboard?createLink=1"
+              className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-600"
+              scroll={false}
             >
               Add New Link
-            </button>
+            </Link>
           </div>
         )}
       </div>
