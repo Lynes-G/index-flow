@@ -2,6 +2,11 @@
 
 import CreateLinkPanel from "@/components/CreateLinkPanel";
 import {
+  CREATE_LINK_SHEET_QUERY_KEY,
+  DASHBOARD_PATH,
+  shouldOpenCreateLinkSheet,
+} from "@/lib/linkCreationSheet";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -29,14 +34,14 @@ const LinkCreationSheetProvider = ({
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (searchParams.get("createLink") !== "1") {
+    if (!shouldOpenCreateLinkSheet(searchParams)) {
       return;
     }
 
     setOpen(true);
 
     const nextSearchParams = new URLSearchParams(searchParams.toString());
-    nextSearchParams.delete("createLink");
+    nextSearchParams.delete(CREATE_LINK_SHEET_QUERY_KEY);
 
     const nextQuery = nextSearchParams.toString();
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
@@ -46,6 +51,7 @@ const LinkCreationSheetProvider = ({
 
   const handleSuccess = async () => {
     setOpen(false);
+    router.push(DASHBOARD_PATH);
     router.refresh();
   };
 

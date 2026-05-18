@@ -4,6 +4,7 @@ import DashboardMetricsSkeleton from "@/components/DashboardMetricsSkeleton";
 import ManageLinks from "@/components/ManageLinks";
 import UsernameForm from "@/components/UsernameForm";
 import { api } from "@/convex/_generated/api";
+import { getCreateLinkSheetHref } from "@/lib/linkCreationSheet";
 import { fetchAnalytics } from "@/lib/fetchAnalytics";
 import { checkTinybirdConnection } from "@/lib/checkTinybirdConnection";
 import type { AnalyticsData } from "@/lib/fetchAnalytics";
@@ -294,7 +295,7 @@ const DashboardPage = async ({
               ))}
             </div>
             <Link
-              href="/dashboard?createLink=1"
+              href={getCreateLinkSheetHref()}
               className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-600"
               scroll={false}
             >
