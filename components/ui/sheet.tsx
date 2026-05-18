@@ -78,13 +78,17 @@ const SheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       data-slot="sheet-content"
-      className={cn(sheetVariants({ side }), className)}
+      className={cn(
+        sheetVariants({ side }),
+        "p-6 pr-16 sm:p-8 sm:pr-20",
+        className
+      )}
       {...props}
     >
       {children}
       <DialogPrimitive.Close
         className={cn(
-          "absolute top-4 right-4 rounded-full border border-slate-200/80 bg-white/80 p-2 text-slate-500",
+          "absolute top-4 right-4 rounded-full border border-slate-200/80 bg-white/80 p-2 text-slate-500 sm:top-5 sm:right-5",
           "transition-colors hover:border-slate-300 hover:bg-white hover:text-slate-900",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15",
           "disabled:pointer-events-none"
