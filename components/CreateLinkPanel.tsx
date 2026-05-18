@@ -1,0 +1,50 @@
+import CreateLinkForm from "@/components/CreateLinkForm";
+
+const featureNotes = [
+  "Drag and drop to reorder later",
+  "Automatic link validation before save",
+  "Click tracking analytics for every link",
+];
+
+const CreateLinkPanel = () => {
+  return (
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+            Create a new link
+          </h1>
+          <div className="mt-4 h-1 w-20 rounded-full bg-linear-to-r from-blue-500 to-orange-500" />
+        </div>
+        <p className="max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
+          Add a destination to your link-in-bio page. New links appear in the
+          order you create them, and you can reorganize everything later from
+          the dashboard.
+        </p>
+        <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+          {featureNotes.map((note) => (
+            <span
+              key={note}
+              className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1"
+            >
+              {note}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8">
+        <div className="mb-6 space-y-2">
+          <h2 className="text-xl font-semibold text-slate-900">Link details</h2>
+          <p className="text-sm leading-6 text-slate-500 sm:text-base">
+            Give your link a clear name and paste the full destination URL.
+          </p>
+        </div>
+
+        <CreateLinkForm />
+      </div>
+    </div>
+  );
+};
+
+export default CreateLinkPanel;

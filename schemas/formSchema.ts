@@ -16,7 +16,8 @@ export type UsernameFormData = z.infer<typeof usernameFormSchema>;
 export const createLinkFormSchema = z.object({
   title: z
     .string()
-    .min(1, "Title is required")
+    .trim()
+    .min(1, "Link name is required")
     .max(100, "Title must be less than 100 characters"),
   url: z
     .string()
@@ -24,7 +25,7 @@ export const createLinkFormSchema = z.object({
     .min(1, "URL is required")
     .refine(
       (value) => isSafeExternalUrl(value),
-      "Please enter a valid http or https URL",
+      "Enter a full link URL starting with http:// or https://",
     ),
 });
 export type CreateLinkFormData = z.infer<typeof createLinkFormSchema>;

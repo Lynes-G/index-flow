@@ -19,7 +19,15 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { normalizeExternalUrl } from "@/lib/externalLinks";
 
-const CreateLinkForm = () => {
+type CreateLinkFormProps = {
+  submitLabel?: string;
+  onSuccess?: () => void | Promise<void>;
+};
+
+const CreateLinkForm = ({
+  submitLabel = "Create Link",
+  onSuccess,
+}: CreateLinkFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, startTransition] = useTransition();
   const router = useRouter();
@@ -34,13 +42,12 @@ const CreateLinkForm = () => {
   });
 
   const onSubmit = async (data: CreateLinkFormData) => {
-    console.log(data);
     setError(null);
     startTransition(async () => {
       try {
         const normalizedUrl = normalizeExternalUrl(data.url);
         if (!normalizedUrl) {
-          setError("Please enter a valid http or https URL");
+          setError("Enter a full link URL starting with http:// or https://");
           return;
         }
 
@@ -48,9 +55,19 @@ const CreateLinkForm = () => {
           title: data.title,
           url: normalizedUrl,
         });
+
+        if (onSuccess) {
+          await onSuccess();
+          return;
+        }
+
         router.push("/dashboard");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to create link");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to create the link right now. Please try again.",
+        );
       }
     });
   };
@@ -110,7 +127,7 @@ const CreateLinkForm = () => {
         )}
       </FieldSet>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Creating..." : "Create Link"}
+        {isSubmitting ? "Creating..." : submitLabel}
       </Button>
     </form>
   );
