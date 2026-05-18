@@ -1,6 +1,6 @@
 "use client";
 
-import { useLinkCreationSheet } from "@/components/LinkCreationSheetProvider";
+import { useOptionalLinkCreationSheet } from "@/components/LinkCreationSheetProvider";
 import {
   DASHBOARD_NEW_LINK_PATH,
   getCreateLinkSheetHref,
@@ -23,9 +23,12 @@ const Header = ({
   logoHref?: string;
 }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const { openCreateLinkSheet } = useLinkCreationSheet();
+  const linkCreationSheet = useOptionalLinkCreationSheet();
   const pathname = usePathname();
   const shouldShowCreateEntries = pathname !== DASHBOARD_NEW_LINK_PATH;
+  const createLinkHref = linkCreationSheet
+    ? getCreateLinkSheetHref()
+    : DASHBOARD_NEW_LINK_PATH;
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 639px)");
@@ -74,14 +77,24 @@ const Header = ({
         <Authenticated>
           <div className="flex flex-nowrap items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 p-2 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-sm">
             {shouldShowCreateEntries ? (
-              <button
-                type="button"
-                onClick={openCreateLinkSheet}
-                className="hidden min-h-10 items-center gap-1 rounded-full bg-[color:var(--brand-accent)] px-3 py-2 text-xs font-semibold text-[#111216] shadow-[0_14px_24px_rgba(251,176,59,0.3)] transition-all duration-200 hover:bg-[#ffc868] sm:inline-flex sm:min-h-11 sm:px-4 sm:text-sm"
-              >
-                <Plus className="size-4" />
-                Add Link
-              </button>
+              linkCreationSheet ? (
+                <button
+                  type="button"
+                  onClick={linkCreationSheet.openCreateLinkSheet}
+                  className="hidden min-h-10 items-center gap-1 rounded-full bg-[color:var(--brand-accent)] px-3 py-2 text-xs font-semibold text-[#111216] shadow-[0_14px_24px_rgba(251,176,59,0.3)] transition-all duration-200 hover:bg-[#ffc868] sm:inline-flex sm:min-h-11 sm:px-4 sm:text-sm"
+                >
+                  <Plus className="size-4" />
+                  Add Link
+                </button>
+              ) : (
+                <Link
+                  href={DASHBOARD_NEW_LINK_PATH}
+                  className="hidden min-h-10 items-center gap-1 rounded-full bg-[color:var(--brand-accent)] px-3 py-2 text-xs font-semibold text-[#111216] shadow-[0_14px_24px_rgba(251,176,59,0.3)] transition-all duration-200 hover:bg-[#ffc868] sm:inline-flex sm:min-h-11 sm:px-4 sm:text-sm"
+                >
+                  <Plus className="size-4" />
+                  Add Link
+                </Link>
+              )
             ) : null}
             <Button
               asChild
@@ -99,7 +112,7 @@ const Header = ({
               <UserButton.MenuItems>
                 {isMobile && shouldShowCreateEntries && (
                   <UserButton.Link
-                    href={getCreateLinkSheetHref()}
+                    href={createLinkHref}
                     label="Add Link"
                     labelIcon={<Plus className="size-4" />}
                   />

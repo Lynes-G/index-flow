@@ -13,7 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { createContext, use, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type LinkCreationSheetContextValue = {
@@ -79,7 +79,7 @@ const LinkCreationSheetProvider = ({
 };
 
 const useLinkCreationSheet = () => {
-  const context = use(LinkCreationSheetContext);
+  const context = useOptionalLinkCreationSheet();
 
   if (!context) {
     throw new Error(
@@ -90,4 +90,10 @@ const useLinkCreationSheet = () => {
   return context;
 };
 
-export { LinkCreationSheetProvider, useLinkCreationSheet };
+const useOptionalLinkCreationSheet = () => useContext(LinkCreationSheetContext);
+
+export {
+  LinkCreationSheetProvider,
+  useLinkCreationSheet,
+  useOptionalLinkCreationSheet,
+};
