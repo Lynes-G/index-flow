@@ -58,7 +58,7 @@ const PublicProfileHero = ({
       </div>
 
       <div className="relative z-10 mx-auto -mt-12 max-w-2xl sm:-mt-16 lg:-mt-18">
-        <div className="rounded-[1.75rem] border border-white/60 bg-white/86 px-5 pb-5 pt-0 text-center shadow-2xl shadow-slate-900/10 backdrop-blur-xl sm:rounded-[2rem] sm:px-8 sm:pb-8">
+        <div className="rounded-[1.75rem] border border-white/60 bg-white/86 px-5 pt-0 pb-5 text-center shadow-2xl shadow-slate-900/10 backdrop-blur-xl sm:rounded-[2rem] sm:px-8 sm:pb-8">
           <div className="-mt-12 flex justify-center sm:-mt-14">
             <div className="relative">
               {profilePictureUrl ? (
@@ -89,7 +89,7 @@ const PublicProfileHero = ({
 
           <div className="mt-4 space-y-4 sm:mt-5 sm:space-y-5">
             <div className="space-y-2">
-              <h1 className="text-[2rem] font-semibold tracking-[-0.03em] text-slate-900 sm:text-4xl">
+              <h1 className="text-[2rem] font-semibold tracking-[-0.03em] wrap-break-word text-slate-900 sm:text-4xl">
                 @{username}
               </h1>
               {description && (
