@@ -127,7 +127,11 @@ const CreateLinkForm = ({
           </div>
         )}
       </FieldSet>
-      <Button type="submit" disabled={isSubmitting} className="w-full">
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="h-11 w-full rounded-full bg-[color:var(--brand-accent)] font-semibold text-[#111216] shadow-[0_14px_24px_rgba(251,176,59,0.3)] transition-all duration-200 hover:bg-[#ffc868] focus-visible:ring-[color:var(--brand-accent)]/35"
+      >
         {isSubmitting ? "Creating..." : submitLabel}
       </Button>
     </form>

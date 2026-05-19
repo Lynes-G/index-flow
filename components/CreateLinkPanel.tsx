@@ -1,9 +1,15 @@
 import CreateLinkForm from "@/components/CreateLinkForm";
 
 const featureNotes = [
-  "Drag and drop to reorder later",
-  "Automatic link validation before save",
-  "Click tracking analytics for every link",
+  {
+    text: "Easy drag & drop reordering",
+  },
+  {
+    text: "Automatic URL validation",
+  },
+  {
+    text: "Click tracking analytics",
+  },
 ];
 
 type CreateLinkPanelProps = {
@@ -26,14 +32,12 @@ const CreateLinkPanel = ({ submitLabel, onSuccess }: CreateLinkPanelProps) => {
           order you create them, and you can reorganize everything later from
           the dashboard.
         </p>
-        <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+        <div className="space-y-4 pt-2">
           {featureNotes.map((note) => (
-            <span
-              key={note}
-              className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1"
-            >
-              {note}
-            </span>
+            <div key={note.text} className="flex items-center gap-3">
+              <div className="size-2 rounded-full bg-[color:var(--brand-accent)]" />
+              <span className="text-base text-slate-600">{note.text}</span>
+            </div>
           ))}
         </div>
       </div>
