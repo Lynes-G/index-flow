@@ -19,7 +19,15 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { normalizeExternalUrl } from "@/lib/externalLinks";
 
-const CreateLinkForm = () => {
+type CreateLinkFormProps = {
+  submitLabel?: string;
+  onSuccess?: () => void | Promise<void>;
+};
+
+const CreateLinkForm = ({
+  submitLabel = "Create Link",
+  onSuccess,
+}: CreateLinkFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, startTransition] = useTransition();
   const router = useRouter();
@@ -34,13 +42,12 @@ const CreateLinkForm = () => {
   });
 
   const onSubmit = async (data: CreateLinkFormData) => {
-    console.log(data);
     setError(null);
     startTransition(async () => {
       try {
         const normalizedUrl = normalizeExternalUrl(data.url);
         if (!normalizedUrl) {
-          setError("Please enter a valid http or https URL");
+          setError("Enter a full URL or a domain like example.com");
           return;
         }
 
@@ -48,9 +55,19 @@ const CreateLinkForm = () => {
           title: data.title,
           url: normalizedUrl,
         });
+
+        if (onSuccess) {
+          await onSuccess();
+          return;
+        }
+
         router.push("/dashboard");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to create link");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to create the link right now. Please try again.",
+        );
       }
     });
   };
@@ -96,7 +113,8 @@ const CreateLinkForm = () => {
                   autoComplete="off"
                 />
                 <FieldDescription>
-                  This is the destination URL for your link.
+                  Paste a full URL or a domain like example.com. We&apos;ll
+                  handle the rest.
                 </FieldDescription>
                 <FieldError>{fieldState.error?.message}</FieldError>
               </Field>
@@ -109,8 +127,12 @@ const CreateLinkForm = () => {
           </div>
         )}
       </FieldSet>
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Creating..." : "Create Link"}
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="h-11 w-full rounded-full bg-[color:var(--brand-accent)] font-semibold text-[#111216] shadow-[0_14px_24px_rgba(251,176,59,0.3)] transition-all duration-200 hover:bg-[#ffc868] focus-visible:ring-[color:var(--brand-accent)]/35"
+      >
+        {isSubmitting ? "Creating..." : submitLabel}
       </Button>
     </form>
   );

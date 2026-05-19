@@ -4,6 +4,7 @@ import DashboardMetricsSkeleton from "@/components/DashboardMetricsSkeleton";
 import ManageLinks from "@/components/ManageLinks";
 import UsernameForm from "@/components/UsernameForm";
 import { api } from "@/convex/_generated/api";
+import { getCreateLinkSheetHref } from "@/lib/linkCreationSheet";
 import { fetchAnalytics } from "@/lib/fetchAnalytics";
 import { checkTinybirdConnection } from "@/lib/checkTinybirdConnection";
 import type { AnalyticsData } from "@/lib/fetchAnalytics";
@@ -13,6 +14,7 @@ import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 import { Eye, Lock } from "lucide-react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Suspense } from "react";
 
 const emptyAnalytics: AnalyticsData = {
@@ -292,12 +294,13 @@ const DashboardPage = async ({
                 </div>
               ))}
             </div>
-            <button
-              type="button"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600"
+            <Link
+              href={getCreateLinkSheetHref()}
+              className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-600"
+              scroll={false}
             >
               Add New Link
-            </button>
+            </Link>
           </div>
         )}
       </div>
