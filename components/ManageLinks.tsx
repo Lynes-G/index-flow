@@ -83,26 +83,46 @@ const ManageLinks = ({
     resolveThemePreset(defaultThemePresetKey).accentColor;
   const accentColor = existingCustomization?.accentColor || defaultAccentColor;
   const accentForeground = getAccentForeground(accentColor);
+  const addLinkButtonStyle = {
+    "--accent-color": accentColor,
+    "--accent-foreground": accentForeground,
+    "--accent-soft": `${accentColor}12`,
+    "--accent-ring": `${accentColor}55`,
+  } as CSSProperties;
 
   return (
-    <>
+    <div className="space-y-5">
       {hasLinks ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
-              {items.map((id) => {
-                const link = linkMap[id];
-                return <SortableItem key={id} id={id} link={link} />;
-              })}
-            </div>
-          </SortableContext>
-        </DndContext>
+        <div className="space-y-4">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={items}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-3">
+                {items.map((id) => {
+                  const link = linkMap[id];
+                  return <SortableItem key={id} id={id} link={link} />;
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
+          <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/70 px-4 py-3 text-xs leading-5 text-slate-500">
+            <p className="font-semibold uppercase tracking-[0.18em] text-slate-700">
+              Keyboard tip
+            </p>
+            <p className="mt-1">
+              Press space to lift a link, use arrow keys to move it, then press
+              space again to drop it.
+            </p>
+          </div>
+        </div>
       ) : (
-        <div className="rounded-3xl border border-slate-200/80 bg-slate-50/90 p-8 text-center shadow-sm">
+        <div className="rounded-[1.6rem] border border-slate-200/80 bg-white/72 p-6 text-center sm:p-8">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm">
             <Link2 className="size-6" />
           </div>
@@ -114,32 +134,26 @@ const ManageLinks = ({
           </p>
         </div>
       )}
-      {hasLinks && (
-        <p className="mt-4 text-xs font-medium text-slate-500">
-          Tip: Press space to lift a link, use arrow keys to move, then press
-          space to drop.
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-slate-600">
+          {hasLinks
+            ? "Keep your most important destinations near the top."
+            : "Start with one destination and build from there."}
         </p>
-      )}
-      <Button
-        variant="outline"
-        type="button"
-        onClick={openCreateLinkSheet}
-        className="mt-5 h-12 w-full rounded-2xl border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none"
-        style={
-          {
-            "--accent-color": accentColor,
-            "--accent-foreground": accentForeground,
-            "--accent-soft": `${accentColor}12`,
-            "--accent-ring": `${accentColor}55`,
-          } as CSSProperties
-        }
-      >
-        <span className="flex items-center justify-center gap-2">
-          <Plus className="size-4" />
-          Add New Link
-        </span>
-      </Button>
-    </>
+        <Button
+          variant="outline"
+          type="button"
+          onClick={openCreateLinkSheet}
+          className="h-12 w-full rounded-2xl border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none sm:w-auto sm:min-w-[180px]"
+          style={addLinkButtonStyle}
+        >
+          <span className="flex items-center justify-center gap-2">
+            <Plus className="size-4" />
+            Add New Link
+          </span>
+        </Button>
+      </div>
+    </div>
   );
 };
 

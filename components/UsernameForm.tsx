@@ -59,6 +59,7 @@ const UsernameForm = () => {
     api.lib.usernames.getUserSlug,
     user?.id ? { userId: user.id } : "skip",
   );
+  const publicProfileUrl = `${getBaseUrl()}/u/${currentSlug}`;
 
   const availabilityCheck = useQuery(
     api.lib.usernames.checkUsernameAvailability,
@@ -120,88 +121,86 @@ const UsernameForm = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="mb-2 text-lg font-semibold text-gray-900">
-          Customize your link
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold tracking-[0.22em] text-[color:var(--brand-purple)] uppercase">
+          Username
+        </p>
+        <h3 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.04em] text-slate-900 sm:text-[1.75rem]">
+          Customize your public link
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm leading-6 text-slate-600 sm:text-base">
           Choose a custom username for you link-in-bio page. This will be your
           public URL.
         </p>
       </div>
 
-      {/* Current username status */}
       {hasCustomUsername && (
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <User className="size-4 text-green-600" />
-              <span className="text-sm font-medium text-green-900">
-                Current username
-              </span>
+        <div className="rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/85 px-4 py-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-emerald-800">
+                <User className="size-4" />
+                <p className="text-xs font-semibold tracking-[0.18em] uppercase">
+                  Current username
+                </p>
+              </div>
+              <p className="font-mono text-sm text-emerald-950">{currentSlug}</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="rounded bg-white/70 px-2 py-1 font-mono text-sm text-green-800">
-                {currentSlug}
-              </span>
               <Link
-                className="flex h-11 w-11 items-center justify-center rounded-full text-green-600 transition-colors hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="inline-flex h-11 items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-4 text-sm font-medium text-emerald-900 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                 href={`/u/${currentSlug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Open public profile"
               >
-                <ExternalLink className="size-5" />
+                <ExternalLink className="size-4" />
+                Open profile
               </Link>
             </div>
           </div>
         </div>
       )}
 
-      {/* URL Preview */}
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="size-2 rounded-full bg-gray-500" />
-          <span className="text-sm font-medium text-gray-700">
-            Your Link Preview
-          </span>
-        </div>
-        <div className="flex items-center">
+      <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/78 p-3 sm:p-4">
+        <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
+          Public URL
+        </p>
+        <div className="mt-2 flex items-center gap-2">
           <Link
             href={`/u/${currentSlug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 truncate rounded-l border-y border-l bg-white px-3 py-2 font-mono text-gray-800 transition-colors hover:bg-gray-50"
+            className="min-w-0 flex-1 truncate rounded-xl bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800 transition-colors hover:bg-slate-100"
           >
-            {getBaseUrl()}/u/{currentSlug}
+            {publicProfileUrl}
           </Link>
           <button
             type="button"
             onClick={() => {
-              navigator.clipboard.writeText(`${getBaseUrl()}/u/${currentSlug}`);
+              navigator.clipboard.writeText(publicProfileUrl);
               toast.success("Copied to clipboard!");
             }}
-            className="flex h-11 w-11 items-center justify-center border border-r bg-white transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 focus-visible:outline-none"
             title="Copy to clipboard"
             aria-label="Copy public URL"
           >
-            <Copy className="size-5 text-gray-500" />
+            <Copy className="size-5 text-slate-500" />
           </button>
         </div>
       </div>
 
-      {/* Form */}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FieldSet>
-          <FieldGroup className="p-2">
+          <FieldGroup className="rounded-[1.35rem] border border-slate-200/80 bg-white/72 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
             <Controller
               name="username"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="username">Username</FieldLabel>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="relative flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                    <div className="relative min-w-0 flex-1">
                       <Input
                         {...field}
                         id="username"
@@ -227,29 +226,32 @@ const UsernameForm = () => {
                         )}
                       </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        if (isEditing) {
-                          setIsEditing(false);
-                          if (currentSlug) {
-                            form.setValue("username", currentSlug, {
-                              shouldDirty: false,
-                            });
+                    <div className="flex items-center gap-2 sm:pt-0.5">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-11 rounded-full px-5"
+                        onClick={() => {
+                          if (isEditing) {
+                            setIsEditing(false);
+                            if (currentSlug) {
+                              form.setValue("username", currentSlug, {
+                                shouldDirty: false,
+                              });
+                            }
+                          } else {
+                            setIsEditing(true);
                           }
-                        } else {
-                          setIsEditing(true);
-                        }
-                      }}
-                    >
-                      {isEditing ? "Cancel" : "Edit"}
-                    </Button>
+                        }}
+                      >
+                        {isEditing ? "Cancel" : "Edit"}
+                      </Button>
+                    </div>
                   </div>
                 </Field>
               )}
             />
-            <FieldGroup className="gap-0">
+            <FieldGroup className="gap-1">
               <FieldDescription>
                 Your username can contain letters, numbers, and underscores.
               </FieldDescription>
@@ -275,7 +277,7 @@ const UsernameForm = () => {
 
         <Button
           type="submit"
-          className="bg-brand-primary hover:bg-brand-primary-strong text-brand-ink w-full disabled:opacity-50"
+          className="h-12 w-full rounded-2xl disabled:opacity-50"
           disabled={isSubmitDisabled}
         >
           {form.formState.isSubmitting ? (

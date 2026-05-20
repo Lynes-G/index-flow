@@ -124,35 +124,40 @@ const DashboardPage = async ({
   ) : (
     <AdminPageShell className={sectionContainerClass}>
       <div className="dashboard-shell dashboard-shell-inner">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-gray-400 p-3">
-            <Lock className="size-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Analytics Overview
-            </h2>
-            <p className="text-gray-600">
-              Detailed analytics unlock on Pro and above, but billing is
-              currently paused.
-            </p>
+        <div className="space-y-4">
+          <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+            Analytics
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+            <div className="rounded-2xl bg-slate-900 p-3 text-white shadow-sm shadow-slate-900/10">
+              <Lock className="size-6" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900 sm:text-3xl">
+                Analytics are paused for this workspace
+              </h2>
+              <p className="text-sm leading-6 text-slate-600 sm:text-base">
+                Detailed analytics unlock on Pro and above, but billing is
+                currently paused.
+              </p>
+            </div>
           </div>
         </div>
         <div className="dashboard-section-divider mt-6 pt-6">
-          <div className="rounded-2xl bg-gray-50 p-4">
-            <p className="text-gray-600">
+          <div className="rounded-[1.4rem] border border-slate-200/80 bg-white/72 p-4 sm:p-5">
+            <p className="text-sm leading-6 text-slate-600">
               New accounts stay on Free by default. Pro and Ultra access
               currently come from admin-issued invites rather than direct
               checkout.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-600">
-              <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
+            <div className="mt-4 flex flex-wrap gap-2 text-sm text-slate-600">
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
                 Top links
               </span>
-              <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
                 Referrers
               </span>
-              <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
                 Countries
               </span>
             </div>
@@ -168,14 +173,19 @@ const DashboardPage = async ({
         <div
           className={`dashboard-shell dashboard-shell-inner text-sm ${
             tinybirdStatus.ok
-              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-              : "border-amber-200 bg-amber-50 text-amber-900"
+              ? "border-emerald-200 bg-emerald-50/90 text-emerald-900"
+              : "border-amber-200 bg-amber-50/90 text-amber-900"
           }`}
         >
-          <p className="font-semibold">
-            Tinybird status: {tinybirdStatus.ok ? "Connected" : "Check"}
+          <p className="text-[11px] font-semibold tracking-[0.18em] uppercase opacity-80">
+            Tinybird status
           </p>
-          <p className="mt-1 text-xs opacity-80">{tinybirdStatus.message}</p>
+          <p className="mt-2 text-sm font-semibold">
+            {tinybirdStatus.ok ? "Connected" : "Needs attention"}
+          </p>
+          <p className="mt-1 text-xs leading-5 opacity-80">
+            {tinybirdStatus.message}
+          </p>
         </div>
       </AdminPageShell>
     ) : null;
@@ -187,63 +197,52 @@ const DashboardPage = async ({
           <UsernameForm />
         ) : (
           <div className="space-y-6">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">
-                Customize your link
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold tracking-[0.22em] text-[color:var(--brand-purple)] uppercase">
+                Username
+              </p>
+              <h3 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.04em] text-slate-900 sm:text-[1.75rem]">
+                Customize your public link
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm leading-6 text-slate-600 sm:text-base">
                 Preview the username section layout without connecting it to a
                 real account.
               </p>
             </div>
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="size-2 rounded-full bg-green-500" />
-                  <span className="text-sm font-medium text-green-900">
+            <div className="rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/85 px-4 py-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold tracking-[0.18em] text-emerald-700 uppercase">
                     Current username
-                  </span>
-                </div>
-                <span className="rounded bg-white/75 px-2 py-1 font-mono text-sm text-green-800">
-                  your-profile
-                </span>
-              </div>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="size-2 rounded-full bg-slate-400" />
-                <span className="text-sm font-medium text-slate-700">
-                  Your Link Preview
-                </span>
-              </div>
-              <div className="rounded-md border border-slate-200 bg-white px-3 py-2 font-mono text-sm text-slate-700">
-                http://localhost:3000/u/your-profile
-              </div>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              <div className="space-y-3">
-                <div>
-                  <p className="mb-2 text-sm font-medium text-slate-800">
-                    Username
                   </p>
-                  <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                  <p className="font-mono text-sm text-emerald-950">
                     your-profile
-                  </div>
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm text-slate-500"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white"
-                  >
-                    Save Username
-                  </button>
+                <span className="inline-flex h-11 items-center rounded-full border border-emerald-200 bg-white/80 px-4 text-sm font-medium text-emerald-900">
+                  Preview mode
+                </span>
+              </div>
+            </div>
+            <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/78 p-3 sm:p-4">
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
+                Public URL
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <div className="min-w-0 flex-1 truncate rounded-xl bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800">
+                  http://localhost:3000/u/your-profile
                 </div>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500">
+                  Copy
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
+                Edit
+              </div>
+              <div className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white">
+                Save Username
               </div>
             </div>
           </div>
@@ -261,9 +260,12 @@ const DashboardPage = async ({
   const manageLinksSection = (
     <AdminPageShell className={sectionContainerClass}>
       <div className="dashboard-shell dashboard-shell-inner">
-        <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">
+            <p className="text-[11px] font-semibold tracking-[0.22em] text-[color:var(--brand-purple)] uppercase">
+              Links
+            </p>
+            <h2 className="mt-2 font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.04em] text-slate-900 sm:text-[1.75rem]">
               Manage your links
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
@@ -271,14 +273,14 @@ const DashboardPage = async ({
               reorder, edit details, or remove links that are no longer needed.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3 text-sm text-slate-600">
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">
+          <div className="flex flex-wrap gap-2 text-sm text-slate-600">
+            <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1">
               Drag & drop
             </span>
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">
+            <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1">
               Realtime updates
             </span>
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">
+            <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1">
               Click tracking
             </span>
           </div>
@@ -292,7 +294,7 @@ const DashboardPage = async ({
                 {["Portfolio", "Newsletter", "Book a call"].map((title) => (
                   <div
                     key={title}
-                    className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                    className="flex flex-col gap-4 rounded-[1.35rem] border border-slate-200/80 bg-white/92 p-4 shadow-sm shadow-slate-900/5 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex items-center gap-3">
                       <div className="rounded-lg p-1 text-slate-400">⋮⋮</div>
@@ -306,14 +308,14 @@ const DashboardPage = async ({
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-500">
                         Stats
                       </span>
-                      <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500">
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-500">
                         Edit
                       </span>
-                      <span className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs text-rose-600">
+                      <span className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs text-rose-600">
                         Delete
                       </span>
                     </div>
@@ -322,7 +324,7 @@ const DashboardPage = async ({
               </div>
               <Link
                 href={getCreateLinkSheetHref()}
-                className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-600"
+                className="block w-full rounded-2xl border border-slate-200 bg-white/78 px-4 py-3 text-center text-sm font-medium text-slate-600"
                 scroll={false}
               >
                 Add New Link
