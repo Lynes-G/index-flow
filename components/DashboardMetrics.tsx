@@ -23,6 +23,13 @@ const DashboardMetrics = ({
   analytics,
   canAccessUltraFeatures,
 }: DashboardMetricsProps) => {
+  const metricCardClass =
+    "rounded-[1.35rem] border border-slate-200/80 bg-white/92 p-4 shadow-sm shadow-slate-900/5 sm:p-5";
+  const metricIconWrapClass =
+    "rounded-[1rem] border border-white/80 p-3 shadow-sm shadow-slate-900/5";
+  const summaryPanelClass =
+    "rounded-[1.4rem] border border-slate-200/80 bg-white/72 p-4 sm:p-5";
+
   const formDate = ({ dateString }: { dateString: string | null }) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -51,19 +58,24 @@ const DashboardMetrics = ({
   return (
     <AdminPageShell>
       <div className="dashboard-shell dashboard-shell-inner">
-        <div className="mb-8">
-          <h2 className="mb-2 text-2xl font-semibold text-slate-900">
-            Analytics Overview
+        <div className="mb-6 space-y-2 sm:mb-8">
+          <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+            Analytics
+          </p>
+          <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900 sm:text-3xl">
+            Performance overview
           </h2>
-          <p className="text-sm text-slate-600 sm:text-base">
-            Last 30 days performance metrics
+          <p className="text-sm leading-6 text-slate-600 sm:text-base">
+            Last 30 days across clicks, visitors, and profile activity.
           </p>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          <div className={metricCardClass}>
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-blue-50/95 text-blue-600`}
+              >
                 <MousePointer className="size-6" />
               </div>
               <div className="text-blue-200">
@@ -80,9 +92,11 @@ const DashboardMetrics = ({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
+          <div className={metricCardClass}>
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-indigo-50/95 text-indigo-600`}
+              >
                 <Users className="size-6" />
               </div>
               <div className="text-indigo-200">
@@ -100,9 +114,11 @@ const DashboardMetrics = ({
           </div>
 
           {canAccessUltraFeatures ? (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
+            <div className={metricCardClass}>
+              <div className="mb-4 flex items-center justify-between sm:mb-5">
+                <div
+                  className={`${metricIconWrapClass} bg-emerald-50/95 text-emerald-600`}
+                >
                   <Globe className="size-6" />
                 </div>
                 <div className="text-emerald-200">
@@ -119,9 +135,11 @@ const DashboardMetrics = ({
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 opacity-80 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
+            <div className="rounded-[1.35rem] border border-emerald-200/80 bg-white/85 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+              <div className="mb-4 flex items-center justify-between sm:mb-5">
+                <div
+                  className={`${metricIconWrapClass} bg-emerald-50/95 text-emerald-600`}
+                >
                   <Globe className="size-6" />
                 </div>
                 <div className="text-emerald-300">
@@ -142,9 +160,11 @@ const DashboardMetrics = ({
             </div>
           )}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="rounded-xl bg-sky-50 p-3 text-sky-600">
+          <div className={metricCardClass}>
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-sky-50/95 text-sky-600`}
+              >
                 <Link className="size-6" />
               </div>
               <div className="text-sky-200">
@@ -161,9 +181,11 @@ const DashboardMetrics = ({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="rounded-xl bg-cyan-50 p-3 text-cyan-600">
+          <div className={metricCardClass}>
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-cyan-50/95 text-cyan-600`}
+              >
                 <QrCode className="size-6" />
               </div>
               <div className="text-cyan-200">
@@ -180,9 +202,11 @@ const DashboardMetrics = ({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="rounded-xl bg-orange-50 p-3 text-orange-600">
+          <div className={metricCardClass}>
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-orange-50/95 text-orange-600`}
+              >
                 <Calendar className="size-6" />
               </div>
               <div className="text-orange-200">
@@ -201,22 +225,31 @@ const DashboardMetrics = ({
         </div>
 
         {!hasActivity && (
-          <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-            <p className="text-sm font-semibold text-slate-900">
+          <div className="mt-4 rounded-[1.5rem] border border-slate-200/80 bg-white/70 p-4 text-sm leading-6 text-slate-600 sm:p-5">
+            <p className="font-semibold text-slate-900">
               No activity yet
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1">
               Share your link-in-bio to start tracking clicks and visitors.
             </p>
           </div>
         )}
 
         {(analytics.topLinkTitle || analytics.topReferrer) && (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="dashboard-section-divider mt-6 pt-6 sm:mt-8 sm:pt-8">
+            <div className="mb-4 space-y-1">
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
+                Highlights
+              </p>
+              <p className="text-sm text-slate-600">
+                A quick read on the strongest sources of recent activity.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
             {analytics.topLinkTitle && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className={summaryPanelClass}>
                 <div className="mb-3 flex items-center gap-3">
-                  <div className="rounded-lg bg-slate-500 p-2">
+                  <div className="rounded-xl bg-slate-900 p-2 text-white">
                     <ExternalLink className="size-4 text-white" />
                   </div>
                   <h3 className="font-semibold text-slate-900">
@@ -230,9 +263,9 @@ const DashboardMetrics = ({
             )}
 
             {analytics.topReferrer && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className={summaryPanelClass}>
                 <div className="mb-3 flex items-center gap-3">
-                  <div className="rounded-lg bg-slate-500 p-2">
+                  <div className="rounded-xl bg-slate-900 p-2 text-white">
                     <Globe className="size-4 text-white" />
                   </div>
                   <h3 className="font-semibold text-slate-900">Top Referrer</h3>
@@ -242,6 +275,7 @@ const DashboardMetrics = ({
                 </p>
               </div>
             )}
+          </div>
           </div>
         )}
       </div>
