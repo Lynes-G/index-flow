@@ -78,16 +78,17 @@ const DashboardPage = async ({
   const analytics = userId ? await fetchAnalytics(userId) : emptyAnalytics;
   const tinybirdStatus =
     isDev && userId ? await checkTinybirdConnection(userId) : null;
+  const sectionContainerClass = "mx-auto max-w-7xl px-3 sm:px-4 lg:px-8";
 
   const headerSection = (
-    <AdminPageShell>
+    <AdminPageShell className={sectionContainerClass}>
       <AdminSurface className={dashboardSurfaceClassName}>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
               Dashboard workspace
             </p>
-            <h1 className="mt-3 font-serif text-3xl leading-tight text-slate-900 sm:text-4xl">
+            <h1 className="mt-3 font-['Sora',sans-serif] text-3xl leading-tight font-semibold tracking-[-0.05em] text-slate-900 sm:text-4xl">
               Shape your public page, links, and performance from one place.
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
@@ -127,7 +128,7 @@ const DashboardPage = async ({
       />
     </Suspense>
   ) : (
-    <AdminPageShell>
+    <AdminPageShell className={sectionContainerClass}>
       <AdminSurface className={dashboardSurfaceClassName}>
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-gray-400 p-3">
@@ -169,7 +170,7 @@ const DashboardPage = async ({
 
   const tinybirdSection =
     isDev && tinybirdStatus ? (
-      <AdminPageShell>
+      <AdminPageShell className={sectionContainerClass}>
         <AdminSurface
           className={`${dashboardSurfaceClassName} text-sm ${
             tinybirdStatus.ok
@@ -186,7 +187,7 @@ const DashboardPage = async ({
     ) : null;
 
   const usernameSection = (
-    <AdminPageShell>
+    <AdminPageShell className={sectionContainerClass}>
       <AdminSurface className={dashboardSurfaceClassName}>
         {userId ? (
           <UsernameForm />
@@ -258,13 +259,13 @@ const DashboardPage = async ({
   );
 
   const customizationSection = (
-    <AdminPageShell>
+    <AdminPageShell className={sectionContainerClass}>
       <CustomizationForm />
     </AdminPageShell>
   );
 
   const manageLinksSection = (
-    <AdminPageShell>
+    <AdminPageShell className={sectionContainerClass}>
       <AdminSurface className={dashboardSurfaceClassName}>
         <div className="flex flex-col gap-3 sm:gap-4">
           <div>
