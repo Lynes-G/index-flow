@@ -4,18 +4,18 @@ import DashboardMetricsSkeleton from "@/components/DashboardMetricsSkeleton";
 import ManageLinks from "@/components/ManageLinks";
 import UsernameForm from "@/components/UsernameForm";
 import { api } from "@/convex/_generated/api";
-import { getCreateLinkSheetHref } from "@/lib/linkCreationSheet";
-import { fetchAnalytics } from "@/lib/fetchAnalytics";
+import { preloadQuery } from "convex/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { Eye, Lock } from "lucide-react";
+import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { checkTinybirdConnection } from "@/lib/checkTinybirdConnection";
 import type { AnalyticsData } from "@/lib/fetchAnalytics";
+import { fetchAnalytics } from "@/lib/fetchAnalytics";
+import { getCreateLinkSheetHref } from "@/lib/linkCreationSheet";
 import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
-import { headers } from "next/headers";
-import { auth } from "@clerk/nextjs/server";
-import { preloadQuery } from "convex/nextjs";
-import { Eye, Lock } from "lucide-react";
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Suspense } from "react";
 
 const emptyAnalytics: AnalyticsData = {
   totalClicks: 0,
@@ -72,23 +72,42 @@ const DashboardPage = async ({
   const tinybirdStatus =
     isDev && userId ? await checkTinybirdConnection(userId) : null;
   const sectionContainerClass = "mx-auto max-w-7xl px-3 sm:px-4 lg:px-8";
-  const sectionCardClass =
-    "rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-6 lg:p-8";
+  const dashboardShellClass = "dashboard-shell";
+  const dashboardShellInnerClass = "dashboard-shell-inner";
   const headerSection = (
     <div className={sectionContainerClass}>
-      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200/70 bg-white/95 px-4 py-5 shadow-sm sm:px-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
-            Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Manage your links, page style, and analytics.
-          </p>
+      <div className={`${dashboardShellClass} ${dashboardShellInnerClass}`}>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
+              Dashboard workspace
+            </p>
+            <h1 className="mt-3 font-serif text-3xl leading-tight text-slate-900 sm:text-4xl">
+              Shape your public page, links, and performance from one place.
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+              Update the pieces visitors see, keep your links in order, and
+              check how your page is performing without leaving this workspace.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            <span className="rounded-full border border-slate-200/80 bg-white/80 px-3 py-1.5">
+              Links
+            </span>
+            <span className="rounded-full border border-slate-200/80 bg-white/80 px-3 py-1.5">
+              Styling
+            </span>
+            <span className="rounded-full border border-slate-200/80 bg-white/80 px-3 py-1.5">
+              Analytics
+            </span>
+          </div>
         </div>
         {isDevPreview ? (
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-900">
-            <Eye className="size-3.5" />
-            Dev preview mode
+          <div className="dashboard-section-divider mt-6 pt-4">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-900">
+              <Eye className="size-3.5" />
+              Dev preview mode
+            </div>
           </div>
         ) : null}
       </div>
@@ -103,8 +122,8 @@ const DashboardPage = async ({
     </Suspense>
   ) : (
     <div className={sectionContainerClass}>
-      <div className={sectionCardClass}>
-        <div className="mb-6 flex items-center gap-3">
+      <div className={`${dashboardShellClass} ${dashboardShellInnerClass}`}>
+        <div className="flex items-center gap-3">
           <div className="rounded-xl bg-gray-400 p-3">
             <Lock className="size-6 text-white" />
           </div>
@@ -118,22 +137,24 @@ const DashboardPage = async ({
             </p>
           </div>
         </div>
-        <div className="mt-4 rounded-lg bg-gray-50 p-4">
-          <p className="text-gray-600">
-            New accounts stay on Free by default. Pro and Ultra access
-            currently come from admin-issued invites rather than direct
-            checkout.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-600">
-            <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
-              Top links
-            </span>
-            <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
-              Referrers
-            </span>
-            <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
-              Countries
-            </span>
+        <div className="dashboard-section-divider mt-6 pt-6">
+          <div className="rounded-2xl bg-gray-50 p-4">
+            <p className="text-gray-600">
+              New accounts stay on Free by default. Pro and Ultra access
+              currently come from admin-issued invites rather than direct
+              checkout.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-600">
+              <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
+                Top links
+              </span>
+              <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
+                Referrers
+              </span>
+              <span className="rounded-full border border-gray-200 bg-white px-3 py-1">
+                Countries
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -143,7 +164,7 @@ const DashboardPage = async ({
     isDev && tinybirdStatus ? (
       <div className={sectionContainerClass}>
         <div
-          className={`rounded-3xl border p-5 text-sm shadow-sm sm:p-6 ${
+          className={`${dashboardShellClass} ${dashboardShellInnerClass} text-sm ${
             tinybirdStatus.ok
               ? "border-emerald-200 bg-emerald-50 text-emerald-900"
               : "border-amber-200 bg-amber-50 text-amber-900"
@@ -158,7 +179,7 @@ const DashboardPage = async ({
     ) : null;
   const usernameSection = (
     <div className={sectionContainerClass}>
-      <div className={sectionCardClass}>
+      <div className={`${dashboardShellClass} ${dashboardShellInnerClass}`}>
         {userId ? (
           <UsernameForm />
         ) : (
@@ -234,8 +255,8 @@ const DashboardPage = async ({
   );
   const manageLinksSection = (
     <div className={sectionContainerClass}>
-      <div className={sectionCardClass}>
-        <div className="mb-8 flex flex-col gap-3 border-b border-slate-200/80 pb-6 sm:gap-4">
+      <div className={`${dashboardShellClass} ${dashboardShellInnerClass}`}>
+        <div className="flex flex-col gap-3 sm:gap-4">
           <div>
             <h2 className="text-2xl font-semibold text-slate-900">
               Manage your links
@@ -257,52 +278,53 @@ const DashboardPage = async ({
             </span>
           </div>
         </div>
-
-        {preloadedLinks ? (
-          <ManageLinks preloadedLinks={preloadedLinks} />
-        ) : (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              {["Portfolio", "Newsletter", "Book a call"].map((title) => (
-                <div
-                  key={title}
-                  className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg p-1 text-slate-400">⋮⋮</div>
-                    <div>
-                      <p className="text-base font-semibold text-slate-900">
-                        {title}
-                      </p>
-                      <p className="text-sm text-slate-600">
-                        https://example.com/
-                        {title.toLowerCase().replace(/\s+/g, "-")}
-                      </p>
+        <div className="dashboard-section-divider mt-8 pt-8">
+          {preloadedLinks ? (
+            <ManageLinks preloadedLinks={preloadedLinks} />
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                {["Portfolio", "Newsletter", "Book a call"].map((title) => (
+                  <div
+                    key={title}
+                    className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg p-1 text-slate-400">⋮⋮</div>
+                      <div>
+                        <p className="text-base font-semibold text-slate-900">
+                          {title}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          https://example.com/
+                          {title.toLowerCase().replace(/\s+/g, "-")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500">
+                        Stats
+                      </span>
+                      <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500">
+                        Edit
+                      </span>
+                      <span className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs text-rose-600">
+                        Delete
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500">
-                      Stats
-                    </span>
-                    <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500">
-                      Edit
-                    </span>
-                    <span className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs text-rose-600">
-                      Delete
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Link
+                href={getCreateLinkSheetHref()}
+                className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-600"
+                scroll={false}
+              >
+                Add New Link
+              </Link>
             </div>
-            <Link
-              href={getCreateLinkSheetHref()}
-              className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-600"
-              scroll={false}
-            >
-              Add New Link
-            </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
@@ -315,10 +337,11 @@ const DashboardPage = async ({
   ];
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 pb-10 sm:space-y-7">
       {headerSection}
       {defaultSections.map(
-        (section, index) => section && <Suspense key={index}>{section}</Suspense>,
+        (section, index) =>
+          section && <Suspense key={index}>{section}</Suspense>,
       )}
     </div>
   );
