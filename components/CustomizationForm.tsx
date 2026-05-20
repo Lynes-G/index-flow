@@ -385,11 +385,17 @@ const extractGradientColors = (value?: string) => {
 
 const dashboardFontFallback = '"Sora", "Helvetica Neue", sans-serif';
 
+const dashboardAllowedFontFamilies = new Set(
+  themePresetList
+    .map((preset) => preset.fontFamily)
+    .filter(
+      (fontFamily) =>
+        fontFamily.includes("sans-serif") || fontFamily.includes("monospace"),
+    ),
+);
+
 const isDashboardSafeFontFamily = (fontFamily?: string) =>
-  Boolean(
-    fontFamily &&
-      (fontFamily.includes("sans-serif") || fontFamily.includes("monospace")),
-  );
+  Boolean(fontFamily && dashboardAllowedFontFamilies.has(fontFamily));
 
 const sanitizeDashboardFontFamily = (fontFamily?: string) =>
   isDashboardSafeFontFamily(fontFamily) ? fontFamily : dashboardFontFallback;
@@ -539,10 +545,10 @@ const CustomizationForm = () => {
   const [isLoading, startTransition] = useTransition();
   const [isUploading, startUploading] = useTransition();
 
-  const uniqueFonts = useMemo(() => {
-    const fonts = new Set(themePresetList.map((preset) => preset.fontFamily));
-    return Array.from(fonts).filter(isDashboardSafeFontFamily);
-  }, []);
+  const uniqueFonts = useMemo(
+    () => Array.from(dashboardAllowedFontFamilies),
+    [],
+  );
   const countryOptions = useMemo(() => getCountryOptions(), []);
   const localePhoneCountry = useMemo(() => {
     if (typeof navigator === "undefined") return "US";
@@ -681,33 +687,39 @@ const CustomizationForm = () => {
 
     startTransition(async () => {
       try {
-        await updateCustomization({
-          description: formData.description || undefined,
-          accentColor: formData.accentColor || undefined,
-          themePreset: formData.themePreset || undefined,
+        const sanitizedFormData = {
+          ...formData,
           fontFamily: sanitizeDashboardFontFamily(formData.fontFamily),
-          layoutStyle: formData.layoutStyle || undefined,
-          linkStyle: formData.linkStyle || undefined,
-          featuredLinkId: formData.featuredLinkId,
-          backgroundType: formData.backgroundType || undefined,
+        };
+
+        await updateCustomization({
+          description: sanitizedFormData.description || undefined,
+          accentColor: sanitizedFormData.accentColor || undefined,
+          themePreset: sanitizedFormData.themePreset || undefined,
+          fontFamily: sanitizedFormData.fontFamily,
+          layoutStyle: sanitizedFormData.layoutStyle || undefined,
+          linkStyle: sanitizedFormData.linkStyle || undefined,
+          featuredLinkId: sanitizedFormData.featuredLinkId,
+          backgroundType: sanitizedFormData.backgroundType || undefined,
           backgroundValue:
-            formData.backgroundType === "gradient"
-              ? formData.backgroundValue || undefined
+            sanitizedFormData.backgroundType === "gradient"
+              ? sanitizedFormData.backgroundValue || undefined
               : undefined,
-          backgroundSolidColor: formData.backgroundSolidColor || undefined,
-          patternOverlayEnabled: formData.patternOverlayEnabled,
-          patternOverlayValue: formData.patternOverlayEnabled
-            ? formData.patternOverlayValue || undefined
+          backgroundSolidColor:
+            sanitizedFormData.backgroundSolidColor || undefined,
+          patternOverlayEnabled: sanitizedFormData.patternOverlayEnabled,
+          patternOverlayValue: sanitizedFormData.patternOverlayEnabled
+            ? sanitizedFormData.patternOverlayValue || undefined
             : undefined,
-          backgroundImagePositionX: formData.backgroundImagePositionX,
-          backgroundImagePositionY: formData.backgroundImagePositionY,
-          bannerImagePositionX: formData.bannerImagePositionX,
-          bannerImagePositionY: formData.bannerImagePositionY,
-          avatarShape: formData.avatarShape || undefined,
-          profileFields: normalizeProfileFields(formData.profileFields),
-          socialLinks: formData.socialLinks,
+          backgroundImagePositionX: sanitizedFormData.backgroundImagePositionX,
+          backgroundImagePositionY: sanitizedFormData.backgroundImagePositionY,
+          bannerImagePositionX: sanitizedFormData.bannerImagePositionX,
+          bannerImagePositionY: sanitizedFormData.bannerImagePositionY,
+          avatarShape: sanitizedFormData.avatarShape || undefined,
+          profileFields: normalizeProfileFields(sanitizedFormData.profileFields),
+          socialLinks: sanitizedFormData.socialLinks,
         });
-        setSavedSnapshot(snapshotFromForm(formData));
+        setSavedSnapshot(snapshotFromForm(sanitizedFormData));
         toast.success("Customizations saved successfully.");
       } catch (err) {
         console.log("Failed to save customizations:", err);
