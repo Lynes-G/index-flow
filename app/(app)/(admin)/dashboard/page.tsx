@@ -3,10 +3,7 @@ import DashboardMetrics from "@/components/DashboardMetrics";
 import DashboardMetricsSkeleton from "@/components/DashboardMetricsSkeleton";
 import ManageLinks from "@/components/ManageLinks";
 import UsernameForm from "@/components/UsernameForm";
-import {
-  AdminPageShell,
-  AdminSurface,
-} from "@/components/dashboard/AdminShell";
+import { AdminPageShell } from "@/components/dashboard/AdminShell";
 import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
 import { auth } from "@clerk/nextjs/server";
@@ -38,9 +35,6 @@ const isLocalHostname = (hostname: string) =>
   hostname === "127.0.0.1" ||
   hostname === "::1" ||
   hostname === "[::1]";
-
-const dashboardSurfaceClassName =
-  "dashboard-shell dashboard-shell-inner border-transparent bg-transparent p-0 shadow-none backdrop-blur-0 sm:p-0 lg:p-0";
 
 const DashboardPage = async ({
   searchParams,
@@ -82,7 +76,7 @@ const DashboardPage = async ({
 
   const headerSection = (
     <AdminPageShell className={sectionContainerClass}>
-      <AdminSurface className={dashboardSurfaceClassName}>
+      <div className="dashboard-shell dashboard-shell-inner">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
@@ -116,7 +110,7 @@ const DashboardPage = async ({
             </div>
           </div>
         ) : null}
-      </AdminSurface>
+      </div>
     </AdminPageShell>
   );
 
@@ -129,7 +123,7 @@ const DashboardPage = async ({
     </Suspense>
   ) : (
     <AdminPageShell className={sectionContainerClass}>
-      <AdminSurface className={dashboardSurfaceClassName}>
+      <div className="dashboard-shell dashboard-shell-inner">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-gray-400 p-3">
             <Lock className="size-6 text-white" />
@@ -164,15 +158,15 @@ const DashboardPage = async ({
             </div>
           </div>
         </div>
-      </AdminSurface>
+      </div>
     </AdminPageShell>
   );
 
   const tinybirdSection =
     isDev && tinybirdStatus ? (
       <AdminPageShell className={sectionContainerClass}>
-        <AdminSurface
-          className={`${dashboardSurfaceClassName} text-sm ${
+        <div
+          className={`dashboard-shell dashboard-shell-inner text-sm ${
             tinybirdStatus.ok
               ? "border-emerald-200 bg-emerald-50 text-emerald-900"
               : "border-amber-200 bg-amber-50 text-amber-900"
@@ -182,13 +176,13 @@ const DashboardPage = async ({
             Tinybird status: {tinybirdStatus.ok ? "Connected" : "Check"}
           </p>
           <p className="mt-1 text-xs opacity-80">{tinybirdStatus.message}</p>
-        </AdminSurface>
+        </div>
       </AdminPageShell>
     ) : null;
 
   const usernameSection = (
     <AdminPageShell className={sectionContainerClass}>
-      <AdminSurface className={dashboardSurfaceClassName}>
+      <div className="dashboard-shell dashboard-shell-inner">
         {userId ? (
           <UsernameForm />
         ) : (
@@ -254,7 +248,7 @@ const DashboardPage = async ({
             </div>
           </div>
         )}
-      </AdminSurface>
+      </div>
     </AdminPageShell>
   );
 
@@ -266,7 +260,7 @@ const DashboardPage = async ({
 
   const manageLinksSection = (
     <AdminPageShell className={sectionContainerClass}>
-      <AdminSurface className={dashboardSurfaceClassName}>
+      <div className="dashboard-shell dashboard-shell-inner">
         <div className="flex flex-col gap-3 sm:gap-4">
           <div>
             <h2 className="text-2xl font-semibold text-slate-900">
@@ -336,7 +330,7 @@ const DashboardPage = async ({
             </div>
           )}
         </div>
-      </AdminSurface>
+      </div>
     </AdminPageShell>
   );
 

@@ -1,15 +1,9 @@
-import {
-  AdminPageShell,
-  AdminSurface,
-} from "@/components/dashboard/AdminShell";
-
-const dashboardSurfaceClassName =
-  "dashboard-shell dashboard-shell-inner border-transparent bg-transparent p-0 shadow-none backdrop-blur-0 sm:p-0 lg:p-0";
+import { AdminPageShell } from "@/components/dashboard/AdminShell";
 
 const DashboardMetricsSkeleton = () => {
   return (
     <AdminPageShell>
-      <AdminSurface className={dashboardSurfaceClassName}>
+      <div className="dashboard-shell dashboard-shell-inner">
         <div className="mb-8">
           <div className="h-6 w-48 rounded-full bg-slate-200" />
           <div className="mt-3 h-4 w-64 rounded-full bg-slate-100" />
@@ -45,7 +39,7 @@ const DashboardMetricsSkeleton = () => {
             </div>
           ))}
         </div>
-      </AdminSurface>
+      </div>
     </AdminPageShell>
   );
 };

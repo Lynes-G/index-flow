@@ -1,7 +1,4 @@
-import {
-  AdminPageShell,
-  AdminSurface,
-} from "@/components/dashboard/AdminShell";
+import { AdminPageShell } from "@/components/dashboard/AdminShell";
 import type { AnalyticsData } from "@/lib/fetchAnalytics";
 import {
   Calendar,
@@ -21,9 +18,6 @@ interface DashboardMetricsProps {
   analytics: AnalyticsData;
   canAccessUltraFeatures: boolean;
 }
-
-const dashboardSurfaceClassName =
-  "dashboard-shell dashboard-shell-inner border-transparent bg-transparent p-0 shadow-none backdrop-blur-0 sm:p-0 lg:p-0";
 
 const DashboardMetrics = ({
   analytics,
@@ -56,7 +50,7 @@ const DashboardMetrics = ({
 
   return (
     <AdminPageShell>
-      <AdminSurface className={dashboardSurfaceClassName}>
+      <div className="dashboard-shell dashboard-shell-inner">
         <div className="mb-8">
           <h2 className="mb-2 text-2xl font-semibold text-slate-900">
             Analytics Overview
@@ -250,7 +244,7 @@ const DashboardMetrics = ({
             )}
           </div>
         )}
-      </AdminSurface>
+      </div>
     </AdminPageShell>
   );
 };
