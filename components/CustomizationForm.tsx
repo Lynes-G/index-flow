@@ -383,6 +383,17 @@ const extractGradientColors = (value?: string) => {
   };
 };
 
+const dashboardFontFallback = '"Sora", "Helvetica Neue", sans-serif';
+
+const isDashboardSafeFontFamily = (fontFamily?: string) =>
+  Boolean(
+    fontFamily &&
+      (fontFamily.includes("sans-serif") || fontFamily.includes("monospace")),
+  );
+
+const sanitizeDashboardFontFamily = (fontFamily?: string) =>
+  isDashboardSafeFontFamily(fontFamily) ? fontFamily : dashboardFontFallback;
+
 const snapshotFromForm = (data: {
   description: string;
   accentColor: string;
@@ -483,7 +494,7 @@ const CustomizationForm = () => {
     description: "",
     accentColor: defaultPreset.accentColor,
     themePreset: defaultPreset.key,
-    fontFamily: defaultPreset.fontFamily,
+    fontFamily: sanitizeDashboardFontFamily(defaultPreset.fontFamily),
     layoutStyle: defaultPreset.layoutStyle,
     linkStyle: defaultPreset.linkStyle,
     featuredLinkId: null as Id<"links"> | null,
@@ -530,7 +541,7 @@ const CustomizationForm = () => {
 
   const uniqueFonts = useMemo(() => {
     const fonts = new Set(themePresetList.map((preset) => preset.fontFamily));
-    return Array.from(fonts);
+    return Array.from(fonts).filter(isDashboardSafeFontFamily);
   }, []);
   const countryOptions = useMemo(() => getCountryOptions(), []);
   const localePhoneCountry = useMemo(() => {
@@ -564,7 +575,9 @@ const CustomizationForm = () => {
         description: existingCustomization.description || "",
         accentColor: existingCustomization.accentColor || preset.accentColor,
         themePreset: existingCustomization.themePreset || preset.key,
-        fontFamily: existingCustomization.fontFamily || preset.fontFamily,
+        fontFamily: sanitizeDashboardFontFamily(
+          existingCustomization.fontFamily || preset.fontFamily,
+        ),
         layoutStyle: (existingCustomization.layoutStyle ||
           preset.layoutStyle) as LayoutStyle,
         linkStyle: (existingCustomization.linkStyle ||
@@ -672,7 +685,7 @@ const CustomizationForm = () => {
           description: formData.description || undefined,
           accentColor: formData.accentColor || undefined,
           themePreset: formData.themePreset || undefined,
-          fontFamily: formData.fontFamily || undefined,
+          fontFamily: sanitizeDashboardFontFamily(formData.fontFamily),
           layoutStyle: formData.layoutStyle || undefined,
           linkStyle: formData.linkStyle || undefined,
           featuredLinkId: formData.featuredLinkId,
@@ -1116,7 +1129,7 @@ const CustomizationForm = () => {
           className="overflow-hidden rounded-[24px] border border-white/70"
           style={{
             ...previewBackgroundStyle,
-            fontFamily: formData.fontFamily,
+            fontFamily: sanitizeDashboardFontFamily(formData.fontFamily),
           }}
         >
           <div
