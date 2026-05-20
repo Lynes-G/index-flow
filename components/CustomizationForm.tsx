@@ -1312,7 +1312,7 @@ const CustomizationForm = () => {
   );
 
   return (
-    <div className="w-full rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-sm sm:p-7 lg:p-9">
+    <div className="dashboard-shell dashboard-shell-inner w-full">
       <div className="mb-8 flex flex-col gap-4 border-b border-slate-200/80 pb-6 lg:mb-10 lg:flex-row lg:items-start lg:justify-between lg:pb-8">
         <div className="flex items-start gap-4">
           <div
