@@ -2115,57 +2115,67 @@ const CustomizationForm = () => {
 
             {activeTab === "bio" && (
               <section
-              id="panel-bio"
-              role="tabpanel"
-              aria-labelledby="tab-bio"
-              className={sectionCardClass}
-            >
-              <div className="mb-4">
+                id="panel-bio"
+                role="tabpanel"
+                aria-labelledby="tab-bio"
+                className={sectionCardClass}
+              >
                 <div className={sectionHeaderClass}>
-                  <div
-                    className="rounded-lg p-2"
-                    style={accentBadgeStyle}
-                  >
+                  <div className="rounded-lg p-2" style={accentBadgeStyle}>
                     <LinkIcon className="size-4" />
                   </div>
                   <div>
+                    <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                      Bio
+                    </p>
                     <p className={sectionTitleClass}>Bio & Social</p>
                     <p className={sectionHelpClass}>
                       Tell visitors who you are and where to find you.
                     </p>
                   </div>
                 </div>
-              </div>
-              <div className="space-y-8">
-                <div className={settingsGroupClass}>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={(e) =>
-                        handleInputChange("description", e.target.value)
-                      }
-                      placeholder="Tell visitors about yourself..."
-                      rows={3}
-                      maxLength={200}
-                      className="resize-vertical max-h-[200px] min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 focus-visible:border-transparent focus-visible:ring-2 focus-visible:outline-none"
-                    />
-                    <p className="text-sm text-slate-500">
-                      {formData.description.length}/200 characters
-                    </p>
+                <div className="space-y-5">
+                  <div className="dashboard-section-divider pt-5">
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                        Intro
+                      </p>
+                      <p className={sectionTitleClass}>Description</p>
+                      <p className={sectionHelpClass}>
+                        A short summary that helps visitors understand who you
+                        are at a glance.
+                      </p>
+                    </div>
+                    <div className="mt-4 rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4 sm:p-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          name="description"
+                          value={formData.description}
+                          onChange={(e) =>
+                            handleInputChange("description", e.target.value)
+                          }
+                          placeholder="Tell visitors about yourself..."
+                          rows={3}
+                          maxLength={200}
+                          className="resize-vertical max-h-[200px] min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 focus-visible:border-transparent focus-visible:ring-2 focus-visible:outline-none"
+                        />
+                        <p className="text-sm text-slate-500">
+                          {formData.description.length}/200 characters
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className={settingsGroupClass}>
-                  <div className="space-y-4">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <Label className="flex items-center gap-2">
-                          Profile Fields
-                        </Label>
-                        <p className="mt-1 text-xs text-slate-500">
+                  <div className="dashboard-section-divider pt-5">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="space-y-1">
+                        <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                          Contact
+                        </p>
+                        <p className={sectionTitleClass}>Profile Fields</p>
+                        <p className={sectionHelpClass}>
                           Add repeatable phone, email, or free-text items above
                           your social links.
                         </p>
@@ -2178,7 +2188,7 @@ const CustomizationForm = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleAddProfileField(option.value)}
-                            className="flex items-center gap-1"
+                            className="flex items-center gap-1 rounded-full border-slate-300 bg-white/80"
                           >
                             <Plus className="size-4" />
                             {option.label}
@@ -2188,12 +2198,12 @@ const CustomizationForm = () => {
                     </div>
 
                     {formData.profileFields.length === 0 ? (
-                      <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 px-4 py-6 text-sm text-slate-500">
+                      <div className="mt-4 rounded-[1.25rem] border border-dashed border-slate-300 bg-white/76 px-4 py-6 text-sm text-slate-500">
                         No profile fields yet. Add one to show contact details
                         or extra info on the public page.
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="mt-4 space-y-4">
                         {formData.profileFields.map((field, index) => {
                           const phoneValidation =
                             field.type === "phone" && field.value
@@ -2203,7 +2213,7 @@ const CustomizationForm = () => {
                           return (
                             <div
                               key={field.id}
-                              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                              className="rounded-[1.35rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_14px_36px_-28px_rgba(15,23,42,0.5)] sm:p-5"
                             >
                               <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                                 <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
@@ -2220,14 +2230,16 @@ const CustomizationForm = () => {
                                       }
                                       className="h-10 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm"
                                     >
-                                      {profileFieldTypeOptions.map((option) => (
-                                        <option
-                                          key={option.value}
-                                          value={option.value}
-                                        >
-                                          {option.label}
-                                        </option>
-                                      ))}
+                                      {profileFieldTypeOptions.map(
+                                        (option) => (
+                                          <option
+                                            key={option.value}
+                                            value={option.value}
+                                          >
+                                            {option.label}
+                                          </option>
+                                        ),
+                                      )}
                                     </select>
                                   </div>
                                   <div className="min-w-0 space-y-2">
@@ -2264,7 +2276,8 @@ const CustomizationForm = () => {
                                       handleMoveProfileField(field.id, "down")
                                     }
                                     disabled={
-                                      index === formData.profileFields.length - 1
+                                      index ===
+                                      formData.profileFields.length - 1
                                     }
                                   >
                                     <ArrowDown className="size-4" />
@@ -2289,7 +2302,10 @@ const CustomizationForm = () => {
                                     <div className="min-w-0 space-y-2">
                                       <Label>Country</Label>
                                       <select
-                                        value={field.country || preferredPhoneCountry}
+                                        value={
+                                          field.country ||
+                                          preferredPhoneCountry
+                                        }
                                         onChange={(e) =>
                                           handleProfileFieldChange(field.id, {
                                             country: e.target.value,
@@ -2302,8 +2318,8 @@ const CustomizationForm = () => {
                                             key={country.code}
                                             value={country.code}
                                           >
-                                            {country.name} ({country.callingCode}
-                                            )
+                                            {country.name} (
+                                            {country.callingCode})
                                           </option>
                                         ))}
                                       </select>
@@ -2395,99 +2411,105 @@ const CustomizationForm = () => {
                       </div>
                     )}
                   </div>
-                </div>
 
-                <div className={settingsGroupClass}>
-                  <div className="space-y-4">
-                    <Label className="flex items-center gap-2">
-                      Social Links
-                    </Label>
-                    <div className="space-y-3">
-                      <select
-                        value={socialDraft.platform}
-                        onChange={(e) =>
-                          setSocialDraft((prev) => ({
-                            ...prev,
-                            platform: e.target.value as SocialPlatform,
-                          }))
-                        }
-                        className="h-10 rounded-md border border-slate-300 px-3 text-sm"
-                      >
-                        {socialPlatforms.map((platform) => (
-                          <option key={platform} value={platform}>
-                            {platform}
-                          </option>
-                        ))}
-                      </select>
-                      <Input
-                        type="text"
-                        value={socialDraft.url}
-                        onChange={(e) =>
-                          setSocialDraft((prev) => ({
-                            ...prev,
-                            url: e.target.value,
-                          }))
-                        }
-                        placeholder="https://..."
-                      />
-                      <Button
-                        type="button"
-                        onClick={handleAddSocialLink}
-                        className="w-full"
-                        style={accentButtonStyle}
-                      >
-                        Add Link
-                      </Button>
+                  <div className="dashboard-section-divider pt-5">
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                        Network
+                      </p>
+                      <p className={sectionTitleClass}>Social Links</p>
+                      <p className={sectionHelpClass}>
+                        Add the platforms people already know you on.
+                      </p>
                     </div>
-                    {formData.socialLinks.length > 0 && (
-                      <div className="space-y-2">
-                        {formData.socialLinks.map((link, index) => (
-                          <div
-                            key={`${link.platform}-${index}`}
-                            className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-2"
+                    <div className="mt-4 rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4 sm:p-5">
+                      <div className="space-y-4">
+                        <div className="grid gap-3">
+                          <select
+                            value={socialDraft.platform}
+                            onChange={(e) =>
+                              setSocialDraft((prev) => ({
+                                ...prev,
+                                platform: e.target.value as SocialPlatform,
+                              }))
+                            }
+                            className="h-10 rounded-md border border-slate-300 px-3 text-sm"
                           >
-                            <div className="flex min-w-0 items-center gap-3">
-                              {(() => {
-                                const Icon = getSocialPlatformIcon(
-                                  link.platform,
-                                );
-                                return (
-                                  <Icon
-                                    className="size-4 shrink-0 text-slate-700"
-                                    aria-hidden="true"
-                                  />
-                                );
-                              })()}
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-slate-800">
-                                  {link.platform}
-                                </p>
-                                <p className="truncate text-xs text-slate-500">
-                                  {link.url}
-                                </p>
+                            {socialPlatforms.map((platform) => (
+                              <option key={platform} value={platform}>
+                                {platform}
+                              </option>
+                            ))}
+                          </select>
+                          <Input
+                            type="text"
+                            value={socialDraft.url}
+                            onChange={(e) =>
+                              setSocialDraft((prev) => ({
+                                ...prev,
+                                url: e.target.value,
+                              }))
+                            }
+                            placeholder="https://..."
+                          />
+                          <Button
+                            type="button"
+                            onClick={handleAddSocialLink}
+                            className="w-full"
+                            style={accentButtonStyle}
+                          >
+                            Add Link
+                          </Button>
+                        </div>
+                        {formData.socialLinks.length > 0 && (
+                          <div className="space-y-3">
+                            {formData.socialLinks.map((link, index) => (
+                              <div
+                                key={`${link.platform}-${index}`}
+                                className="flex items-center justify-between gap-3 rounded-[1.1rem] border border-slate-200/85 bg-white/92 px-4 py-3 shadow-[0_14px_32px_-30px_rgba(15,23,42,0.5)]"
+                              >
+                                <div className="flex min-w-0 items-center gap-3">
+                                  {(() => {
+                                    const Icon = getSocialPlatformIcon(
+                                      link.platform,
+                                    );
+                                    return (
+                                      <Icon
+                                        className="size-4 shrink-0 text-slate-700"
+                                        aria-hidden="true"
+                                      />
+                                    );
+                                  })()}
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-medium text-slate-800">
+                                      {link.platform}
+                                    </p>
+                                    <p className="truncate text-xs text-slate-500">
+                                      {link.url}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleRemoveSocialLink(index)}
+                                >
+                                  Remove
+                                </Button>
                               </div>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleRemoveSocialLink(index)}
-                            >
-                              Remove
-                            </Button>
+                            ))}
                           </div>
-                        ))}
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
-          )}
+              </section>
+            )}
+          </div>
 
-            </div>
-
-            <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
+          <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
               {previewPanel}
             </aside>
         </div>
