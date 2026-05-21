@@ -21,11 +21,11 @@ export default function BillingOverview({
 
   return (
     <section className="template-noise editorial-surface relative overflow-hidden px-5 py-6 sm:px-8 sm:py-8">
-      <div className="template-glow-ring template-pulse left-[8%] top-6 h-44 w-44 bg-[rgba(251,176,59,0.22)]" />
+      <div className="template-glow-ring template-pulse left-[8%] top-6 h-44 w-44 bg-[rgba(208,212,23,0.22)]" />
       <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
         <div className="space-y-5">
           <div className="space-y-3">
-            <p className="text-[11px] font-semibold tracking-[0.26em] text-[color:var(--brand-accent-strong)] uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.26em] text-[color:var(--brand-purple)] uppercase">
               Billing overview
             </p>
             <h1 className="max-w-3xl font-['Sora',sans-serif] text-3xl leading-tight font-semibold tracking-[-0.06em] text-slate-900 sm:text-4xl">
@@ -53,10 +53,10 @@ export default function BillingOverview({
             </div>
 
             <div className="template-accent-card rounded-[1.5rem] p-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-[#39270c] uppercase">
+              <p className="text-xs font-semibold tracking-[0.18em] text-[color:var(--brand-eggplant)] uppercase">
                 Invite grant status
               </p>
-              <p className="mt-3 text-sm leading-7 text-[#33230b]">
+              <p className="mt-3 text-sm leading-7 text-[color:color-mix(in_srgb,var(--brand-eggplant)_86%,white)]">
                 {grantLabel
                   ? `Your account currently includes an admin invite grant for ${grantLabel}. That grant can raise the effective plan above a direct subscription while it remains active.`
                   : "There is no active admin invite grant on this account, so your current access reflects your direct subscription and available product entitlements."}

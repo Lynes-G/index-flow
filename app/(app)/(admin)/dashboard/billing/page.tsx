@@ -19,7 +19,7 @@ const BillingPage = async () => {
 
       <section className="editorial-surface overflow-hidden px-5 py-6 sm:px-6 sm:py-7 lg:px-8 lg:py-8">
         <div className="mb-6 max-w-2xl space-y-3">
-          <p className="text-[11px] font-semibold tracking-[0.26em] text-[color:var(--brand-accent-strong)] uppercase">
+          <p className="text-[11px] font-semibold tracking-[0.26em] text-[color:var(--brand-purple)] uppercase">
             Billing paused
           </p>
           <h2 className="font-['Sora',sans-serif] text-3xl leading-tight font-semibold tracking-[-0.06em] text-slate-900">
