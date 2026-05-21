@@ -1091,7 +1091,8 @@ const CustomizationForm = () => {
   const sectionCardClass =
     "rounded-[26px] border border-slate-200/80 bg-white/95 p-5 shadow-sm sm:p-6 xl:p-7";
   const sectionHeaderClass = "flex items-start gap-3 sm:gap-4";
-  const sectionTitleClass = "text-lg font-semibold text-slate-900";
+  const sectionTitleClass =
+    "font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900";
   const sectionHelpClass = "mt-1 text-sm leading-6 text-slate-500";
   const settingsGroupClass =
     "rounded-2xl border border-slate-200/80 bg-slate-50/80 p-5 sm:p-6";
@@ -1117,7 +1118,7 @@ const CustomizationForm = () => {
   }, [formData, savedSnapshot]);
 
   const previewPanel = (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
+    <div className="dashboard-shell dashboard-shell-inner rounded-[1.75rem]">
       <div className="mb-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-slate-900">Live preview</p>
@@ -1350,7 +1351,7 @@ const CustomizationForm = () => {
             <p className="mb-2 text-xs font-semibold tracking-[0.18em] text-orange-600 uppercase">
               Customization Studio
             </p>
-            <h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+            <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900 sm:text-3xl">
               Customize your page
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
@@ -1404,59 +1405,52 @@ const CustomizationForm = () => {
           })}
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] xl:gap-8 xl:items-start">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start xl:gap-8">
             <div className="min-w-0 space-y-6">
           {activeTab === "essentials" && (
             <section
-              id="panel-essentials"
-              role="tabpanel"
-              aria-labelledby="tab-essentials"
-              className={sectionCardClass}
-            >
-              <div className="mb-4">
+                id="panel-essentials"
+                role="tabpanel"
+                aria-labelledby="tab-essentials"
+                className={sectionCardClass}
+              >
                 <div className={sectionHeaderClass}>
-                  <div
-                    className="rounded-lg p-2"
-                    style={accentBadgeStyle}
-                  >
+                  <div className="rounded-lg p-2" style={accentBadgeStyle}>
                     <Sparkles className="size-4" />
                   </div>
                   <div>
-                    <p className={sectionTitleClass}>Essentials</p>
+                    <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                      Essentials
+                    </p>
+                    <p className={sectionTitleClass}>Brand basics</p>
                     <p className={sectionHelpClass}>
                       Set your brand color and font.
                     </p>
                   </div>
                 </div>
-              </div>
-              <div className="space-y-8">
-                <div className={settingsGroupClass}>
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <ReactAriaColorPicker
-                        label="Accent Color"
-                        value={formData.accentColor}
-                        onChange={(value) =>
-                          handleInputChange("accentColor", value)
-                        }
-                        helperText="Choose the main brand color used for buttons, highlights, and emphasis across your page."
-                        dialogTitle="Accent color"
-                        triggerTitle="Pick accent color"
-                      />
-                    </div>
-
+                <div className="space-y-5">
+                  <div className="space-y-4 rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
+                    <ReactAriaColorPicker
+                      label="Accent Color"
+                      value={formData.accentColor}
+                      onChange={(value) =>
+                        handleInputChange("accentColor", value)
+                      }
+                      helperText="Choose the main brand color used for buttons, highlights, and emphasis across your page."
+                      dialogTitle="Accent color"
+                      triggerTitle="Pick accent color"
+                    />
                     <p className="text-sm font-medium text-slate-700">
                       Use this for buttons and accents.
                     </p>
                   </div>
-                </div>
 
-                <div className={settingsGroupClass}>
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2">
-                      <Type className="size-4" />
-                      Font Family
-                    </Label>
+                  <div className="dashboard-section-divider pt-5">
+                    <div className="space-y-3 rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
+                      <Label className="flex items-center gap-2">
+                        <Type className="size-4" />
+                        Font Family
+                      </Label>
                     <select
                       value={formData.fontFamily}
                       onChange={(e) =>
