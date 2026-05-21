@@ -1671,83 +1671,81 @@ const CustomizationForm = () => {
 
           {activeTab === "media" && (
             <section
-              id="panel-media"
-              role="tabpanel"
-              aria-labelledby="tab-media"
-              className={sectionCardClass}
-            >
-              <div className="mb-4">
+                id="panel-media"
+                role="tabpanel"
+                aria-labelledby="tab-media"
+                className={sectionCardClass}
+              >
                 <div className={sectionHeaderClass}>
-                  <div
-                    className="rounded-lg p-2"
-                    style={accentBadgeStyle}
-                  >
+                  <div className="rounded-lg p-2" style={accentBadgeStyle}>
                     <ImageIcon className="size-4" />
                   </div>
                   <div>
-                    <p className={sectionTitleClass}>Media</p>
+                    <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                      Media
+                    </p>
+                    <p className={sectionTitleClass}>Background & imagery</p>
                     <p className={sectionHelpClass}>
                       Add background, banner, and profile images.
                     </p>
                   </div>
                 </div>
-              </div>
-              <div className="space-y-8">
-                <div className={settingsGroupClass}>
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2">
-                      Background Style
-                    </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {backgroundTypeOptions.map((option) => (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={
-                            formData.backgroundType === option.value
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              backgroundType: option.value,
-                              backgroundValue:
-                                option.value === "gradient"
-                                  ? prev.backgroundValue ||
-                                    `linear-gradient(135deg, ${gradientColors.start} 0%, ${gradientColors.end} 100%)`
-                                  : undefined,
-                            }))
-                          }
-                          style={
-                            formData.backgroundType === option.value
-                              ? { ...accentControlVars, ...accentButtonStyle }
-                              : undefined
-                          }
-                          className={cn(
-                            "min-w-20",
-                            formData.backgroundType === option.value
-                              ? "text-[color:var(--accent-foreground)]"
-                              : "",
-                          )}
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
-                    </div>
+                <div className="space-y-5">
+                  <div className={settingsGroupClass}>
+                    <div className="space-y-3">
+                      <Label className="flex items-center gap-2">
+                        Background Style
+                      </Label>
+                      <div className="flex flex-wrap gap-2">
+                        {backgroundTypeOptions.map((option) => (
+                          <Button
+                            key={option.value}
+                            type="button"
+                            variant={
+                              formData.backgroundType === option.value
+                                ? "default"
+                                : "outline"
+                            }
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                backgroundType: option.value,
+                                backgroundValue:
+                                  option.value === "gradient"
+                                    ? prev.backgroundValue ||
+                                      `linear-gradient(135deg, ${gradientColors.start} 0%, ${gradientColors.end} 100%)`
+                                    : undefined,
+                              }))
+                            }
+                            style={
+                              formData.backgroundType === option.value
+                                ? { ...accentControlVars, ...accentButtonStyle }
+                                : undefined
+                            }
+                            className={cn(
+                              "min-w-20",
+                              formData.backgroundType === option.value
+                                ? "text-accent-foreground"
+                                : "",
+                            )}
+                          >
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
 
-                    {formData.backgroundType !== "image" && (
-                      <div className="space-y-4 pt-2">
-                        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                          <div className="mb-4 space-y-1">
-                            <p className="text-sm font-semibold text-slate-900">
-                              Base color
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              This anchors the overall background mood before
-                              any gradient blend or texture is added.
-                            </p>
-                          </div>
+                      {formData.backgroundType !== "image" && (
+                        <div className="space-y-4 pt-2">
+                          <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4">
+                            <div className="mb-4 space-y-1">
+                              <p className="text-sm font-semibold text-slate-900">
+                                Base color
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                This anchors the overall background mood before
+                                any gradient blend or texture is added.
+                              </p>
+                            </div>
                             <ReactAriaColorPicker
                               label="Solid Color"
                               value={formData.backgroundSolidColor}
@@ -1757,204 +1755,289 @@ const CustomizationForm = () => {
                               dialogTitle="Background solid color"
                               triggerTitle="Pick solid background color"
                             />
-                        </div>
+                          </div>
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                          <div className="space-y-2">
-                            <Label>Pattern Overlay</Label>
-                            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-3">
-                              <div>
-                                <p className="text-sm font-medium text-slate-700">
-                                  Enable overlay
-                                </p>
-                                <p className="text-xs text-slate-500">
-                                  Add subtle texture to the background
-                                </p>
-                              </div>
-                              <button
-                                id="patternOverlayEnabled"
-                                type="button"
-                                role="switch"
-                                aria-checked={formData.patternOverlayEnabled}
-                                onClick={() =>
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    patternOverlayEnabled:
-                                      !prev.patternOverlayEnabled,
-                                    patternOverlayValue:
-                                      !prev.patternOverlayEnabled &&
-                                      !prev.patternOverlayValue
-                                        ? patternOptions[0]?.value
-                                        : prev.patternOverlayValue,
-                                  }))
-                                }
-                                className={cn(
-                                  "relative inline-flex h-6 w-11 items-center rounded-full border transition",
-                                  formData.patternOverlayEnabled
-                                    ? "border-transparent"
-                                    : "border-slate-200 bg-slate-100",
-                                )}
-                                style={
-                                  formData.patternOverlayEnabled
-                                    ? { backgroundColor: formData.accentColor }
-                                    : undefined
-                                }
-                              >
-                                <span
+                          <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4">
+                            <div className="space-y-2">
+                              <Label>Pattern Overlay</Label>
+                              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-3">
+                                <div>
+                                  <p className="text-sm font-medium text-slate-700">
+                                    Enable overlay
+                                  </p>
+                                  <p className="text-xs text-slate-500">
+                                    Add subtle texture to the background
+                                  </p>
+                                </div>
+                                <button
+                                  id="patternOverlayEnabled"
+                                  type="button"
+                                  role="switch"
+                                  aria-checked={formData.patternOverlayEnabled}
+                                  onClick={() =>
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      patternOverlayEnabled:
+                                        !prev.patternOverlayEnabled,
+                                      patternOverlayValue:
+                                        !prev.patternOverlayEnabled &&
+                                        !prev.patternOverlayValue
+                                          ? patternOptions[0]?.value
+                                          : prev.patternOverlayValue,
+                                    }))
+                                  }
                                   className={cn(
-                                    "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition",
-                                    formData.patternOverlayEnabled &&
-                                      "translate-x-6",
+                                    "relative inline-flex h-6 w-11 items-center rounded-full border transition",
+                                    formData.patternOverlayEnabled
+                                      ? "border-transparent"
+                                      : "border-slate-200 bg-slate-100",
                                   )}
-                                />
-                              </button>
+                                  style={
+                                    formData.patternOverlayEnabled
+                                      ? {
+                                          backgroundColor: formData.accentColor,
+                                        }
+                                      : undefined
+                                  }
+                                >
+                                  <span
+                                    className={cn(
+                                      "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition",
+                                      formData.patternOverlayEnabled &&
+                                        "translate-x-6",
+                                    )}
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {formData.backgroundType === "gradient" && (
-                      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <div className="mb-4 space-y-1">
-                          <p className="text-sm font-semibold text-slate-900">
-                            Gradient blend
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Pick the two colors that fade into each other across
-                            the background.
-                          </p>
-                        </div>
-                        <div className="space-y-4">
-                          <ReactAriaColorPicker
-                            label="Gradient Start"
-                            value={gradientColors.start}
-                            onChange={(value) =>
-                              handleGradientChange("start", value)
-                            }
-                            dialogTitle="Gradient start color"
-                            triggerTitle="Pick gradient start color"
-                          />
-                          <ReactAriaColorPicker
-                            label="Gradient End"
-                            value={gradientColors.end}
-                            onChange={(value) =>
-                              handleGradientChange("end", value)
-                            }
-                            dialogTitle="Gradient end color"
-                            triggerTitle="Pick gradient end color"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {formData.patternOverlayEnabled &&
-                      formData.backgroundType !== "image" && (
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                          {patternOptions.map((option) => (
-                            <button
-                              key={option.label}
-                              type="button"
-                              onClick={() =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  patternOverlayValue: option.value,
-                                }))
+                      {formData.backgroundType === "gradient" && (
+                        <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4">
+                          <div className="mb-4 space-y-1">
+                            <p className="text-sm font-semibold text-slate-900">
+                              Gradient blend
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Pick the two colors that fade into each other
+                              across the background.
+                            </p>
+                          </div>
+                          <div className="space-y-4">
+                            <ReactAriaColorPicker
+                              label="Gradient Start"
+                              value={gradientColors.start}
+                              onChange={(value) =>
+                                handleGradientChange("start", value)
                               }
-                              className={cn(
-                                "w-full rounded-xl border p-3 text-left",
-                                formData.patternOverlayValue === option.value
-                                  ? ""
-                                  : "border-slate-200",
-                              )}
-                              style={
-                                formData.patternOverlayValue === option.value
-                                  ? { borderColor: formData.accentColor }
-                                  : undefined
+                              dialogTitle="Gradient start color"
+                              triggerTitle="Pick gradient start color"
+                            />
+                            <ReactAriaColorPicker
+                              label="Gradient End"
+                              value={gradientColors.end}
+                              onChange={(value) =>
+                                handleGradientChange("end", value)
                               }
-                            >
-                              <div
-                                className="mb-2 h-12 rounded-lg"
-                                style={{
-                                  backgroundImage:
-                                    option.previewValue || option.value,
-                                  backgroundColor: "#F8FAFC",
-                                  backgroundSize: "18px 18px",
-                                  backgroundRepeat: "repeat",
-                                }}
-                              />
-                              <p className="text-sm font-medium text-slate-700">
-                                {option.label}
-                              </p>
-                            </button>
-                          ))}
+                              dialogTitle="Gradient end color"
+                              triggerTitle="Pick gradient end color"
+                            />
+                          </div>
                         </div>
                       )}
 
-                    {formData.backgroundType === "image" && (
+                      {formData.patternOverlayEnabled &&
+                        formData.backgroundType !== "image" && (
+                          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                            {patternOptions.map((option) => (
+                              <button
+                                key={option.label}
+                                type="button"
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    patternOverlayValue: option.value,
+                                  }))
+                                }
+                                className={cn(
+                                  "w-full rounded-xl border p-3 text-left",
+                                  formData.patternOverlayValue === option.value
+                                    ? ""
+                                    : "border-slate-200",
+                                )}
+                                style={
+                                  formData.patternOverlayValue === option.value
+                                    ? { borderColor: formData.accentColor }
+                                    : undefined
+                                }
+                              >
+                                <div
+                                  className="mb-2 h-12 rounded-lg"
+                                  style={{
+                                    backgroundImage:
+                                      option.previewValue || option.value,
+                                    backgroundColor: "#F8FAFC",
+                                    backgroundSize: "18px 18px",
+                                    backgroundRepeat: "repeat",
+                                  }}
+                                />
+                                <p className="text-sm font-medium text-slate-700">
+                                  {option.label}
+                                </p>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                      {formData.backgroundType === "image" && (
+                        <UploadImageCard
+                          title="Background Image"
+                          preview={
+                            <div
+                              className={cn(
+                                "h-36 w-full touch-none rounded-lg border border-slate-200 bg-slate-100 select-none",
+                                existingCustomization?.backgroundImageUrl
+                                  ? "cursor-grab"
+                                  : "cursor-default",
+                              )}
+                              style={
+                                existingCustomization?.backgroundImageUrl
+                                  ? {
+                                      backgroundImage: `url(${existingCustomization.backgroundImageUrl})`,
+                                      backgroundSize: "cover",
+                                      backgroundPosition: `${formData.backgroundImagePositionX}% ${formData.backgroundImagePositionY}%`,
+                                    }
+                                  : undefined
+                              }
+                              onPointerDown={handleDragStart("background")}
+                              onPointerMove={handleDragMove("background")}
+                              onPointerUp={handleDragEnd}
+                              onPointerLeave={handleDragEnd}
+                            >
+                              {!existingCustomization?.backgroundImageUrl && (
+                                <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
+                                  Upload a background image to position it
+                                </div>
+                              )}
+                            </div>
+                          }
+                          actions={
+                            <div className="flex flex-wrap items-center gap-4">
+                              <input
+                                type="file"
+                                ref={backgroundInputRef}
+                                accept="image/*"
+                                onChange={(e) =>
+                                  handleImageUpload(e, "background")
+                                }
+                                className="hidden"
+                                disabled={isUploading}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() =>
+                                  backgroundInputRef.current?.click()
+                                }
+                                disabled={isUploading}
+                                className="flex items-center gap-2"
+                              >
+                                <Upload className="size-4" />
+                                {isUploading
+                                  ? "Uploading..."
+                                  : "Upload Background"}
+                              </Button>
+                              {existingCustomization?.backgroundImageUrl && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleRemoveImage("background")
+                                  }
+                                  disabled={isUploading}
+                                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                >
+                                  <X className="mr-1 size-4" />
+                                  Remove
+                                </Button>
+                              )}
+                            </div>
+                          }
+                          helperText="Max 5MB"
+                          footerText="Drag to reposition"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={settingsGroupClass}>
+                    <div className="space-y-6">
                       <UploadImageCard
-                        title="Background Image"
+                        title="Banner Image"
                         preview={
                           <div
                             className={cn(
-                              "h-36 w-full touch-none rounded-lg border border-slate-200 bg-slate-100 select-none",
-                              existingCustomization?.backgroundImageUrl
+                              "relative h-24 w-full touch-none overflow-hidden rounded-lg bg-slate-100 select-none sm:h-20 sm:w-32",
+                              existingCustomization?.bannerImageUrl
                                 ? "cursor-grab"
                                 : "cursor-default",
                             )}
                             style={
-                              existingCustomization?.backgroundImageUrl
+                              existingCustomization?.bannerImageUrl
                                 ? {
-                                    backgroundImage: `url(${existingCustomization.backgroundImageUrl})`,
+                                    backgroundImage: `url(${existingCustomization.bannerImageUrl})`,
                                     backgroundSize: "cover",
-                                    backgroundPosition: `${formData.backgroundImagePositionX}% ${formData.backgroundImagePositionY}%`,
+                                    backgroundPosition: `${formData.bannerImagePositionX}% ${formData.bannerImagePositionY}%`,
                                   }
                                 : undefined
                             }
-                            onPointerDown={handleDragStart("background")}
-                            onPointerMove={handleDragMove("background")}
+                            onPointerDown={handleDragStart("banner")}
+                            onPointerMove={handleDragMove("banner")}
                             onPointerUp={handleDragEnd}
                             onPointerLeave={handleDragEnd}
                           >
-                            {!existingCustomization?.backgroundImageUrl && (
-                              <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
-                                Upload a background image to position it
+                            {!existingCustomization?.bannerImageUrl && (
+                              <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
+                                No banner
+                              </div>
+                            )}
+                            {existingCustomization?.bannerImageUrl && (
+                              <div className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-sm">
+                                <GripVertical className="size-3" />
+                                Drag
                               </div>
                             )}
                           </div>
                         }
                         actions={
-                          <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                             <input
                               type="file"
-                              ref={backgroundInputRef}
+                              ref={bannerInputRef}
                               accept="image/*"
-                              onChange={(e) =>
-                                handleImageUpload(e, "background")
-                              }
+                              onChange={(e) => handleImageUpload(e, "banner")}
                               className="hidden"
                               disabled={isUploading}
                             />
                             <Button
                               type="button"
                               variant="outline"
-                              onClick={() =>
-                                backgroundInputRef.current?.click()
-                              }
+                              onClick={() => bannerInputRef.current?.click()}
                               disabled={isUploading}
                               className="flex items-center gap-2"
                             >
                               <Upload className="size-4" />
-                              {isUploading
-                                ? "Uploading..."
-                                : "Upload Background"}
+                              {isUploading ? "Uploading..." : "Upload Banner"}
                             </Button>
-                            {existingCustomization?.backgroundImageUrl && (
+                            {existingCustomization?.bannerImageUrl && (
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleRemoveImage("background")}
+                                onClick={() => handleRemoveImage("banner")}
                                 disabled={isUploading}
                                 className="text-red-600 hover:bg-red-50 hover:text-red-700"
                               >
@@ -1964,155 +2047,74 @@ const CustomizationForm = () => {
                             )}
                           </div>
                         }
-                        helperText="Max 5MB"
-                        footerText="Drag to reposition"
+                        helperText="Recommended: 1200x400 · Max 5MB"
+                        footerText="Drag the preview to reposition"
                       />
-                    )}
-                  </div>
-                </div>
 
-                <div className={settingsGroupClass}>
-                  <div className="space-y-6">
-                    <UploadImageCard
-                      title="Banner Image"
-                      preview={
-                        <div
-                          className={cn(
-                            "relative h-24 w-full touch-none overflow-hidden rounded-lg bg-slate-100 select-none sm:h-20 sm:w-32",
-                            existingCustomization?.bannerImageUrl
-                              ? "cursor-grab"
-                              : "cursor-default",
-                          )}
-                          style={
-                            existingCustomization?.bannerImageUrl
-                              ? {
-                                  backgroundImage: `url(${existingCustomization.bannerImageUrl})`,
-                                  backgroundSize: "cover",
-                                  backgroundPosition: `${formData.bannerImagePositionX}% ${formData.bannerImagePositionY}%`,
-                                }
-                              : undefined
-                          }
-                          onPointerDown={handleDragStart("banner")}
-                          onPointerMove={handleDragMove("banner")}
-                          onPointerUp={handleDragEnd}
-                          onPointerLeave={handleDragEnd}
-                        >
-                          {!existingCustomization?.bannerImageUrl && (
-                            <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
-                              No banner
-                            </div>
-                          )}
-                          {existingCustomization?.bannerImageUrl && (
-                            <div className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-sm">
-                              <GripVertical className="size-3" />
-                              Drag
-                            </div>
-                          )}
-                        </div>
-                      }
-                      actions={
-                        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                          <input
-                            type="file"
-                            ref={bannerInputRef}
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "banner")}
-                            className="hidden"
-                            disabled={isUploading}
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => bannerInputRef.current?.click()}
-                            disabled={isUploading}
-                            className="flex items-center gap-2"
-                          >
-                            <Upload className="size-4" />
-                            {isUploading ? "Uploading..." : "Upload Banner"}
-                          </Button>
-                          {existingCustomization?.bannerImageUrl && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleRemoveImage("banner")}
+                      <UploadImageCard
+                        title="Profile Picture"
+                        preview={
+                          <div className="size-16 self-center overflow-hidden rounded-full bg-slate-100 sm:self-auto">
+                            {existingCustomization?.profilePictureUrl ? (
+                              <Image
+                                src={existingCustomization.profilePictureUrl}
+                                alt="Current Profile Picture"
+                                width={64}
+                                height={64}
+                                className="h-full w-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
+                                No photo
+                              </div>
+                            )}
+                          </div>
+                        }
+                        actions={
+                          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, "profile")}
+                              className="hidden"
                               disabled={isUploading}
-                              className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                            >
-                              <X className="mr-1 size-4" />
-                              Remove
-                            </Button>
-                          )}
-                        </div>
-                      }
-                      helperText="Recommended: 1200x400 · Max 5MB"
-                      footerText="Drag the preview to reposition"
-                    />
-
-                    <UploadImageCard
-                      title="Profile Picture"
-                      preview={
-                        <div className="size-16 self-center overflow-hidden rounded-full bg-slate-100 sm:self-auto">
-                          {existingCustomization?.profilePictureUrl ? (
-                            <Image
-                              src={existingCustomization.profilePictureUrl}
-                              alt="Current Profile Picture"
-                              width={64}
-                              height={64}
-                              className="h-full w-full rounded-full object-cover"
                             />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
-                              No photo
-                            </div>
-                          )}
-                        </div>
-                      }
-                      actions={
-                        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "profile")}
-                            className="hidden"
-                            disabled={isUploading}
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={isUploading}
-                            className="flex items-center gap-2"
-                          >
-                            <Upload className="size-4" />
-                            {isUploading ? "Uploading..." : "Upload Photo"}
-                          </Button>
-                          {existingCustomization?.profilePictureUrl && (
                             <Button
                               type="button"
                               variant="outline"
-                              size="sm"
-                              onClick={() => handleRemoveImage("profile")}
+                              onClick={() => fileInputRef.current?.click()}
                               disabled={isUploading}
-                              className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                              className="flex items-center gap-2"
                             >
-                              <X className="mr-1 size-4" />
-                              Remove
+                              <Upload className="size-4" />
+                              {isUploading ? "Uploading..." : "Upload Photo"}
                             </Button>
-                          )}
-                        </div>
-                      }
-                      helperText="Max 5MB. JPG, PNG, WebP"
-                    />
+                            {existingCustomization?.profilePictureUrl && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleRemoveImage("profile")}
+                                disabled={isUploading}
+                                className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                              >
+                                <X className="mr-1 size-4" />
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+                        }
+                        helperText="Max 5MB. JPG, PNG, WebP"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
-          )}
+              </section>
+            )}
 
-          {activeTab === "bio" && (
-            <section
+            {activeTab === "bio" && (
+              <section
               id="panel-bio"
               role="tabpanel"
               aria-labelledby="tab-bio"
