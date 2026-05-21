@@ -1466,6 +1466,7 @@ const CustomizationForm = () => {
                     </select>
                   </div>
                 </div>
+                </div>
               </div>
             </section>
           )}
@@ -1477,24 +1478,22 @@ const CustomizationForm = () => {
               aria-labelledby="tab-layout"
               className={sectionCardClass}
             >
-              <div className="mb-4">
-                <div className={sectionHeaderClass}>
-                  <div
-                    className="rounded-lg p-2"
-                    style={accentBadgeStyle}
-                  >
-                    <LayoutGrid className="size-4" />
-                  </div>
-                  <div>
-                    <p className={sectionTitleClass}>Layout & Links</p>
-                    <p className={sectionHelpClass}>
-                      Control how your links stack and look.
-                    </p>
-                  </div>
+              <div className={sectionHeaderClass}>
+                <div className="rounded-lg p-2" style={accentBadgeStyle}>
+                  <LayoutGrid className="size-4" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
+                    Layout
+                  </p>
+                  <p className={sectionTitleClass}>Layout & Links</p>
+                  <p className={sectionHelpClass}>
+                    Control how your links stack and look.
+                  </p>
                 </div>
               </div>
-              <div className="space-y-8">
-                <div className={settingsGroupClass}>
+              <div className="space-y-5">
+                <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
                   <div className="space-y-3">
                     <Label className="flex items-center gap-2">
                       <LayoutGrid className="size-4" />
@@ -1535,11 +1534,12 @@ const CustomizationForm = () => {
                   </div>
                 </div>
 
-                <div className={settingsGroupClass}>
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2">
-                      <LinkIcon className="size-4" />
-                      Link Style
+                <div className="dashboard-section-divider pt-5">
+                  <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
+                    <div className="space-y-3">
+                      <Label className="flex items-center gap-2">
+                        <LinkIcon className="size-4" />
+                        Link Style
                     </Label>
                     <div className="flex flex-wrap gap-2">
                       {linkStyleOptions.map((option) => (
@@ -1574,8 +1574,10 @@ const CustomizationForm = () => {
                     </div>
                   </div>
                 </div>
-                <div className={settingsGroupClass}>
-                  <div className="space-y-3">
+                </div>
+                <div className="dashboard-section-divider pt-5">
+                  <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
+                    <div className="space-y-3">
                     <div className="space-y-1">
                       <Label
                         htmlFor="featured-link"
@@ -1621,8 +1623,10 @@ const CustomizationForm = () => {
                     </p>
                   </div>
                 </div>
-                <div className={settingsGroupClass}>
-                  <div className="space-y-3">
+                </div>
+                <div className="dashboard-section-divider pt-5">
+                  <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
+                    <div className="space-y-3">
                     <Label className="flex items-center gap-2">
                       <Circle className="size-4" />
                       Avatar Shape
