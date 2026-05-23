@@ -5,8 +5,16 @@ import type { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { Palette, LayoutGrid, LayoutList, Circle, Square } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import type { CSSProperties, ComponentType } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import type { CSSProperties, ComponentType, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DesktopFloatingPreview, {
@@ -22,6 +30,7 @@ import { buildDashboardPreviewModel } from "@/lib/dashboardPreview";
 import { cn } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/getBaseUrl";
 import { socialPlatforms, type SocialPlatform } from "@/lib/socialPlatforms";
+import type { DashboardPreviewContentProps } from "@/components/dashboard/DashboardPreviewContent";
 import {
   applyPreferredPhoneCountry,
   resolveLocalePhoneCountry,
@@ -231,6 +240,20 @@ type CustomizationFormData = {
   socialLinks: Array<{ platform: string; url: string }>;
 };
 
+type DesktopPreviewState = {
+  previewBackgroundStyle: CSSProperties;
+  fontFamily: string;
+  contentProps: DashboardPreviewContentProps;
+};
+
+type CustomizationPreviewContextValue = {
+  previewState: DesktopPreviewState | null;
+  setPreviewState: (state: DesktopPreviewState | null) => void;
+};
+
+const CustomizationPreviewContext =
+  createContext<CustomizationPreviewContextValue | null>(null);
+
 const snapshotFromForm = (data: CustomizationFormData) => {
   return JSON.stringify({
     description: data.description,
@@ -255,6 +278,64 @@ const snapshotFromForm = (data: CustomizationFormData) => {
   });
 };
 
+const CustomizationPreviewProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [previewState, setPreviewState] = useState<DesktopPreviewState | null>(
+    null,
+  );
+
+  const value = useMemo(
+    () => ({
+      previewState,
+      setPreviewState,
+    }),
+    [previewState],
+  );
+
+  return (
+    <CustomizationPreviewContext.Provider value={value}>
+      {children}
+    </CustomizationPreviewContext.Provider>
+  );
+};
+
+const useCustomizationPreviewContext = () =>
+  useContext(CustomizationPreviewContext);
+
+const CustomizationDesktopPreviewRail = () => {
+  const previewContext = useCustomizationPreviewContext();
+  const previewState = previewContext?.previewState ?? null;
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-[1.4rem] border border-slate-200/80 bg-white/88 p-4">
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-slate-900">
+            Live desktop preview
+          </p>
+          <p className="text-sm leading-6 text-slate-600">
+            Compare your edits against the public page as you work.
+          </p>
+        </div>
+      </div>
+      {previewState ? (
+        <DesktopFloatingPreview
+          previewBackgroundStyle={previewState.previewBackgroundStyle}
+          fontFamily={previewState.fontFamily}
+          contentProps={previewState.contentProps}
+        />
+      ) : (
+        <div className="hidden rounded-[2rem] border border-slate-200/80 bg-slate-50/90 p-6 text-sm text-slate-500 xl:block">
+          Loading preview...
+        </div>
+      )}
+    </div>
+  );
+};
+
 type CustomizationFormProps = {
   shellMode?: "stacked" | "appearance";
 };
@@ -263,6 +344,7 @@ const CustomizationForm = ({
   shellMode = "stacked",
 }: CustomizationFormProps) => {
   const { user } = useUser();
+  const previewContext = useCustomizationPreviewContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
@@ -936,20 +1018,34 @@ const CustomizationForm = ({
   };
 
   const previewPreset = resolveThemePreset(formData.themePreset);
-  const previewBackgroundStyle = getBackgroundStyle({
-    backgroundType: formData.backgroundType,
-    backgroundValue: formData.backgroundValue,
-    backgroundImageUrl:
-      formData.backgroundType === "image"
-        ? existingCustomization?.backgroundImageUrl
-        : undefined,
-    backgroundSolidColor: formData.backgroundSolidColor,
-    patternOverlayEnabled: formData.patternOverlayEnabled,
-    patternOverlayValue: formData.patternOverlayValue,
-    backgroundImagePositionX: formData.backgroundImagePositionX,
-    backgroundImagePositionY: formData.backgroundImagePositionY,
-    preset: previewPreset,
-  });
+  const previewBackgroundStyle = useMemo(
+    () =>
+      getBackgroundStyle({
+        backgroundType: formData.backgroundType,
+        backgroundValue: formData.backgroundValue,
+        backgroundImageUrl:
+          formData.backgroundType === "image"
+            ? existingCustomization?.backgroundImageUrl
+            : undefined,
+        backgroundSolidColor: formData.backgroundSolidColor,
+        patternOverlayEnabled: formData.patternOverlayEnabled,
+        patternOverlayValue: formData.patternOverlayValue,
+        backgroundImagePositionX: formData.backgroundImagePositionX,
+        backgroundImagePositionY: formData.backgroundImagePositionY,
+        preset: previewPreset,
+      }),
+    [
+      existingCustomization?.backgroundImageUrl,
+      formData.backgroundImagePositionX,
+      formData.backgroundImagePositionY,
+      formData.backgroundSolidColor,
+      formData.backgroundType,
+      formData.backgroundValue,
+      formData.patternOverlayEnabled,
+      formData.patternOverlayValue,
+      previewPreset,
+    ],
+  );
   const dashboardPreviewModel = useMemo(
     () =>
       buildDashboardPreviewModel({
@@ -1038,33 +1134,54 @@ const CustomizationForm = ({
     return snapshotFromForm(formData) !== savedSnapshot;
   }, [formData, savedSnapshot]);
 
+  const basePreviewContentProps = useMemo(
+    () => ({
+      username: dashboardPreviewModel.displayName,
+      accentColor: formData.accentColor,
+      avatarShape: formData.avatarShape,
+      description: formData.description || "Add a short bio...",
+      profilePictureUrl: existingCustomization?.profilePictureUrl,
+      profileFields: formData.profileFields,
+      socialLinks: formData.socialLinks,
+      bannerImageUrl: existingCustomization?.bannerImageUrl,
+      bannerImagePositionX: formData.bannerImagePositionX,
+      bannerImagePositionY: formData.bannerImagePositionY,
+      featuredLink: dashboardPreviewModel.selectedFeaturedLink
+        ? {
+            _id: dashboardPreviewModel.selectedFeaturedLink.id,
+            title: dashboardPreviewModel.selectedFeaturedLink.title,
+            url: dashboardPreviewModel.selectedFeaturedLink.url,
+            order: dashboardPreviewModel.selectedFeaturedLink.order,
+          }
+        : null,
+      links: dashboardPreviewModel.previewLinks.map((link) => ({
+        _id: link.id,
+        title: link.title,
+        url: link.url,
+        order: link.order,
+      })),
+      layoutStyle: formData.layoutStyle,
+      linkStyle: formData.linkStyle,
+    }),
+    [
+      dashboardPreviewModel.displayName,
+      dashboardPreviewModel.previewLinks,
+      dashboardPreviewModel.selectedFeaturedLink,
+      existingCustomization?.bannerImageUrl,
+      existingCustomization?.profilePictureUrl,
+      formData.accentColor,
+      formData.avatarShape,
+      formData.bannerImagePositionX,
+      formData.bannerImagePositionY,
+      formData.description,
+      formData.layoutStyle,
+      formData.linkStyle,
+      formData.profileFields,
+      formData.socialLinks,
+    ],
+  );
   const sharedPreviewContentProps = {
-    username: dashboardPreviewModel.displayName,
-    accentColor: formData.accentColor,
-    avatarShape: formData.avatarShape,
-    description: formData.description || "Add a short bio...",
-    profilePictureUrl: existingCustomization?.profilePictureUrl,
-    profileFields: formData.profileFields,
-    socialLinks: formData.socialLinks,
-    bannerImageUrl: existingCustomization?.bannerImageUrl,
-    bannerImagePositionX: formData.bannerImagePositionX,
-    bannerImagePositionY: formData.bannerImagePositionY,
-    featuredLink: dashboardPreviewModel.selectedFeaturedLink
-      ? {
-          _id: dashboardPreviewModel.selectedFeaturedLink.id,
-          title: dashboardPreviewModel.selectedFeaturedLink.title,
-          url: dashboardPreviewModel.selectedFeaturedLink.url,
-          order: dashboardPreviewModel.selectedFeaturedLink.order,
-        }
-      : null,
-    links: dashboardPreviewModel.previewLinks.map((link) => ({
-      _id: link.id,
-      title: link.title,
-      url: link.url,
-      order: link.order,
-    })),
-    layoutStyle: formData.layoutStyle,
-    linkStyle: formData.linkStyle,
+    ...basePreviewContentProps,
     bannerDragProps: {
       draggable: Boolean(existingCustomization?.bannerImageUrl),
       onPointerDown: handleDragStart("banner"),
@@ -1074,16 +1191,39 @@ const CustomizationForm = ({
     },
   };
   const mobilePreviewContentProps = {
-    ...sharedPreviewContentProps,
+    ...basePreviewContentProps,
     bannerDragProps: undefined,
   };
+  const previewFontFamily = sanitizeDashboardFontFamily(formData.fontFamily);
   const desktopPreview = (
     <DesktopFloatingPreview
       previewBackgroundStyle={previewBackgroundStyle}
-      fontFamily={sanitizeDashboardFontFamily(formData.fontFamily)}
+      fontFamily={previewFontFamily}
       contentProps={sharedPreviewContentProps}
     />
   );
+
+  useEffect(() => {
+    if (shellMode !== "appearance" || !previewContext) {
+      return;
+    }
+
+    previewContext.setPreviewState({
+      previewBackgroundStyle,
+      fontFamily: previewFontFamily,
+      contentProps: basePreviewContentProps,
+    });
+
+    return () => {
+      previewContext.setPreviewState(null);
+    };
+  }, [
+    previewBackgroundStyle,
+    previewContext,
+    previewFontFamily,
+    basePreviewContentProps,
+    shellMode,
+  ]);
 
   const desktopQrPanel = (
     <section
@@ -1353,12 +1493,12 @@ const CustomizationForm = ({
           open={isMobilePreviewOpen}
           onOpenChange={setIsMobilePreviewOpen}
           previewBackgroundStyle={previewBackgroundStyle}
-          fontFamily={sanitizeDashboardFontFamily(formData.fontFamily)}
+          fontFamily={previewFontFamily}
           contentProps={mobilePreviewContentProps}
           triggerStyle={accentButtonStyle}
           hasUnsavedChanges={hasUnsavedChanges}
         />
-        {showInlineDesktopPreview ? (
+        {!showInlineDesktopPreview ? (
           <div className="hidden xl:block">{desktopPreview}</div>
         ) : null}
         <div className={cn(showInlineDesktopPreview ? "mt-0 xl:hidden" : "mt-6")}>
@@ -1369,4 +1509,5 @@ const CustomizationForm = ({
   );
 };
 
+export { CustomizationDesktopPreviewRail, CustomizationPreviewProvider };
 export default CustomizationForm;
