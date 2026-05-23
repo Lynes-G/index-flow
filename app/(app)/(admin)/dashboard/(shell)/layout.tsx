@@ -4,7 +4,7 @@ const DashboardShellRouteGroupLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className="relative left-1/2 w-screen max-w-none -translate-x-1/2 px-4 xl:px-6 2xl:px-8">
+    <div className="mx-[calc(50%-50dvw)] max-w-none px-4 xl:px-6 2xl:px-8">
       {children}
     </div>
   );
