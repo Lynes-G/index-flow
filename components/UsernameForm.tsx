@@ -59,7 +59,8 @@ const UsernameForm = () => {
     api.lib.usernames.getUserSlug,
     user?.id ? { userId: user.id } : "skip",
   );
-  const publicProfileUrl = `${getBaseUrl()}/u/${currentSlug}`;
+  const resolvedSlug = currentSlug ?? user?.id ?? "";
+  const publicProfileUrl = resolvedSlug ? `${getBaseUrl()}/u/${resolvedSlug}` : "";
 
   const availabilityCheck = useQuery(
     api.lib.usernames.checkUsernameAvailability,
@@ -121,16 +122,10 @@ const UsernameForm = () => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <p className="text-[11px] font-semibold tracking-[0.22em] text-[color:var(--brand-purple)] uppercase">
-          Username
-        </p>
-        <h3 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.04em] text-slate-900 sm:text-[1.75rem]">
-          Customize your public link
-        </h3>
-        <p className="text-sm leading-6 text-slate-600 sm:text-base">
-          Choose a custom username for you link-in-bio page. This will be your
-          public URL.
+      <div className="rounded-[1.4rem] border border-slate-200/80 bg-white/84 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+        <p className="text-sm leading-6 text-slate-600">
+          Choose the name that appears in your public profile link. When you
+          update it here, every shared `/u/...` address updates with it.
         </p>
       </div>
 
@@ -144,12 +139,14 @@ const UsernameForm = () => {
                   Current username
                 </p>
               </div>
-              <p className="font-mono text-sm text-emerald-950">{currentSlug}</p>
+              <p className="font-mono text-sm text-emerald-950">
+                {resolvedSlug}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Link
                 className="inline-flex h-11 items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-4 text-sm font-medium text-emerald-900 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                href={`/u/${currentSlug}`}
+                href={`/u/${resolvedSlug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Open public profile"
@@ -168,16 +165,17 @@ const UsernameForm = () => {
         </p>
         <div className="mt-2 flex items-center gap-2">
           <Link
-            href={`/u/${currentSlug}`}
+            href={`/u/${resolvedSlug}`}
             target="_blank"
             rel="noopener noreferrer"
             className="min-w-0 flex-1 truncate rounded-xl bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800 transition-colors hover:bg-slate-100"
           >
-            {publicProfileUrl}
+            {publicProfileUrl || "Loading your public URL..."}
           </Link>
           <button
             type="button"
             onClick={() => {
+              if (!publicProfileUrl) return;
               navigator.clipboard.writeText(publicProfileUrl);
               toast.success("Copied to clipboard!");
             }}
@@ -199,7 +197,7 @@ const UsernameForm = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="username">Username</FieldLabel>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <div className="relative min-w-0 flex-1">
                       <Input
                         {...field}
@@ -275,20 +273,22 @@ const UsernameForm = () => {
           </FieldGroup>
         </FieldSet>
 
-        <Button
-          type="submit"
-          className="h-12 w-full rounded-2xl disabled:opacity-50"
-          disabled={isSubmitDisabled}
-        >
-          {form.formState.isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 size-4 animate-spin" />
-              Updating...
-            </>
-          ) : (
-            "Update Username"
-          )}
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            className="h-12 min-w-44 rounded-2xl px-6 disabled:opacity-50"
+            disabled={isSubmitDisabled}
+          >
+            {form.formState.isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Username"
+            )}
+          </Button>
+        </div>
       </form>
     </div>
   );

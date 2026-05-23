@@ -20,21 +20,21 @@ export default function BillingOverview({
   const grantLabel = grantedPlan ? planDisplayLabels[grantedPlan] : null;
 
   return (
-    <section className="template-noise editorial-surface relative overflow-hidden px-5 py-6 sm:px-8 sm:py-8">
+    <section className="template-noise editorial-surface relative overflow-hidden px-5 py-5 sm:px-6 sm:py-6">
       <div className="template-glow-ring template-pulse left-[8%] top-6 h-44 w-44 bg-[rgba(208,212,23,0.22)]" />
-      <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+      <div className="relative space-y-6">
         <div className="space-y-5">
           <div className="space-y-3">
             <p className="text-[11px] font-semibold tracking-[0.26em] text-[color:var(--brand-purple)] uppercase">
               Billing overview
             </p>
-            <h1 className="max-w-3xl font-['Sora',sans-serif] text-3xl leading-tight font-semibold tracking-[-0.06em] text-slate-900 sm:text-4xl">
-              Review your account access while billing is paused.
-            </h1>
-            <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-              Your current plan still determines what the dashboard unlocks, but
-              paid upgrades are temporarily disabled. Admin invite grants remain
-              active and can still raise account access.
+            <h2 className="max-w-3xl font-['Sora',sans-serif] text-2xl leading-tight font-semibold tracking-[-0.05em] text-slate-900 sm:text-[2rem]">
+              Review your current dashboard access.
+            </h2>
+            <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+              Paid upgrades are paused, but your plan and any admin invite
+              grant still determine which dashboard features are available right
+              now.
             </p>
           </div>
 

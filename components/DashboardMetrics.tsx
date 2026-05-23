@@ -1,4 +1,3 @@
-import { AdminPageShell } from "@/components/dashboard/AdminShell";
 import type { AnalyticsData } from "@/lib/fetchAnalytics";
 import {
   Calendar,
@@ -56,196 +55,195 @@ const DashboardMetrics = ({
     analytics.qrScans > 0;
 
   return (
-    <AdminPageShell>
-      <div className="dashboard-shell dashboard-shell-inner">
-        <div className="mb-6 space-y-2 sm:mb-8">
-          <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-            Analytics
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4 shadow-sm shadow-slate-900/5 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
+            Last 30 days
           </p>
-          <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900 sm:text-3xl">
-            Performance overview
-          </h2>
-          <p className="text-sm leading-6 text-slate-600 sm:text-base">
-            Last 30 days across clicks, visitors, and profile activity.
+          <p className="text-sm leading-6 text-slate-600">
+            Clicks, visitors, and profile activity in one workspace view.
           </p>
         </div>
+        <div className="inline-flex w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-700 uppercase">
+          {hasActivity ? "Activity tracked" : "Waiting for activity"}
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3">
-          <div className={metricCardClass}>
-            <div className="mb-4 flex items-center justify-between sm:mb-5">
-              <div
-                className={`${metricIconWrapClass} bg-blue-50/95 text-blue-600`}
-              >
-                <MousePointer className="size-6" />
-              </div>
-              <div className="text-blue-200">
-                <TrendingUp className="size-6" />
-              </div>
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div className={metricCardClass}>
+          <div className="mb-4 flex items-center justify-between sm:mb-5">
+            <div
+              className={`${metricIconWrapClass} bg-blue-50/95 text-blue-600`}
+            >
+              <MousePointer className="size-6" />
             </div>
-            <div>
-              <p className="mb-1 text-sm font-medium text-slate-600">
-                Total Clicks
-              </p>
-              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                {analytics.totalClicks.toLocaleString()}
-              </p>
+            <div className="text-blue-200">
+              <TrendingUp className="size-6" />
             </div>
           </div>
-
-          <div className={metricCardClass}>
-            <div className="mb-4 flex items-center justify-between sm:mb-5">
-              <div
-                className={`${metricIconWrapClass} bg-indigo-50/95 text-indigo-600`}
-              >
-                <Users className="size-6" />
-              </div>
-              <div className="text-indigo-200">
-                <TrendingUp className="size-6" />
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-medium text-slate-600">
-                Unique Visitors
-              </p>
-              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                {analytics.uniqueVisitors.toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          {canAccessUltraFeatures ? (
-            <div className={metricCardClass}>
-              <div className="mb-4 flex items-center justify-between sm:mb-5">
-                <div
-                  className={`${metricIconWrapClass} bg-emerald-50/95 text-emerald-600`}
-                >
-                  <Globe className="size-6" />
-                </div>
-                <div className="text-emerald-200">
-                  <MapPin className="size-6" />
-                </div>
-              </div>
-              <div>
-                <p className="mb-1 text-sm font-medium text-slate-600">
-                  Countries Reached
-                </p>
-                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                  {analytics.countriesReached.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-[1.35rem] border border-emerald-200/80 bg-white/85 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
-              <div className="mb-4 flex items-center justify-between sm:mb-5">
-                <div
-                  className={`${metricIconWrapClass} bg-emerald-50/95 text-emerald-600`}
-                >
-                  <Globe className="size-6" />
-                </div>
-                <div className="text-emerald-300">
-                  <Lock className="size-6" />
-                </div>
-              </div>
-              <div>
-                <p className="mb-1 text-sm font-medium text-slate-600">
-                  Countries Reached
-                </p>
-                <div className="mt-2 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">
-                  Upgrade to Ultra
-                </div>
-                <p className="mt-3 text-sm text-slate-500">
-                  Unlock country-level reach insights.
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className={metricCardClass}>
-            <div className="mb-4 flex items-center justify-between sm:mb-5">
-              <div
-                className={`${metricIconWrapClass} bg-sky-50/95 text-sky-600`}
-              >
-                <Link className="size-6" />
-              </div>
-              <div className="text-sky-200">
-                <ExternalLink className="size-6" />
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-medium text-slate-600">
-                Links Clicked
-              </p>
-              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                {analytics.totalLinksClicked.toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          <div className={metricCardClass}>
-            <div className="mb-4 flex items-center justify-between sm:mb-5">
-              <div
-                className={`${metricIconWrapClass} bg-cyan-50/95 text-cyan-600`}
-              >
-                <QrCode className="size-6" />
-              </div>
-              <div className="text-cyan-200">
-                <TrendingUp className="size-6" />
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-medium text-slate-600">
-                QR Scans
-              </p>
-              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                {analytics.qrScans.toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          <div className={metricCardClass}>
-            <div className="mb-4 flex items-center justify-between sm:mb-5">
-              <div
-                className={`${metricIconWrapClass} bg-orange-50/95 text-orange-600`}
-              >
-                <Calendar className="size-6" />
-              </div>
-              <div className="text-orange-200">
-                <Clock className="size-6" />
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-medium text-slate-600">
-                Last Activity
-              </p>
-              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                {formDate({ dateString: analytics.lastClick })}
-              </p>
-            </div>
+          <div>
+            <p className="mb-1 text-sm font-medium text-slate-600">
+              Total Clicks
+            </p>
+            <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              {analytics.totalClicks.toLocaleString()}
+            </p>
           </div>
         </div>
 
-        {!hasActivity && (
-          <div className="mt-4 rounded-[1.5rem] border border-slate-200/80 bg-white/70 p-4 text-sm leading-6 text-slate-600 sm:p-5">
-            <p className="font-semibold text-slate-900">
-              No activity yet
+        <div className={metricCardClass}>
+          <div className="mb-4 flex items-center justify-between sm:mb-5">
+            <div
+              className={`${metricIconWrapClass} bg-indigo-50/95 text-indigo-600`}
+            >
+              <Users className="size-6" />
+            </div>
+            <div className="text-indigo-200">
+              <TrendingUp className="size-6" />
+            </div>
+          </div>
+          <div>
+            <p className="mb-1 text-sm font-medium text-slate-600">
+              Unique Visitors
             </p>
-            <p className="mt-1">
-              Share your link-in-bio to start tracking clicks and visitors.
+            <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              {analytics.uniqueVisitors.toLocaleString()}
             </p>
+          </div>
+        </div>
+
+        {canAccessUltraFeatures ? (
+          <div className={metricCardClass}>
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-emerald-50/95 text-emerald-600`}
+              >
+                <Globe className="size-6" />
+              </div>
+              <div className="text-emerald-200">
+                <MapPin className="size-6" />
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-sm font-medium text-slate-600">
+                Countries Reached
+              </p>
+              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                {analytics.countriesReached.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-[1.35rem] border border-emerald-200/80 bg-white/85 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+            <div className="mb-4 flex items-center justify-between sm:mb-5">
+              <div
+                className={`${metricIconWrapClass} bg-emerald-50/95 text-emerald-600`}
+              >
+                <Globe className="size-6" />
+              </div>
+              <div className="text-emerald-300">
+                <Lock className="size-6" />
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-sm font-medium text-slate-600">
+                Countries Reached
+              </p>
+              <div className="mt-2 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">
+                Upgrade to Ultra
+              </div>
+              <p className="mt-3 text-sm text-slate-500">
+                Unlock country-level reach insights.
+              </p>
+            </div>
           </div>
         )}
 
-        {(analytics.topLinkTitle || analytics.topReferrer) && (
-          <div className="dashboard-section-divider mt-6 pt-6 sm:mt-8 sm:pt-8">
-            <div className="mb-4 space-y-1">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                Highlights
-              </p>
-              <p className="text-sm text-slate-600">
-                A quick read on the strongest sources of recent activity.
-              </p>
+        <div className={metricCardClass}>
+          <div className="mb-4 flex items-center justify-between sm:mb-5">
+            <div
+              className={`${metricIconWrapClass} bg-sky-50/95 text-sky-600`}
+            >
+              <Link className="size-6" />
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+            <div className="text-sky-200">
+              <ExternalLink className="size-6" />
+            </div>
+          </div>
+          <div>
+            <p className="mb-1 text-sm font-medium text-slate-600">
+              Links Clicked
+            </p>
+            <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              {analytics.totalLinksClicked.toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className={metricCardClass}>
+          <div className="mb-4 flex items-center justify-between sm:mb-5">
+            <div
+              className={`${metricIconWrapClass} bg-cyan-50/95 text-cyan-600`}
+            >
+              <QrCode className="size-6" />
+            </div>
+            <div className="text-cyan-200">
+              <TrendingUp className="size-6" />
+            </div>
+          </div>
+          <div>
+            <p className="mb-1 text-sm font-medium text-slate-600">
+              QR Scans
+            </p>
+            <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              {analytics.qrScans.toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className={metricCardClass}>
+          <div className="mb-4 flex items-center justify-between sm:mb-5">
+            <div
+              className={`${metricIconWrapClass} bg-orange-50/95 text-orange-600`}
+            >
+              <Calendar className="size-6" />
+            </div>
+            <div className="text-orange-200">
+              <Clock className="size-6" />
+            </div>
+          </div>
+          <div>
+            <p className="mb-1 text-sm font-medium text-slate-600">
+              Last Activity
+            </p>
+            <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              {formDate({ dateString: analytics.lastClick })}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {!hasActivity && (
+        <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/70 p-4 text-sm leading-6 text-slate-600 sm:p-5">
+          <p className="font-semibold text-slate-900">No activity yet</p>
+          <p className="mt-1">
+            Share your link-in-bio to start tracking clicks and visitors.
+          </p>
+        </div>
+      )}
+
+      {(analytics.topLinkTitle || analytics.topReferrer) && (
+        <div className="space-y-4 rounded-[1.6rem] border border-slate-200/80 bg-white/88 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
+              Highlights
+            </p>
+            <p className="text-sm text-slate-600">
+              A quick read on the strongest sources of recent activity.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
             {analytics.topLinkTitle && (
               <div className={summaryPanelClass}>
                 <div className="mb-3 flex items-center gap-3">
@@ -276,10 +274,9 @@ const DashboardMetrics = ({
               </div>
             )}
           </div>
-          </div>
-        )}
-      </div>
-    </AdminPageShell>
+        </div>
+      )}
+    </div>
   );
 };
 
