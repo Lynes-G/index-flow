@@ -13,7 +13,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     <LinkCreationSheetProvider>
       <div>
         <Header />
-        <main className="max-w-7xl px-4 pt-10 lg:mx-auto xl:px-0">
+        <main className="w-full px-4 pt-10 xl:px-6 2xl:px-8">
           {children}
         </main>
       </div>
