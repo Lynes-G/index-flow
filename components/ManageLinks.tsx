@@ -2,7 +2,12 @@
 
 import { api } from "@/convex/_generated/api";
 import { useLinkCreationSheet } from "@/components/LinkCreationSheetProvider";
-import { Preloaded, useMutation, usePreloadedQuery, useQuery } from "convex/react";
+import {
+  Preloaded,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { CSSProperties, useEffect, useMemo, useState } from "react";
 import {
@@ -27,6 +32,7 @@ import SortableItem from "./SortableItem";
 import { Id } from "@/convex/_generated/dataModel";
 import { getAccentForeground } from "@/lib/accentColor";
 import { defaultThemePresetKey, resolveThemePreset } from "@/lib/themePresets";
+import { toast } from "sonner";
 
 const ManageLinks = ({
   preloadedLinks,
@@ -60,27 +66,34 @@ const ManageLinks = ({
     return Object.fromEntries(links.map((link) => [link._id, link]));
   }, [links]);
 
-  const handleDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
+  const handleDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) {
+      return;
+    }
 
-    if (!over) return;
-    if (active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id as Id<"links">);
-        const newIndex = items.indexOf(over.id as Id<"links">);
-        const newItems = arrayMove(items, oldIndex, newIndex);
+    const oldIndex = items.indexOf(active.id as Id<"links">);
+    const newIndex = items.indexOf(over.id as Id<"links">);
 
-        // Update the order in the DB
-        updateLinkOrder({ linkIds: newItems });
-        return newItems;
-      });
+    if (oldIndex < 0 || newIndex < 0) {
+      return;
+    }
+
+    const reorderedItems = arrayMove(items, oldIndex, newIndex);
+    setItems(reorderedItems);
+
+    try {
+      await updateLinkOrder({ linkIds: reorderedItems });
+    } catch {
+      setItems(items);
+      toast.error("Could not save the new link order. Please try again.");
     }
   };
 
   // ---------------------------------------------------------------
   const hasLinks = items.length > 0;
-  const defaultAccentColor =
-    resolveThemePreset(defaultThemePresetKey).accentColor;
+  const defaultAccentColor = resolveThemePreset(
+    defaultThemePresetKey,
+  ).accentColor;
   const accentColor = existingCustomization?.accentColor || defaultAccentColor;
   const accentForeground = getAccentForeground(accentColor);
   const addLinkButtonStyle = {
@@ -91,7 +104,21 @@ const ManageLinks = ({
   } as CSSProperties;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-[11px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
+            Links workspace
+          </p>
+          <p className="text-sm leading-6 text-slate-600">
+            Reorder, edit, and prune the destinations visitors see on your
+            public page.
+          </p>
+        </div>
+        <p className="text-sm text-slate-500">
+          {hasLinks ? `${items.length} links ready` : "Ready for your first link"}
+        </p>
+      </div>
       {hasLinks ? (
         <div className="space-y-4">
           <DndContext
@@ -112,7 +139,7 @@ const ManageLinks = ({
             </SortableContext>
           </DndContext>
           <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/70 px-4 py-3 text-xs leading-5 text-slate-500">
-            <p className="font-semibold uppercase tracking-[0.18em] text-slate-700">
+            <p className="font-semibold tracking-[0.18em] text-slate-700 uppercase">
               Keyboard tip
             </p>
             <p className="mt-1">
@@ -137,14 +164,14 @@ const ManageLinks = ({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-600">
           {hasLinks
-            ? "Keep your most important destinations near the top."
-            : "Start with one destination and build from there."}
+            ? "Keep your strongest call to action near the top so visitors know where to go first."
+            : "Start with one destination, then add the next most useful step for your visitors."}
         </p>
         <Button
           variant="outline"
           type="button"
           onClick={openCreateLinkSheet}
-          className="h-12 w-full rounded-2xl border-[var(--accent-color)] bg-[var(--accent-soft)] text-[var(--accent-color)] transition-all duration-200 hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)] hover:text-[var(--accent-foreground)] focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:outline-none sm:w-auto sm:min-w-[180px]"
+          className="hover:text-accent-foreground h-12 w-full rounded-2xl border-(--accent-color) bg-(--accent-soft) text-(--accent-color) transition-all duration-200 hover:border-(--accent-color) hover:bg-(--accent-color) focus-visible:ring-(--accent-ring) focus-visible:ring-offset-2 focus-visible:outline-none sm:w-auto sm:min-w-[180px]"
           style={addLinkButtonStyle}
         >
           <span className="flex items-center justify-center gap-2">

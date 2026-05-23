@@ -4,73 +4,32 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
-import {
-  ImageIcon,
-  Palette,
-  Upload,
-  X,
-  LayoutGrid,
-  LayoutList,
-  Sparkles,
-  Type,
-  Link as LinkIcon,
-  Circle,
-  Square,
-  User,
-  GripVertical,
-  Plus,
-  ArrowUp,
-  ArrowDown,
-  MapPin,
-} from "lucide-react";
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
-import type { CSSProperties, ComponentType, ReactNode } from "react";
-import {
-  Button as AriaButton,
-  ColorArea,
-  ColorField,
-  ColorPicker as AriaColorPicker,
-  ColorSlider,
-  ColorThumb,
-  Dialog,
-  DialogTrigger,
-  Input as AriaInput,
-  Label as AriaLabel,
-  Popover,
-  SliderTrack,
-  parseColor,
-  type Color,
-} from "react-aria-components";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
+import { Palette, LayoutGrid, LayoutList, Circle, Square } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import type { CSSProperties, ComponentType } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import DesktopFloatingPreview, {
+  DESKTOP_PREVIEW_XL_MEDIA_QUERY,
+} from "@/components/dashboard/DesktopFloatingPreview";
+import CustomizationEssentialsPanel from "@/components/dashboard/CustomizationEssentialsPanel";
+import MobilePreviewSheet from "@/components/dashboard/MobilePreviewSheet";
+import CustomizationBioSocialPanel from "@/components/dashboard/CustomizationBioSocialPanel";
+import CustomizationLayoutPanel from "@/components/dashboard/CustomizationLayoutPanel";
+import CustomizationMediaPanel from "@/components/dashboard/CustomizationMediaPanel";
 import { getAccentForeground } from "@/lib/accentColor";
+import { buildDashboardPreviewModel } from "@/lib/dashboardPreview";
 import { cn } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/getBaseUrl";
-import {
-  getSocialPlatformIcon,
-  socialPlatforms,
-  type SocialPlatform,
-} from "@/lib/socialPlatforms";
+import { socialPlatforms, type SocialPlatform } from "@/lib/socialPlatforms";
 import {
   applyPreferredPhoneCountry,
   resolveLocalePhoneCountry,
 } from "@/lib/profileFieldCountry";
 import { normalizeSocialUrl } from "@/lib/socialLinks";
 import ProfileQrCard from "@/components/ProfileQrCard";
-import ProfileDetails from "@/components/ProfileDetails";
 import {
   formatPhoneDraft,
-  formatPhoneValue,
   getCountryOptions,
   type ProfileFieldInput,
   type ProfileFieldType,
@@ -120,20 +79,6 @@ const backgroundTypeOptions: Array<{ value: BackgroundType; label: string }> = [
   { value: "image", label: "Image" },
 ];
 
-const previewLayoutClassMap: Record<LayoutStyle, string> = {
-  stacked: "space-y-4",
-  cards: "space-y-4",
-  grid: "grid grid-cols-1 gap-4 sm:grid-cols-2",
-};
-
-const previewLinkStyleMap: Record<LinkStyle, string> = {
-  pill: "rounded-full border border-slate-200/60 bg-white/90",
-  rounded: "rounded-2xl border border-slate-200/60 bg-white/90",
-  outline: "rounded-2xl border-2 border-slate-300/70 bg-white/70",
-  shadow:
-    "rounded-2xl border border-slate-200/40 bg-white/95 shadow-md shadow-slate-900/5",
-};
-
 const patternOptions = [
   {
     label: "Soft Dots",
@@ -156,15 +101,6 @@ const patternOptions = [
     previewValue:
       "linear-gradient(135deg, rgba(59, 130, 246, 0.22) 25%, transparent 25%), linear-gradient(225deg, rgba(59, 130, 246, 0.22) 25%, transparent 25%), linear-gradient(45deg, rgba(59, 130, 246, 0.22) 25%, transparent 25%), linear-gradient(315deg, rgba(59, 130, 246, 0.22) 25%, transparent 25%)",
   },
-];
-
-const profileFieldTypeOptions: Array<{
-  value: ProfileFieldType;
-  label: string;
-}> = [
-  { value: "phone", label: "Phone" },
-  { value: "email", label: "Email" },
-  { value: "freeText", label: "Free text" },
 ];
 
 const createProfileFieldDraft = (
@@ -228,152 +164,17 @@ const customizationTabs: Array<{ value: CustomizationTab; label: string }> = [
   { value: "bio", label: "Bio & Social" },
 ];
 
-type ReactAriaColorPickerProps = {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  helperText?: string;
-  dialogTitle?: string;
-  dialogDescription?: string;
-  triggerTitle?: string;
+type SocialDraft = {
+  platform: SocialPlatform;
+  url: string;
 };
 
-const ReactAriaColorPicker = ({
-  label,
-  value,
-  onChange,
-  helperText,
-  dialogTitle = "Choose color",
-  dialogDescription = "Saturation means how vivid the color is. Brightness means how light or dark it feels.",
-  triggerTitle = "Open color picker",
-}: ReactAriaColorPickerProps) => {
-  const parsedColor = useMemo(() => parseColor(value), [value]);
-
-  const handleColorChange = (nextColor: Color) => {
-    onChange(nextColor.toString("hex"));
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="space-y-2">
-        <Label>{label}</Label>
-        <AriaColorPicker value={parsedColor} onChange={handleColorChange}>
-          <DialogTrigger>
-            <AriaButton className="group flex h-12 w-full items-center justify-between rounded-2xl border border-slate-300 bg-white px-3 text-left shadow-sm transition hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/15">
-              <div className="flex min-w-0 items-center gap-3">
-                <span
-                  className="size-6 rounded-xl border border-slate-200 shadow-inner"
-                  style={{ backgroundColor: value }}
-                />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-900">
-                    {triggerTitle}
-                  </p>
-                  <p className="truncate text-xs text-slate-500">{value}</p>
-                </div>
-              </div>
-              <Palette className="size-4 text-slate-400 transition group-hover:text-slate-600" />
-            </AriaButton>
-            <Popover
-              placement="bottom start"
-              offset={10}
-              className="w-[min(92vw,360px)] rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_30px_90px_rgba(15,23,42,0.18)]"
-            >
-              <Dialog className="space-y-4 outline-none">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">
-                    {dialogTitle}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {dialogDescription}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-600">
-                    Saturation and brightness
-                  </p>
-                  <ColorArea
-                    colorSpace="hsb"
-                    xChannel="saturation"
-                    yChannel="brightness"
-                    className="relative block h-48 w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner"
-                  >
-                    <ColorThumb className="block size-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(15,23,42,0.18),0_4px_14px_rgba(15,23,42,0.2)] focus:outline-none" />
-                  </ColorArea>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium text-slate-600">Hue</p>
-                    <span className="text-xs text-slate-500">{value}</span>
-                  </div>
-                  <ColorSlider
-                    colorSpace="hsb"
-                    channel="hue"
-                    className="w-full"
-                  >
-                    <SliderTrack
-                      className="relative block h-4 w-full rounded-full border border-slate-200"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
-                      }}
-                    >
-                      <ColorThumb className="top-1/2 block size-4 -translate-y-1/2 rounded-full border-2 border-white bg-white shadow-[0_0_0_1px_rgba(15,23,42,0.18),0_4px_14px_rgba(15,23,42,0.2)] focus:outline-none" />
-                    </SliderTrack>
-                  </ColorSlider>
-                </div>
-
-                <ColorField className="space-y-2">
-                  <AriaLabel className="text-xs font-medium text-slate-600">
-                    Hex
-                  </AriaLabel>
-                  <AriaInput className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-900/10" />
-                </ColorField>
-              </Dialog>
-            </Popover>
-          </DialogTrigger>
-        </AriaColorPicker>
-      </div>
-      {helperText ? <p className="text-xs text-slate-500">{helperText}</p> : null}
-    </div>
-  );
+type GradientColors = {
+  start: string;
+  end: string;
 };
 
-type UploadImageCardProps = {
-  title: string;
-  preview: ReactNode;
-  actions: ReactNode;
-  helperText?: string;
-  footerText?: string;
-};
-
-const UploadImageCard = ({
-  title,
-  preview,
-  actions,
-  helperText,
-  footerText,
-}: UploadImageCardProps) => (
-  <div className="space-y-4">
-    <Label className="flex items-center gap-2">{title}</Label>
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        {preview}
-        <div className="flex-1 space-y-2">
-          {actions}
-          {helperText ? (
-            <p className="text-xs text-slate-500">{helperText}</p>
-          ) : null}
-        </div>
-      </div>
-      {footerText ? (
-        <p className="mt-3 text-xs text-slate-500">{footerText}</p>
-      ) : null}
-    </div>
-  </div>
-);
+type ImageAssetType = "profile" | "banner" | "background";
 
 const extractGradientColors = (value?: string) => {
   const matches = value?.match(/#[0-9a-fA-F]{6}/g) || [];
@@ -382,6 +183,9 @@ const extractGradientColors = (value?: string) => {
     end: matches[1] || "#F472B6",
   };
 };
+
+const buildGradientValue = ({ start, end }: GradientColors) =>
+  `linear-gradient(135deg, ${start} 0%, ${end} 100%)`;
 
 const dashboardFontFallback = '"Sora", "Helvetica Neue", sans-serif';
 
@@ -397,10 +201,15 @@ const dashboardAllowedFontFamilies = new Set(
 const isDashboardSafeFontFamily = (fontFamily?: string) =>
   Boolean(fontFamily && dashboardAllowedFontFamilies.has(fontFamily));
 
-const sanitizeDashboardFontFamily = (fontFamily?: string) =>
-  isDashboardSafeFontFamily(fontFamily) ? fontFamily : dashboardFontFallback;
+const sanitizeDashboardFontFamily = (fontFamily?: string): string => {
+  if (fontFamily && isDashboardSafeFontFamily(fontFamily)) {
+    return fontFamily;
+  }
 
-const snapshotFromForm = (data: {
+  return dashboardFontFallback;
+};
+
+type CustomizationFormData = {
   description: string;
   accentColor: string;
   themePreset: string;
@@ -420,7 +229,9 @@ const snapshotFromForm = (data: {
   avatarShape: AvatarShape;
   profileFields: ProfileFieldInput[];
   socialLinks: Array<{ platform: string; url: string }>;
-}) => {
+};
+
+const snapshotFromForm = (data: CustomizationFormData) => {
   return JSON.stringify({
     description: data.description,
     accentColor: data.accentColor,
@@ -444,7 +255,13 @@ const snapshotFromForm = (data: {
   });
 };
 
-const CustomizationForm = () => {
+type CustomizationFormProps = {
+  shellMode?: "stacked" | "appearance";
+};
+
+const CustomizationForm = ({
+  shellMode = "stacked",
+}: CustomizationFormProps) => {
   const { user } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -496,7 +313,7 @@ const CustomizationForm = () => {
       ? "solid"
       : (defaultPreset.background.type as BackgroundType);
 
-  const initialFormState = {
+  const initialFormState: CustomizationFormData = {
     description: "",
     accentColor: defaultPreset.accentColor,
     themePreset: defaultPreset.key,
@@ -525,17 +342,14 @@ const CustomizationForm = () => {
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
     snapshotFromForm(initialFormState),
   );
-  const [previewCompact, setPreviewCompact] = useState(false);
+  const [isMobilePreviewOpen, setIsMobilePreviewOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<CustomizationTab>("essentials");
 
-  const [gradientColors, setGradientColors] = useState(() =>
+  const [gradientColors, setGradientColors] = useState<GradientColors>(() =>
     extractGradientColors(defaultPreset.background.value),
   );
 
-  const [socialDraft, setSocialDraft] = useState<{
-    platform: SocialPlatform;
-    url: string;
-  }>({
+  const [socialDraft, setSocialDraft] = useState<SocialDraft>({
     platform: socialPlatforms[0],
     url: "",
   });
@@ -544,6 +358,31 @@ const CustomizationForm = () => {
 
   const [isLoading, startTransition] = useTransition();
   const [isUploading, startUploading] = useTransition();
+  const showInlineDesktopPreview = shellMode === "appearance";
+
+  const updateFormData = (updates: Partial<CustomizationFormData>) => {
+    setFormData((prev) => ({ ...prev, ...updates }));
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia(DESKTOP_PREVIEW_XL_MEDIA_QUERY);
+    const closeMobilePreviewOnDesktop = (event?: MediaQueryListEvent) => {
+      if (event ? event.matches : mediaQuery.matches) {
+        setIsMobilePreviewOpen(false);
+      }
+    };
+
+    closeMobilePreviewOnDesktop();
+    mediaQuery.addEventListener("change", closeMobilePreviewOnDesktop);
+
+    return () => {
+      mediaQuery.removeEventListener("change", closeMobilePreviewOnDesktop);
+    };
+  }, []);
 
   const uniqueFonts = useMemo(
     () => Array.from(dashboardAllowedFontFamilies),
@@ -672,13 +511,62 @@ const CustomizationForm = () => {
 
   const handleGradientChange = (key: "start" | "end", value: string) => {
     const nextColors = { ...gradientColors, [key]: value };
-    const gradientValue = `linear-gradient(135deg, ${nextColors.start} 0%, ${nextColors.end} 100%)`;
+    const gradientValue = buildGradientValue(nextColors);
     setGradientColors(nextColors);
-    setFormData((prev) => ({
-      ...prev,
+    updateFormData({
       backgroundType: "gradient",
       backgroundValue: gradientValue,
+    });
+  };
+
+  const handleBackgroundTypeChange = (backgroundType: BackgroundType) => {
+    setFormData((prev) => ({
+      ...prev,
+      backgroundType,
+      backgroundValue:
+        backgroundType === "gradient"
+          ? prev.backgroundValue || buildGradientValue(gradientColors)
+          : undefined,
     }));
+  };
+
+  const handlePatternOverlayToggle = () => {
+    setFormData((prev) => ({
+      ...prev,
+      patternOverlayEnabled: !prev.patternOverlayEnabled,
+      patternOverlayValue:
+        !prev.patternOverlayEnabled && !prev.patternOverlayValue
+          ? patternOptions[0]?.value
+          : prev.patternOverlayValue,
+    }));
+  };
+
+  const handlePatternOverlayValueChange = (patternOverlayValue: string) => {
+    updateFormData({ patternOverlayValue });
+  };
+
+  const handleLayoutStyleChange = (layoutStyle: LayoutStyle) => {
+    updateFormData({ layoutStyle });
+  };
+
+  const handleLinkStyleChange = (linkStyle: LinkStyle) => {
+    updateFormData({ linkStyle });
+  };
+
+  const handleFeaturedLinkChange = (featuredLinkId: Id<"links"> | null) => {
+    updateFormData({ featuredLinkId });
+  };
+
+  const handleAvatarShapeChange = (avatarShape: AvatarShape) => {
+    updateFormData({ avatarShape });
+  };
+
+  const handleAccentColorChange = (accentColor: string) => {
+    handleInputChange("accentColor", accentColor);
+  };
+
+  const handleFontFamilyChange = (fontFamily: string) => {
+    handleInputChange("fontFamily", fontFamily);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -716,7 +604,9 @@ const CustomizationForm = () => {
           bannerImagePositionX: sanitizedFormData.bannerImagePositionX,
           bannerImagePositionY: sanitizedFormData.bannerImagePositionY,
           avatarShape: sanitizedFormData.avatarShape || undefined,
-          profileFields: normalizeProfileFields(sanitizedFormData.profileFields),
+          profileFields: normalizeProfileFields(
+            sanitizedFormData.profileFields,
+          ),
           socialLinks: sanitizedFormData.socialLinks,
         });
         setSavedSnapshot(snapshotFromForm(sanitizedFormData));
@@ -728,9 +618,62 @@ const CustomizationForm = () => {
     });
   };
 
+  const clearImageInput = (type: ImageAssetType) => {
+    const inputRef =
+      type === "profile"
+        ? fileInputRef
+        : type === "banner"
+          ? bannerInputRef
+          : backgroundInputRef;
+
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
+  const saveUploadedImage = async (
+    type: ImageAssetType,
+    storageId: Id<"_storage">,
+  ) => {
+    if (type === "profile") {
+      await updateCustomization({
+        profilePictureStorageId: storageId,
+      });
+      return;
+    }
+
+    if (type === "banner") {
+      await updateCustomization({
+        bannerImageStorageId: storageId,
+      });
+      return;
+    }
+
+    await updateCustomization({
+      backgroundImageStorageId: storageId,
+      backgroundType: "image",
+      backgroundValue: undefined,
+    });
+    updateFormData({ backgroundType: "image" });
+  };
+
+  const removeImageByType = async (type: ImageAssetType) => {
+    if (type === "profile") {
+      await removeProfileImage();
+      return;
+    }
+
+    if (type === "banner") {
+      await removeBannerImage();
+      return;
+    }
+
+    await removeBackgroundImage();
+  };
+
   const handleImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "profile" | "banner" | "background",
+    type: ImageAssetType,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -758,59 +701,21 @@ const CustomizationForm = () => {
 
         const { storageId } = await uploadResult.json();
 
-        if (type === "profile") {
-          await updateCustomization({
-            profilePictureStorageId: storageId,
-          });
-        }
-
-        if (type === "banner") {
-          await updateCustomization({
-            bannerImageStorageId: storageId,
-          });
-        }
-
-        if (type === "background") {
-          await updateCustomization({
-            backgroundImageStorageId: storageId,
-            backgroundType: "image",
-            backgroundValue: undefined,
-          });
-          setFormData((prev) => ({
-            ...prev,
-            backgroundType: "image",
-          }));
-        }
+        await saveUploadedImage(type, storageId);
         toast.success("Image uploaded successfully.");
       } catch (err) {
         console.log("Upload failed", err);
         toast.error("Failed to upload image.");
       } finally {
-        if (type === "profile" && fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-        if (type === "banner" && bannerInputRef.current) {
-          bannerInputRef.current.value = "";
-        }
-        if (type === "background" && backgroundInputRef.current) {
-          backgroundInputRef.current.value = "";
-        }
+        clearImageInput(type);
       }
     });
   };
 
-  const handleRemoveImage = (type: "profile" | "banner" | "background") => {
+  const handleRemoveImage = (type: ImageAssetType) => {
     startTransition(async () => {
       try {
-        if (type === "profile") {
-          await removeProfileImage();
-        }
-        if (type === "banner") {
-          await removeBannerImage();
-        }
-        if (type === "background") {
-          await removeBackgroundImage();
-        }
+        await removeImageByType(type);
         toast.success("Image removed successfully.");
       } catch (err) {
         console.log("Failed to remove image", err);
@@ -823,7 +728,7 @@ const CustomizationForm = () => {
     field: string,
     value: string | boolean | number,
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    updateFormData({ [field]: value } as Partial<CustomizationFormData>);
   };
 
   const handleProfileFieldChange = (
@@ -1015,6 +920,14 @@ const CustomizationForm = () => {
     setSocialDraft((prev) => ({ ...prev, url: "" }));
   };
 
+  const handleSocialDraftPlatformChange = (platform: SocialPlatform) => {
+    setSocialDraft((prev) => ({ ...prev, platform }));
+  };
+
+  const handleSocialDraftUrlChange = (url: string) => {
+    setSocialDraft((prev) => ({ ...prev, url }));
+  };
+
   const handleRemoveSocialLink = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -1037,23 +950,31 @@ const CustomizationForm = () => {
     backgroundImagePositionY: formData.backgroundImagePositionY,
     preset: previewPreset,
   });
-  const previewName =
-    user?.username || user?.firstName || user?.lastName || "Your Name";
-  const shareSlug = currentSlug || user?.id || "your-profile";
-  const qrProfileUrl = `${getBaseUrl()}/q/${shareSlug}`;
-  const previewLinks = [
-    { title: "Portfolio", url: "https://example.com" },
-    { title: "Latest Work", url: "https://example.com" },
-    { title: "Newsletter", url: "https://example.com" },
-  ];
-  const selectedFeaturedLink = useMemo(() => {
-    if (!formData.featuredLinkId) return null;
-
-    return (
-      (userLinks || []).find((link) => link._id === formData.featuredLinkId) ??
-      null
-    );
-  }, [formData.featuredLinkId, userLinks]);
+  const dashboardPreviewModel = useMemo(
+    () =>
+      buildDashboardPreviewModel({
+        displayName: user?.username || user?.firstName || user?.lastName,
+        currentSlug,
+        fallbackShareSlug: user?.id,
+        userLinks: (userLinks ?? []).map((link) => ({
+          id: link._id.toString(),
+          title: link.title,
+          url: link.url,
+          order: link.order,
+        })),
+        featuredLinkId: formData.featuredLinkId?.toString() ?? null,
+      }),
+    [
+      currentSlug,
+      formData.featuredLinkId,
+      user?.firstName,
+      user?.id,
+      user?.lastName,
+      user?.username,
+      userLinks,
+    ],
+  );
+  const qrProfileUrl = `${getBaseUrl()}/q/${dashboardPreviewModel.shareSlug}`;
 
   useEffect(() => {
     if (userLinks === undefined || formData.featuredLinkId === null) {
@@ -1117,190 +1038,60 @@ const CustomizationForm = () => {
     return snapshotFromForm(formData) !== savedSnapshot;
   }, [formData, savedSnapshot]);
 
-  const previewPanel = (
-    <div className="dashboard-shell dashboard-shell-inner rounded-[1.75rem]">
-      <div className="mb-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-slate-900">Live preview</p>
-          <p className="text-xs text-slate-500">Mirrors the public page</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setPreviewCompact((prev) => !prev)}
-          className="rounded-full bg-white px-3 py-1 text-xs text-slate-500 shadow-sm transition hover:text-slate-700"
-        >
-          {previewCompact ? "Desktop preview" : "Mobile preview"}
-        </button>
-      </div>
-      <div
-        className={cn(
-          "rounded-[28px] border border-slate-200/80 bg-white/95 p-2 shadow-lg",
-          previewCompact && "mx-auto max-w-[320px]",
-        )}
-      >
-        <div
-          className="overflow-hidden rounded-[24px] border border-white/70"
-          style={{
-            ...previewBackgroundStyle,
-            fontFamily: sanitizeDashboardFontFamily(formData.fontFamily),
-          }}
-        >
-          <div
-            className={cn(
-              "relative h-24 touch-none select-none sm:h-28",
-              existingCustomization?.bannerImageUrl
-                ? "cursor-grab"
-                : "cursor-default",
-            )}
-            style={
-              existingCustomization?.bannerImageUrl
-                ? {
-                    backgroundImage: `url(${existingCustomization.bannerImageUrl})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: `${formData.bannerImagePositionX}% ${formData.bannerImagePositionY}%`,
-                  }
-                : {
-                    background: `linear-gradient(135deg, ${formData.accentColor} 0%, ${formData.accentColor}bb 100%)`,
-                  }
-            }
-            onPointerDown={handleDragStart("banner")}
-            onPointerMove={handleDragMove("banner")}
-            onPointerUp={handleDragEnd}
-            onPointerLeave={handleDragEnd}
-          >
-            <div className="absolute inset-0 bg-black/10" />
-            {existingCustomization?.bannerImageUrl && (
-              <div className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-sm">
-                <GripVertical className="size-3" />
-                Drag to reposition
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-4 px-4 pt-4 pb-6">
-            <div className="rounded-2xl border border-white/60 bg-white/95 p-4 shadow-md">
-              <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    "size-14 bg-white p-1 shadow",
-                    formData.avatarShape === "circle"
-                      ? "rounded-full"
-                      : formData.avatarShape === "rounded"
-                        ? "rounded-2xl"
-                        : "rounded-none",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "h-full w-full overflow-hidden",
-                      formData.avatarShape === "circle"
-                        ? "rounded-full"
-                        : formData.avatarShape === "rounded"
-                          ? "rounded-2xl"
-                          : "rounded-none",
-                    )}
-                  >
-                    {existingCustomization?.profilePictureUrl ? (
-                      <Image
-                        src={existingCustomization.profilePictureUrl}
-                        alt="Profile preview"
-                        width={56}
-                        height={56}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-500">
-                        <User className="size-6" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">
-                    @{previewName}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {formData.description || "Add a short bio..."}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <ProfileDetails
-                  profileFields={formData.profileFields}
-                  accentColor={formData.accentColor}
-                  compact
-                />
-              </div>
-
-              {formData.socialLinks.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {formData.socialLinks.slice(0, 3).map((link, index) => (
-                    <span
-                      key={`${link.platform}-${index}`}
-                      className="rounded-full border bg-white px-3 py-1 text-xs text-slate-600"
-                      style={{ borderColor: `${formData.accentColor}44` }}
-                    >
-                      {link.platform}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-white/60 bg-white/95 p-4 shadow-md">
-              {selectedFeaturedLink && (
-                <div
-                  className="mb-4 rounded-2xl border bg-white/95 p-4"
-                  style={{
-                    borderColor: `${formData.accentColor}55`,
-                    boxShadow: `0 10px 24px ${formData.accentColor}12`,
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                        Featured Link
-                      </p>
-                      <p className="truncate text-sm font-semibold text-slate-900">
-                        {selectedFeaturedLink.title}
-                      </p>
-                      <p className="truncate text-xs text-slate-500">
-                        {selectedFeaturedLink.url}
-                      </p>
-                    </div>
-                    <span
-                      className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                      style={accentBadgeStyle}
-                    >
-                      Highlighted
-                    </span>
-                  </div>
-                </div>
-              )}
-              <div className={cn(previewLayoutClassMap[formData.layoutStyle])}>
-                {previewLinks.map((link, index) => (
-                  <div
-                    key={`${link.title}-${index}`}
-                    className={cn(
-                      "px-4 py-3 text-sm text-slate-800",
-                      previewLinkStyleMap[formData.linkStyle],
-                    )}
-                    style={{ borderColor: `${formData.accentColor}44` }}
-                  >
-                    {link.title}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  const sharedPreviewContentProps = {
+    username: dashboardPreviewModel.displayName,
+    accentColor: formData.accentColor,
+    avatarShape: formData.avatarShape,
+    description: formData.description || "Add a short bio...",
+    profilePictureUrl: existingCustomization?.profilePictureUrl,
+    profileFields: formData.profileFields,
+    socialLinks: formData.socialLinks,
+    bannerImageUrl: existingCustomization?.bannerImageUrl,
+    bannerImagePositionX: formData.bannerImagePositionX,
+    bannerImagePositionY: formData.bannerImagePositionY,
+    featuredLink: dashboardPreviewModel.selectedFeaturedLink
+      ? {
+          _id: dashboardPreviewModel.selectedFeaturedLink.id,
+          title: dashboardPreviewModel.selectedFeaturedLink.title,
+          url: dashboardPreviewModel.selectedFeaturedLink.url,
+          order: dashboardPreviewModel.selectedFeaturedLink.order,
+        }
+      : null,
+    links: dashboardPreviewModel.previewLinks.map((link) => ({
+      _id: link.id,
+      title: link.title,
+      url: link.url,
+      order: link.order,
+    })),
+    layoutStyle: formData.layoutStyle,
+    linkStyle: formData.linkStyle,
+    bannerDragProps: {
+      draggable: Boolean(existingCustomization?.bannerImageUrl),
+      onPointerDown: handleDragStart("banner"),
+      onPointerMove: handleDragMove("banner"),
+      onPointerUp: handleDragEnd,
+      onPointerLeave: handleDragEnd,
+    },
+  };
+  const mobilePreviewContentProps = {
+    ...sharedPreviewContentProps,
+    bannerDragProps: undefined,
+  };
+  const desktopPreview = (
+    <DesktopFloatingPreview
+      previewBackgroundStyle={previewBackgroundStyle}
+      fontFamily={sanitizeDashboardFontFamily(formData.fontFamily)}
+      contentProps={sharedPreviewContentProps}
+    />
   );
 
   const desktopQrPanel = (
-    <section className="hidden lg:block">
+    <section
+      className={cn(
+        "hidden lg:block",
+        showInlineDesktopPreview ? "xl:hidden" : undefined,
+      )}
+    >
       <div className="grid gap-6 rounded-3xl border border-slate-200/80 bg-slate-50/85 p-6 shadow-lg shadow-slate-900/5 xl:grid-cols-[minmax(0,1.1fr)_380px] xl:items-center xl:gap-8 xl:p-8">
         <div className="space-y-4">
           <div className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500 shadow-sm">
@@ -1326,7 +1117,7 @@ const CustomizationForm = () => {
         </div>
 
         <ProfileQrCard
-          username={shareSlug}
+          username={dashboardPreviewModel.shareSlug}
           profileUrl={qrProfileUrl}
           accentColor={formData.accentColor}
           title="Download your QR code"
@@ -1339,7 +1130,7 @@ const CustomizationForm = () => {
 
   return (
     <div className="dashboard-shell dashboard-shell-inner w-full">
-      <div className="mb-8 flex flex-col gap-4 border-b border-slate-200/80 pb-6 lg:mb-10 lg:flex-row lg:items-start lg:justify-between lg:pb-8">
+      <div className="mb-8 border-b border-slate-200/80 pb-6 lg:mb-10 lg:pb-8">
         <div className="flex items-start gap-4">
           <div
             className="rounded-2xl p-3"
@@ -1361,7 +1152,7 @@ const CustomizationForm = () => {
             </p>
           </div>
         </div>
-        <div className="hidden items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-4 py-2 text-xs text-slate-500 shadow-sm md:flex">
+        <div className="mt-4 hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs text-slate-500 shadow-sm md:inline-flex">
           <span>Live preview</span>
           <span className="text-slate-300">•</span>
           <span>
@@ -1370,1167 +1161,210 @@ const CustomizationForm = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-        <div
-          className="flex flex-wrap gap-2 sm:gap-3"
-          role="tablist"
-          aria-label="Customization tabs"
-        >
-          {customizationTabs.map((tab) => {
-            const isActive = activeTab === tab.value;
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                role="tab"
-                id={`tab-${tab.value}`}
-                aria-selected={isActive}
-                aria-controls={`panel-${tab.value}`}
-                className={cn(
-                  "rounded-full border px-4 py-2.5 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-5 sm:text-sm",
-                  isActive
-                    ? "text-[color:var(--accent-foreground)] focus-visible:ring-slate-900/30"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 focus-visible:ring-slate-400",
-                )}
-                style={
-                  isActive
-                    ? { ...accentControlVars, ...accentButtonStyle }
-                    : undefined
-                }
-                onClick={() => setActiveTab(tab.value)}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start xl:gap-8">
-            <div className="min-w-0 space-y-6">
-          {activeTab === "essentials" && (
-            <section
-                id="panel-essentials"
-                role="tabpanel"
-                aria-labelledby="tab-essentials"
-                className={sectionCardClass}
-              >
-                <div className={sectionHeaderClass}>
-                  <div className="rounded-lg p-2" style={accentBadgeStyle}>
-                    <Sparkles className="size-4" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                      Essentials
-                    </p>
-                    <p className={sectionTitleClass}>Brand basics</p>
-                    <p className={sectionHelpClass}>
-                      Set your brand color and font.
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-5">
-                  <div className="space-y-4 rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
-                    <ReactAriaColorPicker
-                      label="Accent Color"
-                      value={formData.accentColor}
-                      onChange={(value) =>
-                        handleInputChange("accentColor", value)
-                      }
-                      helperText="Choose the main brand color used for buttons, highlights, and emphasis across your page."
-                      dialogTitle="Accent color"
-                      triggerTitle="Pick accent color"
-                    />
-                    <p className="text-sm font-medium text-slate-700">
-                      Use this for buttons and accents.
-                    </p>
-                  </div>
-
-                  <div className="dashboard-section-divider pt-5">
-                    <div className="space-y-3 rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
-                      <Label className="flex items-center gap-2">
-                        <Type className="size-4" />
-                        Font Family
-                      </Label>
-                    <select
-                      value={formData.fontFamily}
-                      onChange={(e) =>
-                        handleInputChange("fontFamily", e.target.value)
-                      }
-                      className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    >
-                      {uniqueFonts.map((font) => (
-                        <option key={font} value={font}>
-                          {font.split(",")[0].replace(/\"/g, "")}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {activeTab === "layout" && (
-            <section
-              id="panel-layout"
-              role="tabpanel"
-              aria-labelledby="tab-layout"
-              className={sectionCardClass}
+      <div className="space-y-6">
+        <section className="min-w-0">
+          <div>
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 pb-28 sm:space-y-8 xl:pb-0"
             >
-              <div className={sectionHeaderClass}>
-                <div className="rounded-lg p-2" style={accentBadgeStyle}>
-                  <LayoutGrid className="size-4" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                    Layout
-                  </p>
-                  <p className={sectionTitleClass}>Layout & Links</p>
-                  <p className={sectionHelpClass}>
-                    Control how your links stack and look.
-                  </p>
-                </div>
-              </div>
-              <div className="space-y-5">
-                <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2">
-                      <LayoutGrid className="size-4" />
-                      Layout Style
-                    </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {layoutOptions.map((option) => (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={
-                            formData.layoutStyle === option.value
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              layoutStyle: option.value,
-                            }))
-                          }
-                          className={cn(
-                            "flex items-center gap-2",
-                            formData.layoutStyle === option.value &&
-                              "text-[color:var(--accent-foreground)]",
-                          )}
-                          style={
-                            formData.layoutStyle === option.value
-                              ? { ...accentControlVars, ...accentButtonStyle }
-                              : undefined
-                          }
-                        >
-                          <option.icon className="size-4" />
-                          {option.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="dashboard-section-divider pt-5">
-                  <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
-                    <div className="space-y-3">
-                      <Label className="flex items-center gap-2">
-                        <LinkIcon className="size-4" />
-                        Link Style
-                    </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {linkStyleOptions.map((option) => (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={
-                            formData.linkStyle === option.value
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              linkStyle: option.value,
-                            }))
-                          }
-                          className={
-                            formData.linkStyle === option.value
-                              ? "text-[color:var(--accent-foreground)]"
-                              : ""
-                          }
-                          style={
-                            formData.linkStyle === option.value
-                              ? { ...accentControlVars, ...accentButtonStyle }
-                              : undefined
-                          }
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                </div>
-                <div className="dashboard-section-divider pt-5">
-                  <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
-                    <div className="space-y-3">
-                    <div className="space-y-1">
-                      <Label
-                        htmlFor="featured-link"
-                        className="flex items-center gap-2"
-                      >
-                        <Sparkles className="size-4" />
-                        Featured Link
-                      </Label>
-                      <p className="text-sm text-slate-500">
-                        Pick one link to highlight at the top of your public
-                        page.
-                      </p>
-                    </div>
-                    <select
-                      id="featured-link"
-                      value={formData.featuredLinkId || ""}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          featuredLinkId: e.target.value
-                            ? (e.target.value as Id<"links">)
-                            : null,
-                        }))
+              <div
+                className="flex flex-wrap gap-2 sm:gap-3"
+                role="tablist"
+                aria-label="Customization tabs"
+              >
+                {customizationTabs.map((tab) => {
+                  const isActive = activeTab === tab.value;
+                  return (
+                    <button
+                      key={tab.value}
+                      type="button"
+                      role="tab"
+                      id={`tab-${tab.value}`}
+                      aria-selected={isActive}
+                      aria-controls={`panel-${tab.value}`}
+                      className={cn(
+                        "rounded-full border px-4 py-2.5 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-5 sm:text-sm",
+                        isActive
+                          ? "text-accent-foreground focus-visible:ring-slate-900/30"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 focus-visible:ring-slate-400",
+                      )}
+                      style={
+                        isActive
+                          ? { ...accentControlVars, ...accentButtonStyle }
+                          : undefined
                       }
-                      disabled={!userLinks}
-                      className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm"
+                      onClick={() => setActiveTab(tab.value)}
                     >
-                      <option value="">No featured link</option>
-                      {(userLinks || []).map((link) => (
-                        <option key={link._id} value={link._id}>
-                          {link.title}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-slate-500">
-                      {!userLinks
-                        ? "Loading your links..."
-                        : userLinks.length === 0
-                          ? "Add a link first, then you can feature it here."
-                          : selectedFeaturedLink
-                            ? `Previewing: ${selectedFeaturedLink.title}`
-                            : "Choose a link or keep the regular list only."}
-                    </p>
-                  </div>
-                </div>
-                </div>
-                <div className="dashboard-section-divider pt-5">
-                  <div className="rounded-[1.35rem] border border-slate-200/75 bg-white/76 p-4 sm:p-5">
-                    <div className="space-y-3">
-                    <Label className="flex items-center gap-2">
-                      <Circle className="size-4" />
-                      Avatar Shape
-                    </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {avatarShapeOptions.map((option) => (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={
-                            formData.avatarShape === option.value
-                              ? "default"
-                              : "outline"
-                          }
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              avatarShape: option.value,
-                            }))
-                          }
-                          className={cn(
-                            "flex items-center gap-2",
-                            formData.avatarShape === option.value &&
-                              "text-[color:var(--accent-foreground)]",
-                          )}
-                          style={
-                            formData.avatarShape === option.value
-                              ? { ...accentControlVars, ...accentButtonStyle }
-                              : undefined
-                          }
-                        >
-                          <option.icon className="size-4" />
-                          {option.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid gap-6 xl:gap-8">
+                <div className="min-w-0 space-y-6">
+                  {activeTab === "essentials" && (
+                    <CustomizationEssentialsPanel
+                      accentColor={formData.accentColor}
+                      fontFamily={formData.fontFamily}
+                      uniqueFonts={uniqueFonts}
+                      sectionCardClass={sectionCardClass}
+                      sectionHeaderClass={sectionHeaderClass}
+                      sectionTitleClass={sectionTitleClass}
+                      sectionHelpClass={sectionHelpClass}
+                      accentBadgeStyle={accentBadgeStyle}
+                      onAccentColorChange={handleAccentColorChange}
+                      onFontFamilyChange={handleFontFamilyChange}
+                    />
+                  )}
+
+                  {activeTab === "layout" && (
+                    <CustomizationLayoutPanel
+                      layoutStyle={formData.layoutStyle}
+                      linkStyle={formData.linkStyle}
+                      avatarShape={formData.avatarShape}
+                      featuredLinkId={formData.featuredLinkId}
+                      layoutOptions={layoutOptions}
+                      linkStyleOptions={linkStyleOptions}
+                      avatarShapeOptions={avatarShapeOptions}
+                      userLinks={userLinks}
+                      featuredLinkPreviewTitle={
+                        dashboardPreviewModel.selectedFeaturedLink?.title ??
+                        null
+                      }
+                      sectionCardClass={sectionCardClass}
+                      sectionHeaderClass={sectionHeaderClass}
+                      sectionTitleClass={sectionTitleClass}
+                      sectionHelpClass={sectionHelpClass}
+                      accentBadgeStyle={accentBadgeStyle}
+                      accentButtonStyle={accentButtonStyle}
+                      accentControlVars={accentControlVars}
+                      onLayoutStyleChange={handleLayoutStyleChange}
+                      onLinkStyleChange={handleLinkStyleChange}
+                      onFeaturedLinkChange={handleFeaturedLinkChange}
+                      onAvatarShapeChange={handleAvatarShapeChange}
+                    />
+                  )}
+
+                  {activeTab === "media" && (
+                    <CustomizationMediaPanel
+                      backgroundType={formData.backgroundType}
+                      backgroundSolidColor={formData.backgroundSolidColor}
+                      patternOverlayEnabled={formData.patternOverlayEnabled}
+                      patternOverlayValue={formData.patternOverlayValue}
+                      backgroundImagePositionX={
+                        formData.backgroundImagePositionX
+                      }
+                      backgroundImagePositionY={
+                        formData.backgroundImagePositionY
+                      }
+                      bannerImagePositionX={formData.bannerImagePositionX}
+                      bannerImagePositionY={formData.bannerImagePositionY}
+                      accentColor={formData.accentColor}
+                      gradientColors={gradientColors}
+                      isUploading={isUploading}
+                      settingsGroupClass={settingsGroupClass}
+                      sectionCardClass={sectionCardClass}
+                      sectionHeaderClass={sectionHeaderClass}
+                      sectionTitleClass={sectionTitleClass}
+                      sectionHelpClass={sectionHelpClass}
+                      accentBadgeStyle={accentBadgeStyle}
+                      accentButtonStyle={accentButtonStyle}
+                      accentControlVars={accentControlVars}
+                      backgroundTypeOptions={backgroundTypeOptions}
+                      patternOptions={patternOptions}
+                      existingCustomization={existingCustomization}
+                      fileInputRef={fileInputRef}
+                      bannerInputRef={bannerInputRef}
+                      backgroundInputRef={backgroundInputRef}
+                      onBackgroundTypeChange={handleBackgroundTypeChange}
+                      onBackgroundSolidColorChange={(value) =>
+                        handleInputChange("backgroundSolidColor", value)
+                      }
+                      onPatternOverlayToggle={handlePatternOverlayToggle}
+                      onPatternOverlayValueChange={
+                        handlePatternOverlayValueChange
+                      }
+                      onGradientChange={handleGradientChange}
+                      onImageUpload={handleImageUpload}
+                      onRemoveImage={handleRemoveImage}
+                      onBackgroundPointerDown={handleDragStart("background")}
+                      onBackgroundPointerMove={handleDragMove("background")}
+                      onBannerPointerDown={handleDragStart("banner")}
+                      onBannerPointerMove={handleDragMove("banner")}
+                      onPointerEnd={handleDragEnd}
+                    />
+                  )}
+
+                  {activeTab === "bio" && (
+                    <CustomizationBioSocialPanel
+                      description={formData.description}
+                      profileFields={formData.profileFields}
+                      socialLinks={formData.socialLinks}
+                      socialDraft={socialDraft}
+                      countryOptions={countryOptions}
+                      preferredPhoneCountry={preferredPhoneCountry}
+                      isLocatingCountry={isLocatingCountry}
+                      sectionCardClass={sectionCardClass}
+                      sectionHeaderClass={sectionHeaderClass}
+                      sectionTitleClass={sectionTitleClass}
+                      sectionHelpClass={sectionHelpClass}
+                      accentBadgeStyle={accentBadgeStyle}
+                      accentButtonStyle={accentButtonStyle}
+                      onDescriptionChange={(value) =>
+                        handleInputChange("description", value)
+                      }
+                      onAddProfileField={handleAddProfileField}
+                      onProfileFieldChange={handleProfileFieldChange}
+                      onMoveProfileField={handleMoveProfileField}
+                      onRemoveProfileField={handleRemoveProfileField}
+                      onUseLocationForPhone={handleUseLocationForPhone}
+                      onSocialDraftPlatformChange={
+                        handleSocialDraftPlatformChange
+                      }
+                      onSocialDraftUrlChange={handleSocialDraftUrlChange}
+                      onAddSocialLink={handleAddSocialLink}
+                      onRemoveSocialLink={handleRemoveSocialLink}
+                    />
+                  )}
                 </div>
               </div>
-            </section>
-          )}
 
-          {activeTab === "media" && (
-            <section
-                id="panel-media"
-                role="tabpanel"
-                aria-labelledby="tab-media"
-                className={sectionCardClass}
-              >
-                <div className={sectionHeaderClass}>
-                  <div className="rounded-lg p-2" style={accentBadgeStyle}>
-                    <ImageIcon className="size-4" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                      Media
-                    </p>
-                    <p className={sectionTitleClass}>Background & imagery</p>
-                    <p className={sectionHelpClass}>
-                      Add background, banner, and profile images.
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-5">
-                  <div className={settingsGroupClass}>
-                    <div className="space-y-3">
-                      <Label className="flex items-center gap-2">
-                        Background Style
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {backgroundTypeOptions.map((option) => (
-                          <Button
-                            key={option.value}
-                            type="button"
-                            variant={
-                              formData.backgroundType === option.value
-                                ? "default"
-                                : "outline"
-                            }
-                            onClick={() =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                backgroundType: option.value,
-                                backgroundValue:
-                                  option.value === "gradient"
-                                    ? prev.backgroundValue ||
-                                      `linear-gradient(135deg, ${gradientColors.start} 0%, ${gradientColors.end} 100%)`
-                                    : undefined,
-                              }))
-                            }
-                            style={
-                              formData.backgroundType === option.value
-                                ? { ...accentControlVars, ...accentButtonStyle }
-                                : undefined
-                            }
-                            className={cn(
-                              "min-w-20",
-                              formData.backgroundType === option.value
-                                ? "text-accent-foreground"
-                                : "",
-                            )}
-                          >
-                            {option.label}
-                          </Button>
-                        ))}
-                      </div>
-
-                      {formData.backgroundType !== "image" && (
-                        <div className="space-y-4 pt-2">
-                          <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4">
-                            <div className="mb-4 space-y-1">
-                              <p className="text-sm font-semibold text-slate-900">
-                                Base color
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                This anchors the overall background mood before
-                                any gradient blend or texture is added.
-                              </p>
-                            </div>
-                            <ReactAriaColorPicker
-                              label="Solid Color"
-                              value={formData.backgroundSolidColor}
-                              onChange={(value) =>
-                                handleInputChange("backgroundSolidColor", value)
-                              }
-                              dialogTitle="Background solid color"
-                              triggerTitle="Pick solid background color"
-                            />
-                          </div>
-
-                          <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4">
-                            <div className="space-y-2">
-                              <Label>Pattern Overlay</Label>
-                              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-3">
-                                <div>
-                                  <p className="text-sm font-medium text-slate-700">
-                                    Enable overlay
-                                  </p>
-                                  <p className="text-xs text-slate-500">
-                                    Add subtle texture to the background
-                                  </p>
-                                </div>
-                                <button
-                                  id="patternOverlayEnabled"
-                                  type="button"
-                                  role="switch"
-                                  aria-checked={formData.patternOverlayEnabled}
-                                  onClick={() =>
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      patternOverlayEnabled:
-                                        !prev.patternOverlayEnabled,
-                                      patternOverlayValue:
-                                        !prev.patternOverlayEnabled &&
-                                        !prev.patternOverlayValue
-                                          ? patternOptions[0]?.value
-                                          : prev.patternOverlayValue,
-                                    }))
-                                  }
-                                  className={cn(
-                                    "relative inline-flex h-6 w-11 items-center rounded-full border transition",
-                                    formData.patternOverlayEnabled
-                                      ? "border-transparent"
-                                      : "border-slate-200 bg-slate-100",
-                                  )}
-                                  style={
-                                    formData.patternOverlayEnabled
-                                      ? {
-                                          backgroundColor: formData.accentColor,
-                                        }
-                                      : undefined
-                                  }
-                                >
-                                  <span
-                                    className={cn(
-                                      "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition",
-                                      formData.patternOverlayEnabled &&
-                                        "translate-x-6",
-                                    )}
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {formData.backgroundType === "gradient" && (
-                        <div className="rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4">
-                          <div className="mb-4 space-y-1">
-                            <p className="text-sm font-semibold text-slate-900">
-                              Gradient blend
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              Pick the two colors that fade into each other
-                              across the background.
-                            </p>
-                          </div>
-                          <div className="space-y-4">
-                            <ReactAriaColorPicker
-                              label="Gradient Start"
-                              value={gradientColors.start}
-                              onChange={(value) =>
-                                handleGradientChange("start", value)
-                              }
-                              dialogTitle="Gradient start color"
-                              triggerTitle="Pick gradient start color"
-                            />
-                            <ReactAriaColorPicker
-                              label="Gradient End"
-                              value={gradientColors.end}
-                              onChange={(value) =>
-                                handleGradientChange("end", value)
-                              }
-                              dialogTitle="Gradient end color"
-                              triggerTitle="Pick gradient end color"
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {formData.patternOverlayEnabled &&
-                        formData.backgroundType !== "image" && (
-                          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                            {patternOptions.map((option) => (
-                              <button
-                                key={option.label}
-                                type="button"
-                                onClick={() =>
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    patternOverlayValue: option.value,
-                                  }))
-                                }
-                                className={cn(
-                                  "w-full rounded-xl border p-3 text-left",
-                                  formData.patternOverlayValue === option.value
-                                    ? ""
-                                    : "border-slate-200",
-                                )}
-                                style={
-                                  formData.patternOverlayValue === option.value
-                                    ? { borderColor: formData.accentColor }
-                                    : undefined
-                                }
-                              >
-                                <div
-                                  className="mb-2 h-12 rounded-lg"
-                                  style={{
-                                    backgroundImage:
-                                      option.previewValue || option.value,
-                                    backgroundColor: "#F8FAFC",
-                                    backgroundSize: "18px 18px",
-                                    backgroundRepeat: "repeat",
-                                  }}
-                                />
-                                <p className="text-sm font-medium text-slate-700">
-                                  {option.label}
-                                </p>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-
-                      {formData.backgroundType === "image" && (
-                        <UploadImageCard
-                          title="Background Image"
-                          preview={
-                            <div
-                              className={cn(
-                                "h-36 w-full touch-none rounded-lg border border-slate-200 bg-slate-100 select-none",
-                                existingCustomization?.backgroundImageUrl
-                                  ? "cursor-grab"
-                                  : "cursor-default",
-                              )}
-                              style={
-                                existingCustomization?.backgroundImageUrl
-                                  ? {
-                                      backgroundImage: `url(${existingCustomization.backgroundImageUrl})`,
-                                      backgroundSize: "cover",
-                                      backgroundPosition: `${formData.backgroundImagePositionX}% ${formData.backgroundImagePositionY}%`,
-                                    }
-                                  : undefined
-                              }
-                              onPointerDown={handleDragStart("background")}
-                              onPointerMove={handleDragMove("background")}
-                              onPointerUp={handleDragEnd}
-                              onPointerLeave={handleDragEnd}
-                            >
-                              {!existingCustomization?.backgroundImageUrl && (
-                                <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
-                                  Upload a background image to position it
-                                </div>
-                              )}
-                            </div>
-                          }
-                          actions={
-                            <div className="flex flex-wrap items-center gap-4">
-                              <input
-                                type="file"
-                                ref={backgroundInputRef}
-                                accept="image/*"
-                                onChange={(e) =>
-                                  handleImageUpload(e, "background")
-                                }
-                                className="hidden"
-                                disabled={isUploading}
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() =>
-                                  backgroundInputRef.current?.click()
-                                }
-                                disabled={isUploading}
-                                className="flex items-center gap-2"
-                              >
-                                <Upload className="size-4" />
-                                {isUploading
-                                  ? "Uploading..."
-                                  : "Upload Background"}
-                              </Button>
-                              {existingCustomization?.backgroundImageUrl && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleRemoveImage("background")
-                                  }
-                                  disabled={isUploading}
-                                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                                >
-                                  <X className="mr-1 size-4" />
-                                  Remove
-                                </Button>
-                              )}
-                            </div>
-                          }
-                          helperText="Max 5MB"
-                          footerText="Drag to reposition"
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className={settingsGroupClass}>
-                    <div className="space-y-6">
-                      <UploadImageCard
-                        title="Banner Image"
-                        preview={
-                          <div
-                            className={cn(
-                              "relative h-24 w-full touch-none overflow-hidden rounded-lg bg-slate-100 select-none sm:h-20 sm:w-32",
-                              existingCustomization?.bannerImageUrl
-                                ? "cursor-grab"
-                                : "cursor-default",
-                            )}
-                            style={
-                              existingCustomization?.bannerImageUrl
-                                ? {
-                                    backgroundImage: `url(${existingCustomization.bannerImageUrl})`,
-                                    backgroundSize: "cover",
-                                    backgroundPosition: `${formData.bannerImagePositionX}% ${formData.bannerImagePositionY}%`,
-                                  }
-                                : undefined
-                            }
-                            onPointerDown={handleDragStart("banner")}
-                            onPointerMove={handleDragMove("banner")}
-                            onPointerUp={handleDragEnd}
-                            onPointerLeave={handleDragEnd}
-                          >
-                            {!existingCustomization?.bannerImageUrl && (
-                              <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
-                                No banner
-                              </div>
-                            )}
-                            {existingCustomization?.bannerImageUrl && (
-                              <div className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-sm">
-                                <GripVertical className="size-3" />
-                                Drag
-                              </div>
-                            )}
-                          </div>
-                        }
-                        actions={
-                          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                            <input
-                              type="file"
-                              ref={bannerInputRef}
-                              accept="image/*"
-                              onChange={(e) => handleImageUpload(e, "banner")}
-                              className="hidden"
-                              disabled={isUploading}
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => bannerInputRef.current?.click()}
-                              disabled={isUploading}
-                              className="flex items-center gap-2"
-                            >
-                              <Upload className="size-4" />
-                              {isUploading ? "Uploading..." : "Upload Banner"}
-                            </Button>
-                            {existingCustomization?.bannerImageUrl && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleRemoveImage("banner")}
-                                disabled={isUploading}
-                                className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                              >
-                                <X className="mr-1 size-4" />
-                                Remove
-                              </Button>
-                            )}
-                          </div>
-                        }
-                        helperText="Recommended: 1200x400 · Max 5MB"
-                        footerText="Drag the preview to reposition"
-                      />
-
-                      <UploadImageCard
-                        title="Profile Picture"
-                        preview={
-                          <div className="size-16 self-center overflow-hidden rounded-full bg-slate-100 sm:self-auto">
-                            {existingCustomization?.profilePictureUrl ? (
-                              <Image
-                                src={existingCustomization.profilePictureUrl}
-                                alt="Current Profile Picture"
-                                width={64}
-                                height={64}
-                                className="h-full w-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
-                                No photo
-                              </div>
-                            )}
-                          </div>
-                        }
-                        actions={
-                          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              accept="image/*"
-                              onChange={(e) => handleImageUpload(e, "profile")}
-                              className="hidden"
-                              disabled={isUploading}
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => fileInputRef.current?.click()}
-                              disabled={isUploading}
-                              className="flex items-center gap-2"
-                            >
-                              <Upload className="size-4" />
-                              {isUploading ? "Uploading..." : "Upload Photo"}
-                            </Button>
-                            {existingCustomization?.profilePictureUrl && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleRemoveImage("profile")}
-                                disabled={isUploading}
-                                className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                              >
-                                <X className="mr-1 size-4" />
-                                Remove
-                              </Button>
-                            )}
-                          </div>
-                        }
-                        helperText="Max 5MB. JPG, PNG, WebP"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {activeTab === "bio" && (
-              <section
-                id="panel-bio"
-                role="tabpanel"
-                aria-labelledby="tab-bio"
-                className={sectionCardClass}
-              >
-                <div className={sectionHeaderClass}>
-                  <div className="rounded-lg p-2" style={accentBadgeStyle}>
-                    <LinkIcon className="size-4" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                      Bio
-                    </p>
-                    <p className={sectionTitleClass}>Bio & Social</p>
-                    <p className={sectionHelpClass}>
-                      Tell visitors who you are and where to find you.
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-5">
-                  <div className="dashboard-section-divider pt-5">
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                        Intro
-                      </p>
-                      <p className={sectionTitleClass}>Description</p>
-                      <p className={sectionHelpClass}>
-                        A short summary that helps visitors understand who you
-                        are at a glance.
-                      </p>
-                    </div>
-                    <div className="mt-4 rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4 sm:p-5">
-                      <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea
-                          id="description"
-                          name="description"
-                          value={formData.description}
-                          onChange={(e) =>
-                            handleInputChange("description", e.target.value)
-                          }
-                          placeholder="Tell visitors about yourself..."
-                          rows={3}
-                          maxLength={200}
-                          className="resize-vertical max-h-[200px] min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 focus-visible:border-transparent focus-visible:ring-2 focus-visible:outline-none"
-                        />
-                        <p className="text-sm text-slate-500">
-                          {formData.description.length}/200 characters
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="dashboard-section-divider pt-5">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-                      <div className="space-y-1">
-                        <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                          Contact
-                        </p>
-                        <p className={sectionTitleClass}>Profile Fields</p>
-                        <p className={sectionHelpClass}>
-                          Add repeatable phone, email, or free-text items above
-                          your social links.
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {profileFieldTypeOptions.map((option) => (
-                          <Button
-                            key={option.value}
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleAddProfileField(option.value)}
-                            className="flex items-center gap-1 rounded-full border-slate-300 bg-white/80"
-                          >
-                            <Plus className="size-4" />
-                            {option.label}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {formData.profileFields.length === 0 ? (
-                      <div className="mt-4 rounded-[1.25rem] border border-dashed border-slate-300 bg-white/76 px-4 py-6 text-sm text-slate-500">
-                        No profile fields yet. Add one to show contact details
-                        or extra info on the public page.
-                      </div>
-                    ) : (
-                      <div className="mt-4 space-y-4">
-                        {formData.profileFields.map((field, index) => {
-                          const phoneValidation =
-                            field.type === "phone" && field.value
-                              ? formatPhoneValue(field.value, field.country)
-                              : null;
-
-                          return (
-                            <div
-                              key={field.id}
-                              className="rounded-[1.35rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_14px_36px_-28px_rgba(15,23,42,0.5)] sm:p-5"
-                            >
-                              <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                                <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
-                                  <div className="space-y-2">
-                                    <Label>Field Type</Label>
-                                    <select
-                                      value={field.type}
-                                      onChange={(e) =>
-                                        handleProfileFieldChange(field.id, {
-                                          type: e.target
-                                            .value as ProfileFieldType,
-                                          value: "",
-                                        })
-                                      }
-                                      className="h-10 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm"
-                                    >
-                                      {profileFieldTypeOptions.map(
-                                        (option) => (
-                                          <option
-                                            key={option.value}
-                                            value={option.value}
-                                          >
-                                            {option.label}
-                                          </option>
-                                        ),
-                                      )}
-                                    </select>
-                                  </div>
-                                  <div className="min-w-0 space-y-2">
-                                    <Label>Title</Label>
-                                    <Input
-                                      value={field.title || ""}
-                                      onChange={(e) =>
-                                        handleProfileFieldChange(field.id, {
-                                          title: e.target.value,
-                                        })
-                                      }
-                                      placeholder="Optional label"
-                                    />
-                                  </div>
-                                </div>
-
-                                <div className="flex shrink-0 items-center gap-1 self-end lg:self-start">
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleMoveProfileField(field.id, "up")
-                                    }
-                                    disabled={index === 0}
-                                  >
-                                    <ArrowUp className="size-4" />
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleMoveProfileField(field.id, "down")
-                                    }
-                                    disabled={
-                                      index ===
-                                      formData.profileFields.length - 1
-                                    }
-                                  >
-                                    <ArrowDown className="size-4" />
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleRemoveProfileField(field.id)
-                                    }
-                                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                                  >
-                                    <X className="size-4" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              {field.type === "phone" && (
-                                <div className="space-y-3">
-                                  <div className="grid gap-3 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
-                                    <div className="min-w-0 space-y-2">
-                                      <Label>Country</Label>
-                                      <select
-                                        value={
-                                          field.country ||
-                                          preferredPhoneCountry
-                                        }
-                                        onChange={(e) =>
-                                          handleProfileFieldChange(field.id, {
-                                            country: e.target.value,
-                                          })
-                                        }
-                                        className="h-10 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm"
-                                      >
-                                        {countryOptions.map((country) => (
-                                          <option
-                                            key={country.code}
-                                            value={country.code}
-                                          >
-                                            {country.name} (
-                                            {country.callingCode})
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                    <div className="min-w-0 space-y-2">
-                                      <Label>Phone Number</Label>
-                                      <Input
-                                        type="tel"
-                                        value={field.value || ""}
-                                        onChange={(e) =>
-                                          handleProfileFieldChange(field.id, {
-                                            value: e.target.value,
-                                          })
-                                        }
-                                        placeholder="+1 555 123 4567"
-                                        className="w-full min-w-0"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="flex flex-wrap items-center gap-3">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        handleUseLocationForPhone(field.id)
-                                      }
-                                      disabled={isLocatingCountry}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <MapPin className="size-4" />
-                                      {isLocatingCountry
-                                        ? "Detecting..."
-                                        : "Use My Location"}
-                                    </Button>
-                                    {field.value && phoneValidation && (
-                                      <p
-                                        className={cn(
-                                          "text-xs",
-                                          phoneValidation.isValid
-                                            ? "text-emerald-600"
-                                            : "text-amber-700",
-                                        )}
-                                      >
-                                        {phoneValidation.isValid
-                                          ? `Valid number. Public display: ${phoneValidation.normalizedValue}`
-                                          : "Enter a valid phone number for the selected country."}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              {field.type === "email" && (
-                                <div className="space-y-2">
-                                  <Label>Email Address</Label>
-                                  <Input
-                                    type="email"
-                                    value={field.value || ""}
-                                    onChange={(e) =>
-                                      handleProfileFieldChange(field.id, {
-                                        value: e.target.value,
-                                      })
-                                    }
-                                    placeholder="hello@example.com"
-                                  />
-                                </div>
-                              )}
-
-                              {field.type === "freeText" && (
-                                <div className="space-y-2">
-                                  <Label>Text Value</Label>
-                                  <Textarea
-                                    value={field.value || ""}
-                                    onChange={(e) =>
-                                      handleProfileFieldChange(field.id, {
-                                        value: e.target.value,
-                                      })
-                                    }
-                                    placeholder="Add a short note, role, or extra detail."
-                                    rows={3}
-                                    className="resize-vertical max-h-[200px] min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 focus-visible:border-transparent focus-visible:ring-2 focus-visible:outline-none"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="dashboard-section-divider pt-5">
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-semibold tracking-[0.24em] text-[color:var(--brand-purple)] uppercase">
-                        Network
-                      </p>
-                      <p className={sectionTitleClass}>Social Links</p>
-                      <p className={sectionHelpClass}>
-                        Add the platforms people already know you on.
-                      </p>
-                    </div>
-                    <div className="mt-4 rounded-[1.25rem] border border-slate-200/80 bg-white/82 p-4 sm:p-5">
-                      <div className="space-y-4">
-                        <div className="grid gap-3">
-                          <select
-                            value={socialDraft.platform}
-                            onChange={(e) =>
-                              setSocialDraft((prev) => ({
-                                ...prev,
-                                platform: e.target.value as SocialPlatform,
-                              }))
-                            }
-                            className="h-10 rounded-md border border-slate-300 px-3 text-sm"
-                          >
-                            {socialPlatforms.map((platform) => (
-                              <option key={platform} value={platform}>
-                                {platform}
-                              </option>
-                            ))}
-                          </select>
-                          <Input
-                            type="text"
-                            value={socialDraft.url}
-                            onChange={(e) =>
-                              setSocialDraft((prev) => ({
-                                ...prev,
-                                url: e.target.value,
-                              }))
-                            }
-                            placeholder="https://..."
-                          />
-                          <Button
-                            type="button"
-                            onClick={handleAddSocialLink}
-                            className="w-full"
-                            style={accentButtonStyle}
-                          >
-                            Add Link
-                          </Button>
-                        </div>
-                        {formData.socialLinks.length > 0 && (
-                          <div className="space-y-3">
-                            {formData.socialLinks.map((link, index) => (
-                              <div
-                                key={`${link.platform}-${index}`}
-                                className="flex items-center justify-between gap-3 rounded-[1.1rem] border border-slate-200/85 bg-white/92 px-4 py-3 shadow-[0_14px_32px_-30px_rgba(15,23,42,0.5)]"
-                              >
-                                <div className="flex min-w-0 items-center gap-3">
-                                  {(() => {
-                                    const Icon = getSocialPlatformIcon(
-                                      link.platform,
-                                    );
-                                    return (
-                                      <Icon
-                                        className="size-4 shrink-0 text-slate-700"
-                                        aria-hidden="true"
-                                      />
-                                    );
-                                  })()}
-                                  <div className="min-w-0">
-                                    <p className="text-sm font-medium text-slate-800">
-                                      {link.platform}
-                                    </p>
-                                    <p className="truncate text-xs text-slate-500">
-                                      {link.url}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleRemoveSocialLink(index)}
-                                >
-                                  Remove
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
+              <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
+                <Button
+                  type="submit"
+                  disabled={isUploading || isLoading}
+                  className="w-full transition-opacity hover:opacity-90"
+                  style={accentButtonStyle}
+                >
+                  {isLoading ? "Saving..." : "Save Customizations"}
+                </Button>
+                {hasUnsavedChanges && !isLoading && (
+                  <p className="mt-2 text-xs font-medium text-amber-700">
+                    Unsaved changes
+                  </p>
+                )}
+              </div>
+            </form>
           </div>
-
-          <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
-              {previewPanel}
-            </aside>
+        </section>
+        <MobilePreviewSheet
+          open={isMobilePreviewOpen}
+          onOpenChange={setIsMobilePreviewOpen}
+          previewBackgroundStyle={previewBackgroundStyle}
+          fontFamily={sanitizeDashboardFontFamily(formData.fontFamily)}
+          contentProps={mobilePreviewContentProps}
+          triggerStyle={accentButtonStyle}
+          hasUnsavedChanges={hasUnsavedChanges}
+        />
+        {showInlineDesktopPreview ? (
+          <div className="hidden xl:block">{desktopPreview}</div>
+        ) : null}
+        <div className={cn(showInlineDesktopPreview ? "mt-0 xl:hidden" : "mt-6")}>
+          {desktopQrPanel}
         </div>
-
-        <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
-          <Button
-            type="submit"
-            disabled={isUploading || isLoading}
-            className="w-full transition-opacity hover:opacity-90"
-            style={accentButtonStyle}
-          >
-            {isLoading ? "Saving..." : "Save Customizations"}
-          </Button>
-          {hasUnsavedChanges && !isLoading && (
-            <p className="mt-2 text-xs font-medium text-amber-700">
-              Unsaved changes
-            </p>
-          )}
-        </div>
-      </form>
-      <div className="mt-6">{desktopQrPanel}</div>
+      </div>
     </div>
   );
 };
