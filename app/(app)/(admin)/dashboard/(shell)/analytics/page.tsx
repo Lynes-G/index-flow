@@ -8,8 +8,20 @@ import DashboardRailAnalyticsSummary from "@/components/dashboard/DashboardRailA
 import DashboardRailProfileCard from "@/components/dashboard/DashboardRailProfileCard";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { fetchAnalytics } from "@/lib/fetchAnalytics";
+import { fetchAnalytics, type AnalyticsData } from "@/lib/fetchAnalytics";
 import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
+
+const emptyAnalytics: AnalyticsData = {
+  totalClicks: 0,
+  uniqueVisitors: 0,
+  countriesReached: 0,
+  totalLinksClicked: 0,
+  qrScans: 0,
+  topLinkTitle: null,
+  topReferrer: null,
+  firstClick: null,
+  lastClick: null,
+};
 
 const DashboardAnalyticsPage = async () => {
   const { userId } = await auth();
@@ -18,10 +30,10 @@ const DashboardAnalyticsPage = async () => {
     redirect("/sign-in");
   }
 
-  const [entitlements, analytics] = await Promise.all([
-    getCurrentUserEntitlements(),
-    fetchAnalytics(userId),
-  ]);
+  const entitlements = await getCurrentUserEntitlements();
+  const analytics = entitlements.canAccessAnalytics
+    ? await fetchAnalytics(userId)
+    : emptyAnalytics;
 
   return (
     <DashboardShell
@@ -47,6 +59,7 @@ const DashboardAnalyticsPage = async () => {
     >
       <DashboardMetrics
         analytics={analytics}
+        canAccessAnalytics={entitlements.canAccessAnalytics}
         canAccessUltraFeatures={entitlements.canAccessUltraFeatures}
       />
     </DashboardShell>

@@ -1,5 +1,6 @@
 import type { AnalyticsData } from "@/lib/fetchAnalytics";
 import {
+  BarChart3,
   Calendar,
   Clock,
   ExternalLink,
@@ -15,11 +16,13 @@ import {
 
 interface DashboardMetricsProps {
   analytics: AnalyticsData;
+  canAccessAnalytics: boolean;
   canAccessUltraFeatures: boolean;
 }
 
 const DashboardMetrics = ({
   analytics,
+  canAccessAnalytics,
   canAccessUltraFeatures,
 }: DashboardMetricsProps) => {
   const metricCardClass =
@@ -53,6 +56,69 @@ const DashboardMetrics = ({
     analytics.uniqueVisitors > 0 ||
     analytics.totalLinksClicked > 0 ||
     analytics.qrScans > 0;
+
+  if (!canAccessAnalytics) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-[1.6rem] border border-slate-200/80 bg-white/92 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.06)] sm:p-6">
+          <div className="flex items-start gap-4">
+            <div className="rounded-2xl bg-slate-100 p-3 text-slate-500">
+              <BarChart3 className="size-6" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.04em] text-slate-900">
+                Analytics unlock on Pro and above
+              </h2>
+              <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
+                Detailed profile analytics are part of the paid analytics
+                entitlement. While billing is paused, Pro and Ultra access come
+                from admin-issued invites instead of direct checkout.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-3">
+          <div className="rounded-[1.35rem] border border-slate-200/80 bg-slate-50/85 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+            <MousePointer className="size-5 text-slate-500" />
+            <p className="mt-3 text-sm font-semibold text-slate-900">
+              Track total clicks
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              See how often visitors interact with your public page and links.
+            </p>
+          </div>
+
+          <div className="rounded-[1.35rem] border border-slate-200/80 bg-slate-50/85 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+            <Users className="size-5 text-slate-500" />
+            <p className="mt-3 text-sm font-semibold text-slate-900">
+              Understand visitors
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Review unique visitor volume and the strongest activity windows.
+            </p>
+          </div>
+
+          <div className="rounded-[1.35rem] border border-slate-200/80 bg-slate-50/85 p-4 shadow-sm shadow-slate-900/5 sm:p-5">
+            <Globe className="size-5 text-slate-500" />
+            <p className="mt-3 text-sm font-semibold text-slate-900">
+              Unlock audience reach
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Pro opens analytics, and Ultra expands that view with richer
+              geographic reach details.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/82 p-4 text-sm leading-6 text-slate-600 shadow-sm shadow-slate-900/5 sm:p-5">
+          New accounts stay on Free by default. Think of this page like a
+          locked reporting room: the rail can explain what exists, but the full
+          dashboard only opens once the analytics entitlement is active.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
