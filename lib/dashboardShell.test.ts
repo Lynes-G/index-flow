@@ -28,6 +28,15 @@ test("getDashboardTaskFromPathname resolves each dashboard route", () => {
   assert.equal(getDashboardTaskFromPathname("/dashboard/billing"), "billing");
 });
 
+test("getDashboardTaskFromPathname falls back to links for unknown paths", () => {
+  assert.equal(getDashboardTaskFromPathname("/dashboard/unknown"), "links");
+});
+
+test("getDashboardTaskFromPathname does not misroute similar prefixes", () => {
+  assert.equal(getDashboardTaskFromPathname("/dashboard/appearancex"), "links");
+  assert.equal(getDashboardTaskFromPathname("/dashboard/analytics-old"), "links");
+});
+
 test("getRailModeForTask returns the expected rail mode for each task", () => {
   assert.equal(getRailModeForTask("links"), "preview-compact");
   assert.equal(getRailModeForTask("appearance"), "preview-full");

@@ -24,24 +24,35 @@ export const dashboardTasks: Array<{
   { id: "billing", href: "/dashboard/billing", label: "Billing" },
 ];
 
+function matchesDashboardSegment(pathname: string, segment: string): boolean {
+  return pathname === segment || pathname.startsWith(`${segment}/`);
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled dashboard task: ${value}`);
+}
+
 export function getDashboardTaskFromPathname(pathname: string): DashboardTaskId {
-  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/link/")) {
+  if (
+    pathname === "/dashboard" ||
+    matchesDashboardSegment(pathname, "/dashboard/link")
+  ) {
     return "links";
   }
 
-  if (pathname.startsWith("/dashboard/appearance")) {
+  if (matchesDashboardSegment(pathname, "/dashboard/appearance")) {
     return "appearance";
   }
 
-  if (pathname.startsWith("/dashboard/analytics")) {
+  if (matchesDashboardSegment(pathname, "/dashboard/analytics")) {
     return "analytics";
   }
 
-  if (pathname.startsWith("/dashboard/username")) {
+  if (matchesDashboardSegment(pathname, "/dashboard/username")) {
     return "username";
   }
 
-  if (pathname.startsWith("/dashboard/billing")) {
+  if (matchesDashboardSegment(pathname, "/dashboard/billing")) {
     return "billing";
   }
 
@@ -60,5 +71,7 @@ export function getRailModeForTask(task: DashboardTaskId): DashboardRailMode {
       return "username-summary";
     case "billing":
       return "billing-summary";
+    default:
+      return assertNever(task);
   }
 }
