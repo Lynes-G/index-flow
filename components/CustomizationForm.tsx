@@ -305,9 +305,24 @@ const CustomizationPreviewProvider = ({
 const useCustomizationPreviewContext = () =>
   useContext(CustomizationPreviewContext);
 
+const useRequiredCustomizationPreviewContext = (
+  consumerName: string,
+): CustomizationPreviewContextValue => {
+  const context = useCustomizationPreviewContext();
+
+  if (!context) {
+    throw new Error(
+      `${consumerName} must be rendered within CustomizationPreviewProvider.`,
+    );
+  }
+
+  return context;
+};
+
 const CustomizationDesktopPreviewRail = () => {
-  const previewContext = useCustomizationPreviewContext();
-  const previewState = previewContext?.previewState ?? null;
+  const { previewState } = useRequiredCustomizationPreviewContext(
+    "CustomizationDesktopPreviewRail",
+  );
 
   return (
     <div className="space-y-4">
@@ -441,6 +456,12 @@ const CustomizationForm = ({
   const [isLoading, startTransition] = useTransition();
   const [isUploading, startUploading] = useTransition();
   const showInlineDesktopPreview = shellMode === "appearance";
+
+  if (shellMode === "appearance" && !previewContext) {
+    throw new Error(
+      'CustomizationForm with shellMode="appearance" must be rendered within CustomizationPreviewProvider.',
+    );
+  }
 
   const updateFormData = (updates: Partial<CustomizationFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -1344,130 +1365,158 @@ const CustomizationForm = ({
 
               <div className="grid gap-6 xl:gap-8">
                 <div className="min-w-0 space-y-6">
-                  {activeTab === "essentials" && (
-                    <CustomizationEssentialsPanel
-                      accentColor={formData.accentColor}
-                      fontFamily={formData.fontFamily}
-                      uniqueFonts={uniqueFonts}
-                      sectionCardClass={sectionCardClass}
-                      sectionHeaderClass={sectionHeaderClass}
-                      sectionTitleClass={sectionTitleClass}
-                      sectionHelpClass={sectionHelpClass}
-                      accentBadgeStyle={accentBadgeStyle}
-                      onAccentColorChange={handleAccentColorChange}
-                      onFontFamilyChange={handleFontFamilyChange}
-                    />
-                  )}
+                  <div
+                    role="tabpanel"
+                    id="panel-essentials"
+                    aria-labelledby="tab-essentials"
+                    hidden={activeTab !== "essentials"}
+                  >
+                    {activeTab === "essentials" ? (
+                      <CustomizationEssentialsPanel
+                        accentColor={formData.accentColor}
+                        fontFamily={formData.fontFamily}
+                        uniqueFonts={uniqueFonts}
+                        sectionCardClass={sectionCardClass}
+                        sectionHeaderClass={sectionHeaderClass}
+                        sectionTitleClass={sectionTitleClass}
+                        sectionHelpClass={sectionHelpClass}
+                        accentBadgeStyle={accentBadgeStyle}
+                        onAccentColorChange={handleAccentColorChange}
+                        onFontFamilyChange={handleFontFamilyChange}
+                      />
+                    ) : null}
+                  </div>
 
-                  {activeTab === "layout" && (
-                    <CustomizationLayoutPanel
-                      layoutStyle={formData.layoutStyle}
-                      linkStyle={formData.linkStyle}
-                      avatarShape={formData.avatarShape}
-                      featuredLinkId={formData.featuredLinkId}
-                      layoutOptions={layoutOptions}
-                      linkStyleOptions={linkStyleOptions}
-                      avatarShapeOptions={avatarShapeOptions}
-                      userLinks={userLinks}
-                      featuredLinkPreviewTitle={
-                        dashboardPreviewModel.selectedFeaturedLink?.title ??
-                        null
-                      }
-                      sectionCardClass={sectionCardClass}
-                      sectionHeaderClass={sectionHeaderClass}
-                      sectionTitleClass={sectionTitleClass}
-                      sectionHelpClass={sectionHelpClass}
-                      accentBadgeStyle={accentBadgeStyle}
-                      accentButtonStyle={accentButtonStyle}
-                      accentControlVars={accentControlVars}
-                      onLayoutStyleChange={handleLayoutStyleChange}
-                      onLinkStyleChange={handleLinkStyleChange}
-                      onFeaturedLinkChange={handleFeaturedLinkChange}
-                      onAvatarShapeChange={handleAvatarShapeChange}
-                    />
-                  )}
+                  <div
+                    role="tabpanel"
+                    id="panel-layout"
+                    aria-labelledby="tab-layout"
+                    hidden={activeTab !== "layout"}
+                  >
+                    {activeTab === "layout" ? (
+                      <CustomizationLayoutPanel
+                        layoutStyle={formData.layoutStyle}
+                        linkStyle={formData.linkStyle}
+                        avatarShape={formData.avatarShape}
+                        featuredLinkId={formData.featuredLinkId}
+                        layoutOptions={layoutOptions}
+                        linkStyleOptions={linkStyleOptions}
+                        avatarShapeOptions={avatarShapeOptions}
+                        userLinks={userLinks}
+                        featuredLinkPreviewTitle={
+                          dashboardPreviewModel.selectedFeaturedLink?.title ??
+                          null
+                        }
+                        sectionCardClass={sectionCardClass}
+                        sectionHeaderClass={sectionHeaderClass}
+                        sectionTitleClass={sectionTitleClass}
+                        sectionHelpClass={sectionHelpClass}
+                        accentBadgeStyle={accentBadgeStyle}
+                        accentButtonStyle={accentButtonStyle}
+                        accentControlVars={accentControlVars}
+                        onLayoutStyleChange={handleLayoutStyleChange}
+                        onLinkStyleChange={handleLinkStyleChange}
+                        onFeaturedLinkChange={handleFeaturedLinkChange}
+                        onAvatarShapeChange={handleAvatarShapeChange}
+                      />
+                    ) : null}
+                  </div>
 
-                  {activeTab === "media" && (
-                    <CustomizationMediaPanel
-                      backgroundType={formData.backgroundType}
-                      backgroundSolidColor={formData.backgroundSolidColor}
-                      patternOverlayEnabled={formData.patternOverlayEnabled}
-                      patternOverlayValue={formData.patternOverlayValue}
-                      backgroundImagePositionX={
-                        formData.backgroundImagePositionX
-                      }
-                      backgroundImagePositionY={
-                        formData.backgroundImagePositionY
-                      }
-                      bannerImagePositionX={formData.bannerImagePositionX}
-                      bannerImagePositionY={formData.bannerImagePositionY}
-                      accentColor={formData.accentColor}
-                      gradientColors={gradientColors}
-                      isUploading={isUploading}
-                      settingsGroupClass={settingsGroupClass}
-                      sectionCardClass={sectionCardClass}
-                      sectionHeaderClass={sectionHeaderClass}
-                      sectionTitleClass={sectionTitleClass}
-                      sectionHelpClass={sectionHelpClass}
-                      accentBadgeStyle={accentBadgeStyle}
-                      accentButtonStyle={accentButtonStyle}
-                      accentControlVars={accentControlVars}
-                      backgroundTypeOptions={backgroundTypeOptions}
-                      patternOptions={patternOptions}
-                      existingCustomization={existingCustomization}
-                      fileInputRef={fileInputRef}
-                      bannerInputRef={bannerInputRef}
-                      backgroundInputRef={backgroundInputRef}
-                      onBackgroundTypeChange={handleBackgroundTypeChange}
-                      onBackgroundSolidColorChange={(value) =>
-                        handleInputChange("backgroundSolidColor", value)
-                      }
-                      onPatternOverlayToggle={handlePatternOverlayToggle}
-                      onPatternOverlayValueChange={
-                        handlePatternOverlayValueChange
-                      }
-                      onGradientChange={handleGradientChange}
-                      onImageUpload={handleImageUpload}
-                      onRemoveImage={handleRemoveImage}
-                      onBackgroundPointerDown={handleDragStart("background")}
-                      onBackgroundPointerMove={handleDragMove("background")}
-                      onBannerPointerDown={handleDragStart("banner")}
-                      onBannerPointerMove={handleDragMove("banner")}
-                      onPointerEnd={handleDragEnd}
-                    />
-                  )}
+                  <div
+                    role="tabpanel"
+                    id="panel-media"
+                    aria-labelledby="tab-media"
+                    hidden={activeTab !== "media"}
+                  >
+                    {activeTab === "media" ? (
+                      <CustomizationMediaPanel
+                        backgroundType={formData.backgroundType}
+                        backgroundSolidColor={formData.backgroundSolidColor}
+                        patternOverlayEnabled={formData.patternOverlayEnabled}
+                        patternOverlayValue={formData.patternOverlayValue}
+                        backgroundImagePositionX={
+                          formData.backgroundImagePositionX
+                        }
+                        backgroundImagePositionY={
+                          formData.backgroundImagePositionY
+                        }
+                        bannerImagePositionX={formData.bannerImagePositionX}
+                        bannerImagePositionY={formData.bannerImagePositionY}
+                        accentColor={formData.accentColor}
+                        gradientColors={gradientColors}
+                        isUploading={isUploading}
+                        settingsGroupClass={settingsGroupClass}
+                        sectionCardClass={sectionCardClass}
+                        sectionHeaderClass={sectionHeaderClass}
+                        sectionTitleClass={sectionTitleClass}
+                        sectionHelpClass={sectionHelpClass}
+                        accentBadgeStyle={accentBadgeStyle}
+                        accentButtonStyle={accentButtonStyle}
+                        accentControlVars={accentControlVars}
+                        backgroundTypeOptions={backgroundTypeOptions}
+                        patternOptions={patternOptions}
+                        existingCustomization={existingCustomization}
+                        fileInputRef={fileInputRef}
+                        bannerInputRef={bannerInputRef}
+                        backgroundInputRef={backgroundInputRef}
+                        onBackgroundTypeChange={handleBackgroundTypeChange}
+                        onBackgroundSolidColorChange={(value) =>
+                          handleInputChange("backgroundSolidColor", value)
+                        }
+                        onPatternOverlayToggle={handlePatternOverlayToggle}
+                        onPatternOverlayValueChange={
+                          handlePatternOverlayValueChange
+                        }
+                        onGradientChange={handleGradientChange}
+                        onImageUpload={handleImageUpload}
+                        onRemoveImage={handleRemoveImage}
+                        onBackgroundPointerDown={handleDragStart("background")}
+                        onBackgroundPointerMove={handleDragMove("background")}
+                        onBannerPointerDown={handleDragStart("banner")}
+                        onBannerPointerMove={handleDragMove("banner")}
+                        onPointerEnd={handleDragEnd}
+                      />
+                    ) : null}
+                  </div>
 
-                  {activeTab === "bio" && (
-                    <CustomizationBioSocialPanel
-                      description={formData.description}
-                      profileFields={formData.profileFields}
-                      socialLinks={formData.socialLinks}
-                      socialDraft={socialDraft}
-                      countryOptions={countryOptions}
-                      preferredPhoneCountry={preferredPhoneCountry}
-                      isLocatingCountry={isLocatingCountry}
-                      sectionCardClass={sectionCardClass}
-                      sectionHeaderClass={sectionHeaderClass}
-                      sectionTitleClass={sectionTitleClass}
-                      sectionHelpClass={sectionHelpClass}
-                      accentBadgeStyle={accentBadgeStyle}
-                      accentButtonStyle={accentButtonStyle}
-                      onDescriptionChange={(value) =>
-                        handleInputChange("description", value)
-                      }
-                      onAddProfileField={handleAddProfileField}
-                      onProfileFieldChange={handleProfileFieldChange}
-                      onMoveProfileField={handleMoveProfileField}
-                      onRemoveProfileField={handleRemoveProfileField}
-                      onUseLocationForPhone={handleUseLocationForPhone}
-                      onSocialDraftPlatformChange={
-                        handleSocialDraftPlatformChange
-                      }
-                      onSocialDraftUrlChange={handleSocialDraftUrlChange}
-                      onAddSocialLink={handleAddSocialLink}
-                      onRemoveSocialLink={handleRemoveSocialLink}
-                    />
-                  )}
+                  <div
+                    role="tabpanel"
+                    id="panel-bio"
+                    aria-labelledby="tab-bio"
+                    hidden={activeTab !== "bio"}
+                  >
+                    {activeTab === "bio" ? (
+                      <CustomizationBioSocialPanel
+                        description={formData.description}
+                        profileFields={formData.profileFields}
+                        socialLinks={formData.socialLinks}
+                        socialDraft={socialDraft}
+                        countryOptions={countryOptions}
+                        preferredPhoneCountry={preferredPhoneCountry}
+                        isLocatingCountry={isLocatingCountry}
+                        sectionCardClass={sectionCardClass}
+                        sectionHeaderClass={sectionHeaderClass}
+                        sectionTitleClass={sectionTitleClass}
+                        sectionHelpClass={sectionHelpClass}
+                        accentBadgeStyle={accentBadgeStyle}
+                        accentButtonStyle={accentButtonStyle}
+                        onDescriptionChange={(value) =>
+                          handleInputChange("description", value)
+                        }
+                        onAddProfileField={handleAddProfileField}
+                        onProfileFieldChange={handleProfileFieldChange}
+                        onMoveProfileField={handleMoveProfileField}
+                        onRemoveProfileField={handleRemoveProfileField}
+                        onUseLocationForPhone={handleUseLocationForPhone}
+                        onSocialDraftPlatformChange={
+                          handleSocialDraftPlatformChange
+                        }
+                        onSocialDraftUrlChange={handleSocialDraftUrlChange}
+                        onAddSocialLink={handleAddSocialLink}
+                        onRemoveSocialLink={handleRemoveSocialLink}
+                      />
+                    ) : null}
+                  </div>
                 </div>
               </div>
 

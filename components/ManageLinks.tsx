@@ -9,7 +9,7 @@ import {
   useQuery,
 } from "convex/react";
 import { useUser } from "@clerk/nextjs";
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -49,6 +49,7 @@ const ManageLinks = ({
   );
 
   const [items, setItems] = useState(links.map((link) => link._id));
+  const latestReorderOperationRef = useRef(0);
 
   useEffect(() => {
     setItems(links.map((link) => link._id));
@@ -78,13 +79,20 @@ const ManageLinks = ({
       return;
     }
 
+    const previousItems = items;
     const reorderedItems = arrayMove(items, oldIndex, newIndex);
+    const reorderOperationId = latestReorderOperationRef.current + 1;
+    latestReorderOperationRef.current = reorderOperationId;
     setItems(reorderedItems);
 
     try {
       await updateLinkOrder({ linkIds: reorderedItems });
     } catch {
-      setItems(items);
+      setItems((currentItems) =>
+        latestReorderOperationRef.current === reorderOperationId
+          ? previousItems
+          : currentItems,
+      );
       toast.error("Could not save the new link order. Please try again.");
     }
   };
