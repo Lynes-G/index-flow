@@ -21,7 +21,7 @@ const DashboardSidebar = ({ currentTask }: DashboardSidebarProps) => {
   return (
     <nav
       aria-label="Dashboard sections"
-      className="sticky top-28 rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--brand-eggplant)_10%,white)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,250,240,0.92))] p-4 shadow-[0_18px_48px_rgba(59,21,42,0.08)]"
+      className="rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--brand-eggplant)_10%,white)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,250,240,0.92))] p-4 shadow-[0_18px_48px_rgba(59,21,42,0.08)] xl:sticky xl:top-28"
     >
       <div className="space-y-1">
         <p className="px-3 pb-2 text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase">

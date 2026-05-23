@@ -20,7 +20,7 @@ const DashboardShell = ({
   return (
     <div className="w-full pb-10">
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 2xl:px-4">
-        <section className="dashboard-shell dashboard-shell-inner overflow-hidden">
+        <section className="dashboard-shell dashboard-shell-inner">
           <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(220px,0.8fr)_minmax(0,1.65fr)_minmax(260px,0.95fr)] xl:items-start xl:gap-8">
             <aside className="hidden xl:block xl:min-w-0">{sidebar}</aside>
 
@@ -47,6 +47,22 @@ const DashboardShell = ({
                       {actions}
                     </div>
                   ) : null}
+                </div>
+              </div>
+
+              <div className="space-y-4 xl:hidden">
+                <div className="rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--brand-eggplant)_10%,white)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(255,250,240,0.9))] p-4 shadow-[0_14px_36px_rgba(59,21,42,0.06)]">
+                  <p className="mb-3 text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase">
+                    Task navigation
+                  </p>
+                  {sidebar}
+                </div>
+
+                <div className="rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--brand-eggplant)_10%,white)] bg-white/82 p-4 shadow-[0_14px_36px_rgba(59,21,42,0.06)]">
+                  <p className="mb-3 text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase">
+                    Context panel
+                  </p>
+                  {rail}
                 </div>
               </div>
 
