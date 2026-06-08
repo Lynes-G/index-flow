@@ -22,10 +22,14 @@ const socialLinksValidator = v.optional(
   ),
 );
 
+const normalizeDisplayName = (displayName: string) =>
+  displayName.trim().slice(0, 80);
+
 const customizationResponseValidator = v.object({
   _id: v.id("userCustomizations"),
   _creationTime: v.number(),
   userId: v.string(),
+  displayName: v.optional(v.string()),
   profilePictureStorageId: v.optional(v.id("_storage")),
   profilePictureUrl: v.optional(v.string()),
   description: v.optional(v.string()),
@@ -67,6 +71,7 @@ type ExistingCustomization = NonNullable<
 >;
 
 type CustomizationFieldsArgs = {
+  displayName?: string;
   profilePictureStorageId?: Id<"_storage">;
   description?: string;
   accentColor?: string;
@@ -160,7 +165,12 @@ const buildCustomizationFields = ({
   sanitizedFontFamily?: string;
   isUpdate: boolean;
 }) => {
+  const displayName =
+    args.displayName !== undefined
+      ? normalizeDisplayName(args.displayName)
+      : undefined;
   const fields: CustomizationWriteFields = {
+    ...(args.displayName !== undefined && { displayName }),
     ...(args.profilePictureStorageId !== undefined && {
       profilePictureStorageId: args.profilePictureStorageId,
     }),
@@ -307,6 +317,7 @@ export const getCustomizationBySlug = query({
 // Update or create user customizations
 export const updateCustomizations = mutation({
   args: {
+    displayName: v.optional(v.string()),
     profilePictureStorageId: v.optional(v.id("_storage")),
     description: v.optional(v.string()),
     accentColor: v.optional(v.string()),

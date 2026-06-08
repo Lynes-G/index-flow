@@ -1,4 +1,4 @@
-import { after, NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { geolocation } from "@vercel/functions";
 import { api } from "@/convex/_generated/api";
 import { ServerTrackingEvent, ClientTrackingData } from "@/lib/types";
@@ -100,10 +100,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const link = await convex.query(api.lib.links.getTrackableLink, {
-      userId,
-      linkId: data.linkId,
-    });
+    const eventType = data.eventType ?? "link_click";
+    const link =
+      eventType === "link_click"
+        ? await convex.query(api.lib.links.getTrackableLink, {
+            userId,
+            linkId: data.linkId!,
+          })
+        : {
+            title: "Profile View",
+            url: new URL(`/u/${data.profileUsername}`, request.url).toString(),
+          };
 
     if (!link) {
       return createTrackingResponse(
@@ -128,7 +135,8 @@ export async function POST(request: NextRequest) {
     );
     const trackingEvent: ServerTrackingEvent = {
       ...data,
-      eventType: "link_click",
+      eventType,
+      linkId: data.linkId ?? "",
       linkTitle: link.title,
       linkUrl: link.url,
       timestamp: new Date().toISOString(),
@@ -138,11 +146,9 @@ export async function POST(request: NextRequest) {
     };
 
     if (isTinybirdConfigured()) {
-      after(async () => {
-        await sendTinybirdEventWithRetryBuffer(
-          buildTinybirdTrackingEvent(trackingEvent),
-        );
-      });
+      await sendTinybirdEventWithRetryBuffer(
+        buildTinybirdTrackingEvent(trackingEvent),
+      );
     } else {
       console.warn("Tinybird configuration missing, skipping event send.");
     }

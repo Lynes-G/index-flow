@@ -19,6 +19,7 @@ import { Activity, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 const emptyAnalytics: AnalyticsData = {
+  profileViews: 0,
   totalClicks: 0,
   uniqueVisitors: 0,
   countriesReached: 0,
@@ -31,6 +32,7 @@ const emptyAnalytics: AnalyticsData = {
 };
 
 const sampleAnalytics: AnalyticsData = {
+  profileViews: 312,
   totalClicks: 148,
   uniqueVisitors: 93,
   countriesReached: 7,

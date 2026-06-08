@@ -26,6 +26,7 @@ export default defineSchema({
 
   userCustomizations: defineTable({
     userId: v.string(), // Clerk user ID
+    displayName: v.optional(v.string()), // Public-facing profile name
     profilePictureStorageId: v.optional(v.id("_storage")), // Convex storage ID for profile picture
     description: v.optional(v.string()), // Custom description
     accentColor: v.optional(v.string()), // Custom accent color

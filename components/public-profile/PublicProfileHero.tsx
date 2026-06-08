@@ -37,6 +37,7 @@ const getBannerStyle = ({
 
 type PublicProfileHeroProps = {
   username: string;
+  displayName?: string;
   accentColor: string;
   avatarShape: AvatarShape;
   profilePictureUrl?: string;
@@ -51,6 +52,7 @@ type PublicProfileHeroProps = {
 
 const PublicProfileHero = ({
   username,
+  displayName,
   accentColor,
   avatarShape,
   profilePictureUrl,
@@ -63,6 +65,7 @@ const PublicProfileHero = ({
   forceMobileLayout = false,
 }: PublicProfileHeroProps) => {
   const avatarShapeClass = avatarShapeMap[avatarShape];
+  const resolvedDisplayName = displayName?.trim() || username;
   const bannerStyle = getBannerStyle({
     accentColor,
     bannerImagePositionX,
@@ -161,8 +164,16 @@ const PublicProfileHero = ({
                   !forceMobileLayout && "sm:text-4xl",
                 )}
               >
-                @{username}
+                {resolvedDisplayName}
               </h1>
+              <p
+                className={cn(
+                  "text-sm font-semibold text-slate-500 [overflow-wrap:anywhere]",
+                  !forceMobileLayout && "sm:text-base",
+                )}
+              >
+                @{username}
+              </p>
               {description && (
                 <p
                   className={cn(

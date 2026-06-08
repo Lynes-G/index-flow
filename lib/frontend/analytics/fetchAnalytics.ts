@@ -1,4 +1,8 @@
-import { fetchTinybirdPipe, isTinybirdConfigured } from "@/lib/server/tinybird";
+import {
+  fetchTinybirdPipe,
+  fetchTinybirdSql,
+  isTinybirdConfigured,
+} from "@/lib/server/tinybird";
 import {
   normalizeAnalyticsDateString,
   normalizeAnalyticsText,
@@ -6,6 +10,7 @@ import {
 import { readResponseText } from "@/lib/server/http";
 
 export interface AnalyticsData {
+  profileViews: number;
   totalClicks: number;
   uniqueVisitors: number;
   countriesReached: number;
@@ -18,6 +23,7 @@ export interface AnalyticsData {
 }
 
 const emptyAnalytics = (): AnalyticsData => ({
+  profileViews: 0,
   totalClicks: 0,
   uniqueVisitors: 0,
   countriesReached: 0,
@@ -37,8 +43,10 @@ export const normalizeAnalyticsData = (
   }
 
   return {
+    profileViews: Number(analytics.total_profile_views) || 0,
     totalClicks: Number(analytics.total_clicks) || 0,
-    uniqueVisitors: Number(analytics.unique_visitors) || 0,
+    uniqueVisitors:
+      Number(analytics.unique_visitors ?? analytics.unique_users) || 0,
     countriesReached: Number(analytics.countries_reached) || 0,
     totalLinksClicked: Number(analytics.total_links_clicked) || 0,
     qrScans: Number(analytics.total_qr_scans) || 0,
@@ -63,6 +71,34 @@ export const normalizeAnalyticsData = (
       typeof analytics.last_click === "string" ? analytics.last_click : null,
     ),
   };
+};
+
+const escapeTinybirdSqlString = (value: string) =>
+  value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+
+const fetchProfileViews = async (userId: string, daysBack: number) => {
+  const escapedUserId = escapeTinybirdSqlString(userId);
+  const safeDaysBack = Math.max(1, Math.min(365, Math.floor(daysBack)));
+  const response = await fetchTinybirdSql(`
+    SELECT countIf(event_type = 'profile_view') AS total_profile_views
+    FROM link_clicks
+    WHERE profileUserId = '${escapedUserId}'
+      AND timestamp >= now() - INTERVAL ${safeDaysBack} DAY
+  `);
+
+  if (!response.ok) {
+    console.error(
+      "Tinybird profile view response not ok:",
+      await readResponseText(response),
+    );
+    return 0;
+  }
+
+  const data = (await response.json()) as {
+    data?: Array<{ total_profile_views?: unknown }>;
+  };
+
+  return Number(data.data?.[0]?.total_profile_views) || 0;
 };
 
 export async function fetchAnalytics(
@@ -94,7 +130,16 @@ export async function fetchAnalytics(
       return emptyAnalytics();
     }
 
-    return normalizeAnalyticsData(data.data[0]);
+    const analytics = normalizeAnalyticsData(data.data[0]);
+
+    if (analytics.profileViews > 0) {
+      return analytics;
+    }
+
+    return {
+      ...analytics,
+      profileViews: await fetchProfileViews(userId, daysBack),
+    };
   } catch (err) {
     console.error("Error fetching analytics data:", err);
 

@@ -73,7 +73,7 @@ const getVisitorId = () => {
   return generatedVisitorId;
 };
 
-const trackLinkClick = async (event: ClientTrackingData) => {
+const trackProfileEvent = async (event: ClientTrackingData) => {
   try {
     const trackingConsentGranted = hasTrackingConsent();
     const trackingData = {
@@ -100,8 +100,14 @@ const trackLinkClick = async (event: ClientTrackingData) => {
 
     return trackingData;
   } catch (err) {
-    console.error("Failed to track link click:", err);
+    console.error("Failed to track analytics event:", err);
   }
 };
 
-export { trackLinkClick };
+const trackLinkClick = (event: ClientTrackingData) =>
+  trackProfileEvent({ ...event, eventType: "link_click" });
+
+const trackProfileView = (profileUsername: string) =>
+  trackProfileEvent({ profileUsername, eventType: "profile_view" });
+
+export { trackLinkClick, trackProfileView };

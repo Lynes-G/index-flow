@@ -10,6 +10,7 @@ import {
   BarChart3,
   Calendar,
   Clock,
+  Eye,
   ExternalLink,
   Globe,
   Link,
@@ -86,6 +87,16 @@ const createVisibleMetrics = (
   analytics: AnalyticsData,
   lastActivityLabel: string,
 ): MetricCardProps[] => [
+  {
+    label: "Profile Views",
+    value: analytics.profileViews.toLocaleString(),
+    icon: Eye,
+    secondaryIcon: TrendingUp,
+    tone: {
+      icon: "bg-violet-50/95 text-violet-600",
+      secondaryIcon: "text-violet-200",
+    },
+  },
   {
     label: "Total Clicks",
     value: analytics.totalClicks.toLocaleString(),
@@ -170,6 +181,7 @@ const DashboardMetrics = ({
   isSampleMode = false,
 }: DashboardMetricsProps) => {
   const hasActivity =
+    analytics.profileViews > 0 ||
     analytics.totalClicks > 0 ||
     analytics.uniqueVisitors > 0 ||
     analytics.totalLinksClicked > 0 ||

@@ -1,4 +1,4 @@
-import { after, NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { geolocation } from "@vercel/functions";
 import { api } from "@/convex/_generated/api";
 import { getClient } from "@/convex/lib/client";
@@ -67,11 +67,9 @@ export async function GET(
         ...requestContext,
       };
 
-      after(async () => {
-        await sendTinybirdEventWithRetryBuffer(
-          buildTinybirdTrackingEvent(trackingEvent),
-        );
-      });
+      await sendTinybirdEventWithRetryBuffer(
+        buildTinybirdTrackingEvent(trackingEvent),
+      );
     }
 
     return response;

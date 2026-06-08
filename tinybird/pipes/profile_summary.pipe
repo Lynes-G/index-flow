@@ -7,12 +7,13 @@ SQL >
     SELECT
         profileUserId,
         any(profileUsername) as profileUsername,
+        countIf(event_type = 'profile_view') as total_profile_views,
         countIf(event_type = 'link_click' OR event_type = '') as total_clicks,
-        uniqIf(visitorId, visitorId != '' AND (event_type = 'link_click' OR event_type = '')) as unique_visitors,
+        uniqIf(visitorId, visitorId != '' AND (event_type IN ('profile_view', 'link_click', 'qr_scan') OR event_type = '')) as unique_visitors,
         uniqIf(linkId, event_type = 'link_click' OR event_type = '') as total_links_clicked,
-        uniqIf(location_country, event_type = 'link_click' OR event_type = '') as countries_reached,
-        minIf(timestamp, event_type = 'link_click' OR event_type = '') as first_click,
-        maxIf(timestamp, event_type = 'link_click' OR event_type = '') as last_click,
+        uniqIf(location_country, event_type IN ('profile_view', 'link_click', 'qr_scan') OR event_type = '') as countries_reached,
+        minIf(timestamp, event_type IN ('profile_view', 'link_click', 'qr_scan') OR event_type = '') as first_click,
+        maxIf(timestamp, event_type IN ('profile_view', 'link_click', 'qr_scan') OR event_type = '') as last_click,
         countIf(event_type = 'qr_scan') as total_qr_scans,
         -- Top performing link
         topKIf(1)(linkTitle, event_type = 'link_click' OR event_type = '') as top_link_title,

@@ -697,7 +697,12 @@ const CustomizationForm = ({
   const dashboardPreviewModel = useMemo(
     () =>
       buildDashboardPreviewModel({
-        displayName: user?.username || user?.firstName || user?.lastName,
+        displayName:
+          formData.displayName ||
+          user?.fullName ||
+          user?.username ||
+          user?.firstName ||
+          user?.lastName,
         currentSlug,
         fallbackShareSlug: user?.id,
         userLinks: (userLinks ?? []).map((link) => ({
@@ -710,8 +715,10 @@ const CustomizationForm = ({
       }),
     [
       currentSlug,
+      formData.displayName,
       formData.featuredLinkId,
       user?.firstName,
+      user?.fullName,
       user?.id,
       user?.lastName,
       user?.username,
@@ -840,6 +847,7 @@ const CustomizationForm = ({
   const tabPanels: Record<CustomizationTab, ReactNode> = {
     essentials: (
       <CustomizationEssentialsPanel
+        displayName={formData.displayName}
         accentColor={formData.accentColor}
         fontFamily={formData.fontFamily}
         fontGroups={dashboardEditableFontsByCategory}
@@ -848,6 +856,9 @@ const CustomizationForm = ({
         sectionTitleClass={dashboardSectionClasses.sectionTitle}
         sectionHelpClass={dashboardSectionClasses.sectionHelp}
         accentBadgeStyle={accentBadgeStyle}
+        onDisplayNameChange={(value) =>
+          handleInputChange("displayName", value)
+        }
         onAccentColorChange={(value) => handleInputChange("accentColor", value)}
         onFontFamilyChange={(value) => handleInputChange("fontFamily", value)}
       />

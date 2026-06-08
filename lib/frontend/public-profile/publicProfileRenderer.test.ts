@@ -59,6 +59,20 @@ test("public profile renderer shows QR card and footer for public pages by defau
   assert.match(markup, /Powered by:/);
 });
 
+test("public profile renderer shows display name above username handle", () => {
+  const markup = renderToStaticMarkup(
+    createElement(PublicProfileRenderer, {
+      ...baseProps,
+      displayName: "Lynes Ghalib",
+      showQrCard: false,
+      showFooter: false,
+    }),
+  );
+
+  assert.match(markup, /Lynes Ghalib/);
+  assert.match(markup, /@lynes/);
+});
+
 test("forced mobile profile renderer avoids viewport breakpoint layout classes", () => {
   const markup = renderToStaticMarkup(
     createElement(PublicProfileRenderer, {

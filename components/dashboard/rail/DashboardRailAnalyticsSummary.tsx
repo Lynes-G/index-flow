@@ -1,4 +1,4 @@
-import { BarChart3, Globe, Lock, MousePointer, Users } from "lucide-react";
+import { BarChart3, Eye, Globe, Lock, MousePointer, Users } from "lucide-react";
 
 import {
   DashboardRailCard,
@@ -23,6 +23,11 @@ const createAnalyticsStats = ({
   DashboardRailAnalyticsSummaryProps,
   "analytics" | "canAccessUltraFeatures" | "isSampleMode"
 >) => [
+  {
+    label: "Views",
+    value: analytics.profileViews.toLocaleString(),
+    icon: Eye,
+  },
   {
     label: "Clicks",
     value: analytics.totalClicks.toLocaleString(),
@@ -86,7 +91,7 @@ const DashboardRailAnalyticsSummary = ({
         </div>
       ) : null}
 
-      <div className="grid gap-2.5 min-[420px]:grid-cols-3 xl:grid-cols-1 xl:gap-3">
+      <div className="grid gap-2.5 min-[420px]:grid-cols-2 xl:grid-cols-1 xl:gap-3">
         {stats.map(({ label, value, icon: Icon }) => (
           <DashboardRailPanel
             key={label}

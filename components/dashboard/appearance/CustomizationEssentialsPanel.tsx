@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { Sparkles, Type } from "lucide-react";
 import type { AppearanceFontOption } from "@/lib/frontend/appearance/appearanceFonts";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -16,6 +17,7 @@ import {
 import DashboardColorPicker from "@/components/dashboard/appearance/DashboardColorPicker";
 
 type CustomizationEssentialsPanelProps = {
+  displayName: string;
   accentColor: string;
   fontFamily: string;
   fontGroups: Array<{
@@ -27,11 +29,13 @@ type CustomizationEssentialsPanelProps = {
   sectionTitleClass: string;
   sectionHelpClass: string;
   accentBadgeStyle: CSSProperties;
+  onDisplayNameChange: (value: string) => void;
   onAccentColorChange: (value: string) => void;
   onFontFamilyChange: (value: string) => void;
 };
 
 const CustomizationEssentialsPanel = ({
+  displayName,
   accentColor,
   fontFamily,
   fontGroups,
@@ -40,6 +44,7 @@ const CustomizationEssentialsPanel = ({
   sectionTitleClass,
   sectionHelpClass,
   accentBadgeStyle,
+  onDisplayNameChange,
   onAccentColorChange,
   onFontFamilyChange,
 }: CustomizationEssentialsPanelProps) => {
@@ -69,6 +74,21 @@ const CustomizationEssentialsPanel = ({
       </div>
 
       <div className="space-y-3.5 sm:space-y-4">
+        <div className="dashboard-settings-panel space-y-3.5 p-3.5 sm:p-5">
+          <Label htmlFor="display-name">Display Name</Label>
+          <Input
+            id="display-name"
+            value={displayName}
+            onChange={(event) => onDisplayNameChange(event.target.value)}
+            placeholder="Your public name"
+            maxLength={80}
+            className="h-12 rounded-[1rem] border-slate-200/80 bg-white/88 text-base text-slate-800 shadow-[0_1px_0_rgba(255,255,255,0.85)_inset] sm:text-sm"
+          />
+          <p className="text-sm text-slate-600">
+            This appears above your @username on the public page.
+          </p>
+        </div>
+
         <div className="dashboard-settings-panel space-y-4 p-3.5 sm:p-5">
           <DashboardColorPicker
             label="Accent Color"

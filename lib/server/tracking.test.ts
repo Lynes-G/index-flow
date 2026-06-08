@@ -26,6 +26,20 @@ test("tracking payload validation accepts a valid click payload", () => {
   });
 });
 
+test("tracking payload validation accepts profile views without a link id", () => {
+  const result = validateTrackingEventPayload({
+    profileUsername: "indexflow",
+    eventType: "profile_view",
+    visitorId: "visitor_123",
+  });
+
+  assert.deepEqual(result, {
+    profileUsername: "indexflow",
+    eventType: "profile_view",
+    visitorId: "visitor_123",
+  });
+});
+
 test("tracking payload validation rejects malformed payloads", () => {
   assert.throws(() =>
     validateTrackingEventPayload({
@@ -39,6 +53,14 @@ test("tracking payload validation rejects malformed payloads", () => {
     validateTrackingEventPayload({
       profileUsername: "indexflow",
       linkId: "",
+      visitorId: "visitor_123",
+    }),
+  );
+
+  assert.throws(() =>
+    validateTrackingEventPayload({
+      profileUsername: "indexflow",
+      eventType: "link_click",
       visitorId: "visitor_123",
     }),
   );
@@ -143,7 +165,7 @@ test("known bot user agents are ignored by tracking callers", () => {
   assert.equal(isKnownBotUserAgent("Mozilla/5.0 Safari/605.1.15"), false);
 });
 
-test("tinybird tracking events keep only country and city location fields", () => {
+test("tinybird tracking events keep privacy-safe location fields", () => {
   const event = buildTinybirdTrackingEvent({
     profileUsername: "indexflow",
     profileUserId: "user_123",
@@ -160,7 +182,10 @@ test("tinybird tracking events keep only country and city location fields", () =
 
   assert.deepEqual(event.location, {
     country: "unknown",
+    region: "",
     city: "unknown",
+    latitude: 0,
+    longitude: 0,
   });
 });
 
@@ -180,6 +205,25 @@ test("tinybird tracking events convert ISO timestamps to Tinybird DateTime forma
   });
 
   assert.equal(event.timestamp, "2026-05-23 08:02:42");
+});
+
+test("tinybird tracking events preserve profile view event types", () => {
+  const event = buildTinybirdTrackingEvent({
+    profileUsername: "indexflow",
+    profileUserId: "user_123",
+    visitorId: "visitor_123",
+    linkId: "",
+    linkTitle: "Profile View",
+    linkUrl: "https://indexflow.app/u/indexflow",
+    timestamp: "2026-05-23T08:02:42.123Z",
+    eventType: "profile_view",
+    userAgent: "Mozilla/5.0",
+    referrer: "direct",
+    location: {},
+  });
+
+  assert.equal(event.eventType, "profile_view");
+  assert.equal(event.linkId, "");
 });
 
 test("tracking visitor resolution prefers request cookies", () => {

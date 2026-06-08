@@ -24,12 +24,28 @@ const KNOWN_BOT_USER_AGENT_PATTERNS = [
   /whatsapp/i,
 ];
 
-const trackingEventSchema = z.object({
-  profileUsername: z.string().trim().min(1).max(100),
-  linkId: z.string().trim().min(1).max(128),
-  eventType: z.literal("link_click").optional(),
-  visitorId: z.string().trim().min(1).max(128).optional(),
-});
+const trackingEventSchema = z
+  .object({
+    profileUsername: z.string().trim().min(1).max(100),
+    linkId: z.string().trim().min(1).max(128).optional(),
+    eventType: z
+      .union([
+        z.literal("link_click"),
+        z.literal("profile_view"),
+        z.literal("qr_scan"),
+      ])
+      .optional(),
+    visitorId: z.string().trim().min(1).max(128).optional(),
+  })
+  .superRefine((event, context) => {
+    if ((event.eventType ?? "link_click") === "link_click" && !event.linkId) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "linkId is required for link click events",
+        path: ["linkId"],
+      });
+    }
+  });
 
 export const validateTrackingEventPayload = (payload: unknown) =>
   trackingEventSchema.parse(payload);
@@ -151,6 +167,9 @@ export const buildTinybirdTrackingEvent = (
   referrer: trackingEvent.referrer,
   location: {
     country: trackingEvent.location.country || "unknown",
+    region: "",
     city: trackingEvent.location.city || "unknown",
+    latitude: 0,
+    longitude: 0,
   },
 });

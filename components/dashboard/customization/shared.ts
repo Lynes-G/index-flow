@@ -47,6 +47,7 @@ export type GradientColors = {
 export type ImageAssetType = "profile" | "banner" | "background";
 
 export type CustomizationFormData = {
+  displayName: string;
   description: string;
   accentColor: string;
   themePreset: string;
@@ -268,6 +269,7 @@ export const createInitialCustomizationFormState = (): {
     defaultPreset,
     gradientColors: defaultGradient,
     formData: {
+      displayName: "",
       description: "",
       accentColor: defaultPreset.accentColor,
       themePreset: defaultPreset.key,
@@ -327,6 +329,8 @@ export const createCustomizationFormDataFromExisting = ({
   return {
     gradientColors,
     formData: {
+      displayName:
+        (existingCustomization.displayName as string | undefined) || "",
       description:
         (existingCustomization.description as string | undefined) || "",
       accentColor:
@@ -391,6 +395,7 @@ export const createCustomizationFormDataFromExisting = ({
 
 export const snapshotFromForm = (data: CustomizationFormData) =>
   JSON.stringify({
+    displayName: data.displayName,
     description: data.description,
     accentColor: data.accentColor,
     themePreset: data.themePreset,

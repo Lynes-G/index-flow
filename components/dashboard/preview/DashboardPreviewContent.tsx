@@ -23,6 +23,7 @@ export type BannerDragProps = {
 
 export type DashboardPreviewContentProps = {
   username: string;
+  displayName?: string;
   accentColor: string;
   avatarShape: AvatarShape;
   description?: string;
@@ -68,6 +69,7 @@ const BannerDragOverlay = ({
 
 const DashboardPreviewContent = ({
   username,
+  displayName,
   accentColor,
   avatarShape,
   description,
@@ -86,6 +88,7 @@ const DashboardPreviewContent = ({
   return (
     <PublicProfileRenderer
       username={username}
+      displayName={displayName}
       accentColor={accentColor}
       avatarShape={avatarShape}
       profilePictureUrl={profilePictureUrl}

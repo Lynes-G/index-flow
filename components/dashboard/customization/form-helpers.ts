@@ -79,6 +79,7 @@ export const createBannerDragProps = ({
 export const createCustomizationUpdatePayload = (
   sanitizedFormData: CustomizationFormData,
 ) => ({
+  displayName: sanitizedFormData.displayName.trim() || undefined,
   description: sanitizedFormData.description || undefined,
   accentColor: sanitizedFormData.accentColor || undefined,
   themePreset: sanitizedFormData.themePreset || undefined,
@@ -123,6 +124,7 @@ export const createBasePreviewContentProps = ({
   // The preview mirrors the public page, so the visible @handle must use
   // the public slug instead of any Clerk account username.
   username: dashboardPreviewModel.shareSlug,
+  displayName: dashboardPreviewModel.displayName,
   accentColor: formData.accentColor,
   avatarShape: formData.avatarShape,
   description: formData.description || "Add a short bio...",

@@ -5,6 +5,7 @@ import { splitPublicProfileLinks } from "@/lib/frontend/public-profile/publicPro
 import { getBaseUrl } from "@/lib/frontend/shared/getBaseUrl";
 import { sanitizeAppearanceFontFamily } from "@/lib/frontend/appearance/appearanceFonts";
 import { usePreloadedQuery } from "convex/react";
+import ProfileViewTracker from "./ProfileViewTracker";
 import PublicProfileRenderer from "./PublicProfileRenderer";
 import {
   AvatarShape,
@@ -97,8 +98,10 @@ const PublicPageContent = ({
       className="flex min-h-screen flex-col"
       style={{ ...backgroundStyle, fontFamily }}
     >
+      <ProfileViewTracker username={username} />
       <PublicProfileRenderer
         username={username}
+        displayName={customizations?.displayName}
         accentColor={accentColor}
         avatarShape={avatarShape}
         profilePictureUrl={customizations?.profilePictureUrl}

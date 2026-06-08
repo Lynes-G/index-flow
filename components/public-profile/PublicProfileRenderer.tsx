@@ -20,6 +20,7 @@ import { cn } from "@/lib/frontend/shared/utils";
 
 type PublicProfileRendererProps = {
   username: string;
+  displayName?: string;
   accentColor: string;
   avatarShape: AvatarShape;
   description?: string;
@@ -94,6 +95,7 @@ const mobileLinksSpacingByLayout: Record<LayoutStyle, string> = {
 
 const PublicProfileRenderer = ({
   username,
+  displayName,
   accentColor,
   avatarShape,
   description,
@@ -141,6 +143,7 @@ const PublicProfileRenderer = ({
               <div className="relative">
                 <PublicProfileHero
                   username={username}
+                  displayName={displayName}
                   accentColor={accentColor}
                   avatarShape={avatarShape}
                   profilePictureUrl={profilePictureUrl}

@@ -38,12 +38,35 @@ const buildTinybirdPipeUrl = (
   return url.toString();
 };
 
+const buildTinybirdSqlUrl = (sql: string) => {
+  const config = getTinybirdConfig();
+
+  if (!config) {
+    throw new Error("Tinybird is not configured");
+  }
+
+  const url = new URL("/v0/sql", config.host);
+  url.searchParams.set("q", sql);
+
+  return url.toString();
+};
+
 export const fetchTinybirdPipe = (
   pipeName: string,
   params: Record<string, string | number>,
 ) =>
   fetchWithTimeout(
     buildTinybirdPipeUrl(pipeName, params),
+    {
+      headers: getTinybirdHeaders(),
+      ...noStoreFetchOptions,
+    },
+    TINYBIRD_TIMEOUT_MS,
+  );
+
+export const fetchTinybirdSql = (sql: string) =>
+  fetchWithTimeout(
+    buildTinybirdSqlUrl(sql),
     {
       headers: getTinybirdHeaders(),
       ...noStoreFetchOptions,
@@ -59,23 +82,43 @@ export const sendTinybirdEvent = async (event: unknown) => {
   }
 
   const response = await fetchWithTimeout(
-    `${config.host}/v0/events?name=${LINK_CLICKS_DATASOURCE}`,
+    `${config.host}/v0/events?name=${LINK_CLICKS_DATASOURCE}&wait=true`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${config.token}`,
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-ndjson",
       },
-      body: JSON.stringify(event),
+      body: `${JSON.stringify(event)}\n`,
     },
     TINYBIRD_TIMEOUT_MS,
   );
 
+  const responseText = await readResponseText(response);
+
   if (!response.ok) {
-    const errorText = await readResponseText(response);
     throw new Error(
-      `Tinybird response error (${response.status}): ${errorText || "Unknown error"}`,
+      `Tinybird response error (${response.status}): ${responseText || "Unknown error"}`,
     );
+  }
+
+  try {
+    const result = JSON.parse(responseText) as {
+      quarantined_rows?: number;
+      successful_rows?: number;
+    };
+
+    if ((result.quarantined_rows ?? 0) > 0) {
+      throw new Error(
+        `Tinybird quarantined ${result.quarantined_rows} row(s); successful rows: ${result.successful_rows ?? 0}`,
+      );
+    }
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return;
+    }
+
+    throw error;
   }
 };
 

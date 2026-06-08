@@ -34,8 +34,9 @@ test("normalizeAnalyticsText strips empty text values", () => {
 
 test("normalizeAnalyticsData guards malformed dates and summary values", () => {
   const result = normalizeAnalyticsData({
+    total_profile_views: "25",
     total_clicks: "12",
-    unique_visitors: 4,
+    unique_users: 4,
     countries_reached: undefined,
     total_links_clicked: "3",
     total_qr_scans: null,
@@ -45,6 +46,7 @@ test("normalizeAnalyticsData guards malformed dates and summary values", () => {
     last_click: "2026-05-31T08:00:00.000Z",
   });
 
+  assert.equal(result.profileViews, 25);
   assert.equal(result.totalClicks, 12);
   assert.equal(result.uniqueVisitors, 4);
   assert.equal(result.countriesReached, 0);
