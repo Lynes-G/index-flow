@@ -14,11 +14,8 @@ export const shouldShowSendAction = (status: InviteStatus) =>
 export const normalizeInviteStatus = (status: InviteStatus) =>
   status === "pending" ? "draft" : status;
 
-export const isLegacyInvite = ({
-  status,
-}: {
-  status: InviteStatus;
-}) => status === "pending";
+export const isLegacyInvite = ({ status }: { status: InviteStatus }) =>
+  status === "pending";
 
 export const buildInviteLink = ({
   appUrl,

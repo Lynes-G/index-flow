@@ -18,7 +18,10 @@ test("invite email payload includes exact-email warning and claim link", () => {
   assert.equal(payload.to, "api@hotelaat.com");
   assert.match(payload.subject, /Ultra/i);
   assert.match(payload.html, /exact email/i);
-  assert.match(payload.html, /https:\/\/indexflow\.nullis\.one\/invite\/token/i);
+  assert.match(
+    payload.html,
+    /https:\/\/indexflow\.nullis\.one\/invite\/token/i,
+  );
 });
 
 test("resend error message includes provider details when available", () => {

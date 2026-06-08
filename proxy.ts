@@ -1,27 +1,31 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { isDashboardDevPreviewBypass } from "@/lib/server/clerkMiddleware";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
-const isLocalHostname = (hostname: string) =>
-  hostname === "localhost" ||
-  hostname === "127.0.0.1" ||
-  hostname === "::1" ||
-  hostname === "[::1]";
 
 export default clerkMiddleware(async (auth, req) => {
-  const isDevPreview =
-    process.env.NODE_ENV === "development" &&
-    isLocalHostname(req.nextUrl.hostname) &&
-    req.nextUrl.pathname === "/dashboard" &&
-    req.nextUrl.searchParams.get("devPreview") === "1";
+  const isDevPreview = isDashboardDevPreviewBypass({
+    hostname: req.nextUrl.hostname,
+    pathname: req.nextUrl.pathname,
+    searchParams: req.nextUrl.searchParams,
+    nodeEnv: process.env.NODE_ENV,
+  });
 
-  if (isProtectedRoute(req) && !isDevPreview) await auth.protect();
+  if (!isProtectedRoute(req) || isDevPreview) {
+    return;
+  }
+
+  const { isAuthenticated, redirectToSignIn } = await auth();
+
+  if (!isAuthenticated) {
+    return redirectToSignIn({ returnBackUrl: req.url });
+  }
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
+    "/__clerk/(.*)",
   ],
 };

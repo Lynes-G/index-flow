@@ -2,13 +2,13 @@ DESCRIPTION >
     Get summary analytics for a profile owner - total clicks, top links, etc.
 
 NODE profile_summary_node
-    SQL >
+SQL >
     %
     SELECT
         profileUserId,
         any(profileUsername) as profileUsername,
         countIf(event_type = 'link_click' OR event_type = '') as total_clicks,
-        uniqIf(profileUserId, event_type = 'link_click' OR event_type = '') as unique_users,
+        uniqIf(visitorId, visitorId != '' AND (event_type = 'link_click' OR event_type = '')) as unique_visitors,
         uniqIf(linkId, event_type = 'link_click' OR event_type = '') as total_links_clicked,
         uniqIf(location_country, event_type = 'link_click' OR event_type = '') as countries_reached,
         minIf(timestamp, event_type = 'link_click' OR event_type = '') as first_click,

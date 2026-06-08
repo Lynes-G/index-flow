@@ -1,24 +1,28 @@
-import { CreditCard } from "lucide-react";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { ArrowDownToLine, CreditCard } from "lucide-react";
 
-import AdminInviteManager from "@/components/AdminInviteManager";
-import BillingOverview from "@/components/billing/billing-overview";
-import BillingTrustNotes from "@/components/billing/billing-trust-notes";
-import { DashboardContextRail } from "@/components/dashboard/DashboardContextRail";
-import DashboardRailBillingCard from "@/components/dashboard/DashboardRailBillingCard";
-import DashboardRailProfileCard from "@/components/dashboard/DashboardRailProfileCard";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import AdminInviteManager from "@/components/dashboard/invites/AdminInviteManager";
+import BillingOverview from "@/components/dashboard/billing/BillingOverview";
+import BillingTrustNotes from "@/components/dashboard/billing/BillingTrustNotes";
+import DashboardDevPreviewNotice from "@/components/dashboard/shell/DashboardDevPreviewNotice";
+import { DashboardContextRail } from "@/components/dashboard/shell/DashboardContextRail";
+import DashboardRailBillingCard from "@/components/dashboard/rail/DashboardRailBillingCard";
+import DashboardRailProfileCard from "@/components/dashboard/rail/DashboardRailProfileCard";
+import DashboardShell from "@/components/dashboard/shell/DashboardShell";
+import DashboardSidebar from "@/components/dashboard/shell/DashboardSidebar";
+import { Button } from "@/components/ui/button";
 import { isAdminUserId } from "@/lib/admin";
+import { getDashboardShellAccess } from "@/lib/server/dashboardShellAccess";
 import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
 
-const DashboardBillingPage = async () => {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/sign-in");
-  }
+const DashboardBillingPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) => {
+  const { isDevPreview, userId } = await getDashboardShellAccess({
+    pathname: "/dashboard/billing",
+    searchParams,
+  });
 
   const entitlements = await getCurrentUserEntitlements();
   const isAdmin = isAdminUserId(userId);
@@ -27,7 +31,7 @@ const DashboardBillingPage = async () => {
     <DashboardShell
       sidebar={<DashboardSidebar currentTask="billing" />}
       rail={
-        <DashboardContextRail className="space-y-5">
+        <DashboardContextRail className="space-y-4 sm:space-y-5">
           <DashboardRailProfileCard />
           <DashboardRailBillingCard
             effectivePlan={entitlements.effectivePlan}
@@ -35,36 +39,51 @@ const DashboardBillingPage = async () => {
           />
         </DashboardContextRail>
       }
-      title="Understand your current access while billing is paused"
-      description="Use this billing workspace to see the plan your account is operating on, what invite grants are active, and how access changes are handled right now."
+      title="Review your current access"
+      description="View your plan and access."
       actions={
-        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
-          <CreditCard className="size-4" />
-          Billing workspace
-        </span>
+        <Button asChild size="sm">
+          <a href={isAdmin ? "#admin-invite-tools" : "#billing-access-summary"}>
+            {isAdmin ? (
+              <>
+                <CreditCard className="size-4" />
+                Jump to invite tools
+              </>
+            ) : (
+              <>
+                <ArrowDownToLine className="size-4" />
+                Open access summary
+              </>
+            )}
+          </a>
+        </Button>
       }
     >
-      <div className="space-y-6">
-        <BillingOverview
-          effectivePlan={entitlements.effectivePlan}
-          grantedPlan={entitlements.grantedPlan}
-        />
+      <div className="space-y-4 sm:space-y-6">
+        {isDevPreview ? (
+          <DashboardDevPreviewNotice description="Billing uses sample data in preview mode." />
+        ) : null}
+        <div id="billing-access-summary">
+          <BillingOverview
+            effectivePlan={entitlements.effectivePlan}
+            grantedPlan={entitlements.grantedPlan}
+          />
+        </div>
 
         <BillingTrustNotes />
 
-        {isAdmin ? (
-          <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/92 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.06)] sm:p-6">
-            <div className="mb-5 max-w-2xl space-y-2">
+        {isAdmin && userId ? (
+          <section
+            id="admin-invite-tools"
+            className="dashboard-product-card bg-white/92 p-4 sm:p-6"
+          >
+            <div className="mb-4 max-w-2xl space-y-2 sm:mb-5">
               <p className="text-[11px] font-semibold tracking-[0.26em] text-slate-500 uppercase">
                 Admin access management
               </p>
-              <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900">
+              <h2 className="font-['Sora',sans-serif] text-[1.45rem] font-semibold tracking-[-0.05em] text-slate-900 sm:text-2xl">
                 Invite-based plan grants
               </h2>
-              <p className="text-sm leading-6 text-slate-600">
-                These controls stay separate from the account summary so the
-                main access story remains easy to scan first.
-              </p>
             </div>
             <AdminInviteManager currentUserId={userId} />
           </section>

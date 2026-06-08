@@ -8,16 +8,26 @@ import {
 } from "@/lib/entitlements";
 
 test("admin invite can upgrade a free user to ultra", () => {
-  assert.equal(resolveEffectivePlan({ paidPlan: "free", grantedPlan: "ultra" }), "ultra");
+  assert.equal(
+    resolveEffectivePlan({ paidPlan: "free", grantedPlan: "ultra" }),
+    "ultra",
+  );
 });
 
 test("paid ultra stays ultra even without an admin grant", () => {
-  assert.equal(resolveEffectivePlan({ paidPlan: "ultra", grantedPlan: null }), "ultra");
+  assert.equal(
+    resolveEffectivePlan({ paidPlan: "ultra", grantedPlan: null }),
+    "ultra",
+  );
 });
 
 test("admin users resolve to ultra even without a paid plan or invite grant", () => {
   assert.equal(
-    resolveEffectivePlan({ paidPlan: "free", grantedPlan: null, isAdmin: true }),
+    resolveEffectivePlan({
+      paidPlan: "free",
+      grantedPlan: null,
+      isAdmin: true,
+    }),
     "ultra",
   );
 });

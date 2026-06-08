@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
-import { normalizeExternalUrl } from "../../lib/externalLinks";
+import { normalizeExternalUrl } from "../../lib/frontend/shared/externalLinks";
+import { resolveUserIdFromSlug } from "./slug";
 
 const normalizeLinkInput = (title: string, url: string) => {
   const normalizedTitle = title.trim();
@@ -38,19 +39,7 @@ export const getLinksBySlug = query({
     }),
   ),
   handler: async ({ db }, args) => {
-    // First try to find a custom username
-    const usernameRecord = await db
-      .query("usernames")
-      .withIndex("by_username", (q) => q.eq("username", args.slug))
-      .unique();
-
-    let userId: string;
-    if (usernameRecord) {
-      userId = usernameRecord.userId;
-    } else {
-      // Fallback to treating slug as clerk user ID
-      userId = args.slug;
-    }
+    const userId = await resolveUserIdFromSlug(db, args.slug);
 
     return await db
       .query("links")
@@ -91,24 +80,27 @@ export const updateLinkOrder = mutation({
     const identity = await auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
-    // Get all links and filter out invalid ones
+    const uniqueLinkCount = new Set(
+      args.linkIds.map((linkId) => linkId.toString()),
+    ).size;
+    if (uniqueLinkCount !== args.linkIds.length) {
+      throw new Error("Duplicate links are not allowed");
+    }
+
     const links = await Promise.all(
       args.linkIds.map((linkId) => db.get(linkId)),
     );
 
-    const validLinks = links
-      .map((link, index) => ({ link, originalIndex: index }))
-      .filter(({ link }) => link && link.userId === identity.subject)
-      .map(({ link, originalIndex }) => ({
-        link: link as NonNullable<typeof link>,
-        originalIndex,
-      }));
+    const hasInvalidLink = links.some(
+      (link) => !link || link.userId !== identity.subject,
+    );
 
-    // Update only valid links with their new order
+    if (hasInvalidLink) {
+      throw new Error("Invalid link order payload");
+    }
+
     await Promise.all(
-      validLinks.map(({ link, originalIndex }) =>
-        db.patch(link._id, { order: originalIndex }),
-      ),
+      links.map((link, index) => db.patch(link!._id, { order: index })),
     );
     return null;
   },
@@ -208,13 +200,17 @@ export const getTrackableLink = query({
     }),
   ),
   handler: async ({ db }, args) => {
-    const links = await db
-      .query("links")
-      .withIndex("by_user_and_order", (q) => q.eq("userId", args.userId))
-      .collect();
+    const linkId = db.normalizeId("links", args.linkId);
+    if (!linkId) {
+      return null;
+    }
 
-    const link = links.find((entry) => entry._id.toString() === args.linkId);
+    const link = await db.get(linkId);
     if (!link) {
+      return null;
+    }
+
+    if (link.userId !== args.userId) {
       return null;
     }
 

@@ -9,10 +9,12 @@
  */
 
 import type * as lib_client from "../lib/client.js";
+import type * as lib_inviteSecurity from "../lib/inviteSecurity.js";
 import type * as lib_links from "../lib/links.js";
 import type * as lib_planEntitlements from "../lib/planEntitlements.js";
 import type * as lib_planEntitlementsMaintenance from "../lib/planEntitlementsMaintenance.js";
 import type * as lib_profileFieldsValidator from "../lib/profileFieldsValidator.js";
+import type * as lib_slug from "../lib/slug.js";
 import type * as lib_userCustomization from "../lib/userCustomization.js";
 import type * as lib_usernames from "../lib/usernames.js";
 
@@ -24,10 +26,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "lib/client": typeof lib_client;
+  "lib/inviteSecurity": typeof lib_inviteSecurity;
   "lib/links": typeof lib_links;
   "lib/planEntitlements": typeof lib_planEntitlements;
   "lib/planEntitlementsMaintenance": typeof lib_planEntitlementsMaintenance;
   "lib/profileFieldsValidator": typeof lib_profileFieldsValidator;
+  "lib/slug": typeof lib_slug;
   "lib/userCustomization": typeof lib_userCustomization;
   "lib/usernames": typeof lib_usernames;
 }>;

@@ -24,6 +24,28 @@ const adminInviteRateLimiter = createMemoryRateLimiter({
   windowMs: Number(process.env.RATE_LIMIT_ADMIN_INVITE_WINDOW_MS ?? 60_000),
 });
 
+const buildInviteResponseHeaders = (
+  rateLimitResult: ReturnType<typeof adminInviteRateLimiter.check>,
+) => ({
+  ...buildRateLimitHeaders(rateLimitResult),
+  "Cache-Control": "no-store",
+});
+
+const inviteJson = (
+  body: Record<string, unknown>,
+  {
+    rateLimitResult,
+    status,
+  }: {
+    rateLimitResult: ReturnType<typeof adminInviteRateLimiter.check>;
+    status?: number;
+  },
+) =>
+  NextResponse.json(body, {
+    status,
+    headers: buildInviteResponseHeaders(rateLimitResult),
+  });
+
 export const POST = async (request: Request) => {
   const { userId } = await auth();
 
@@ -40,29 +62,14 @@ export const POST = async (request: Request) => {
   );
 
   if (!rateLimitResult.allowed) {
-    return NextResponse.json(
+    return inviteJson(
       { error: "Too many requests" },
-      {
-        status: 429,
-        headers: {
-          ...buildRateLimitHeaders(rateLimitResult),
-          "Cache-Control": "no-store",
-        },
-      },
+      { status: 429, rateLimitResult },
     );
   }
 
   if (!hasTrustedOrigin(request)) {
-    return NextResponse.json(
-      { error: "Forbidden" },
-      {
-        status: 403,
-        headers: {
-          ...buildRateLimitHeaders(rateLimitResult),
-          "Cache-Control": "no-store",
-        },
-      },
-    );
+    return inviteJson({ error: "Forbidden" }, { status: 403, rateLimitResult });
   }
 
   let json: unknown;
@@ -70,30 +77,18 @@ export const POST = async (request: Request) => {
   try {
     json = await request.json();
   } catch {
-    return NextResponse.json(
+    return inviteJson(
       { error: "Invalid request" },
-      {
-        status: 400,
-        headers: {
-          ...buildRateLimitHeaders(rateLimitResult),
-          "Cache-Control": "no-store",
-        },
-      },
+      { status: 400, rateLimitResult },
     );
   }
 
   const parsed = requestSchema.safeParse(json);
 
   if (!parsed.success) {
-    return NextResponse.json(
+    return inviteJson(
       { error: "Invalid request" },
-      {
-        status: 400,
-        headers: {
-          ...buildRateLimitHeaders(rateLimitResult),
-          "Cache-Control": "no-store",
-        },
-      },
+      { status: 400, rateLimitResult },
     );
   }
 
@@ -110,25 +105,11 @@ export const POST = async (request: Request) => {
     });
   } catch (error) {
     console.error("Failed to send invite email:", error);
-    return NextResponse.json(
+    return inviteJson(
       { error: "Failed to send invite email" },
-      {
-        status: 502,
-        headers: {
-          ...buildRateLimitHeaders(rateLimitResult),
-          "Cache-Control": "no-store",
-        },
-      },
+      { status: 502, rateLimitResult },
     );
   }
 
-  return NextResponse.json(
-    { ok: true },
-    {
-      headers: {
-        ...buildRateLimitHeaders(rateLimitResult),
-        "Cache-Control": "no-store",
-      },
-    },
-  );
+  return inviteJson({ ok: true }, { rateLimitResult });
 };

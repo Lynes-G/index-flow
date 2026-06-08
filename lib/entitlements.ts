@@ -26,7 +26,8 @@ export const resolveEffectivePlan = ({
   return planRank[grantedPlan] > planRank[paidPlan] ? grantedPlan : paidPlan;
 };
 
-export const canAccessAnalytics = (plan: Plan) => planRank[plan] >= planRank.pro;
+export const canAccessAnalytics = (plan: Plan) =>
+  planRank[plan] >= planRank.pro;
 
 export const canAccessUltraFeatures = (plan: Plan) =>
   planRank[plan] >= planRank.ultra;

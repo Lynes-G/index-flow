@@ -5,6 +5,7 @@ export interface ClientTrackingData {
   profileUsername: string;
   linkId: string;
   eventType?: "link_click" | "qr_scan";
+  visitorId?: string;
 }
 
 // Complete server-side tracking event with additional data
@@ -13,6 +14,7 @@ export interface ServerTrackingEvent extends ClientTrackingData {
   linkTitle: string;
   linkUrl: string;
   profileUserId: string;
+  visitorId: string;
   location: Geo;
   timestamp: string;
   eventType: "link_click" | "qr_scan";

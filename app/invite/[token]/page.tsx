@@ -17,15 +17,20 @@ interface InvitePageProps {
 const InvitePage = async ({ params }: InvitePageProps) => {
   const { token } = await params;
   const tokenHash = hashInviteToken(token);
-  const invite = await fetchQuery(api.lib.planEntitlements.getInviteByTokenHash, {
-    tokenHash,
-  });
+  const invite = await fetchQuery(
+    api.lib.planEntitlements.getInviteByTokenHash,
+    {
+      tokenHash,
+    },
+  );
 
   if (!invite) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-semibold text-slate-900">Invite not found</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Invite not found
+          </h1>
           <p className="mt-3 text-slate-600">
             This invite link is invalid or no longer available.
           </p>
@@ -50,17 +55,22 @@ const InvitePage = async ({ params }: InvitePageProps) => {
             You were invited to IndexFlow {invite.invitedPlan.toUpperCase()}
           </h1>
           <p className="mt-3 text-slate-600">
-            Sign in or sign up with <span className="font-medium">{inviteEmail}</span> to
-            claim this permanent free access.
+            Sign in or sign up with{" "}
+            <span className="font-medium">{inviteEmail}</span> to claim this
+            permanent free access.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild>
-              <Link href={`/sign-up?redirect_url=${encodeURIComponent(invitePath)}`}>
+              <Link
+                href={`/sign-up?redirect_url=${encodeURIComponent(invitePath)}`}
+              >
                 Sign up to claim
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href={`/sign-in?redirect_url=${encodeURIComponent(invitePath)}`}>
+              <Link
+                href={`/sign-in?redirect_url=${encodeURIComponent(invitePath)}`}
+              >
                 Sign in instead
               </Link>
             </Button>
@@ -80,9 +90,12 @@ const InvitePage = async ({ params }: InvitePageProps) => {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16">
         <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-8 shadow-sm">
-          <h1 className="text-3xl font-semibold text-slate-900">Invite already claimed</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Invite already claimed
+          </h1>
           <p className="mt-3 text-slate-700">
-            This account already has the {invite.invitedPlan.toUpperCase()} grant.
+            This account already has the {invite.invitedPlan.toUpperCase()}{" "}
+            grant.
           </p>
           <div className="mt-6">
             <Button asChild>
@@ -98,7 +111,9 @@ const InvitePage = async ({ params }: InvitePageProps) => {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-semibold text-slate-900">Invite already used</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Invite already used
+          </h1>
           <p className="mt-3 text-slate-600">
             This invite has already been claimed by another account.
           </p>
@@ -111,7 +126,9 @@ const InvitePage = async ({ params }: InvitePageProps) => {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-semibold text-slate-900">Invite revoked</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Invite revoked
+          </h1>
           <p className="mt-3 text-slate-600">
             This invite is no longer active.
           </p>
@@ -124,11 +141,17 @@ const InvitePage = async ({ params }: InvitePageProps) => {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16">
         <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 shadow-sm">
-          <h1 className="text-3xl font-semibold text-slate-900">Wrong account</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Wrong account
+          </h1>
           <p className="mt-3 text-slate-700">
-            This invite was sent to <span className="font-medium">{invite.email}</span>, but
-            you are signed in as{" "}
-            <span className="font-medium">{primaryEmail ?? "an account without a primary email"}</span>.
+            This invite was sent to{" "}
+            <span className="font-medium">{invite.email}</span>, but you are
+            signed in as{" "}
+            <span className="font-medium">
+              {primaryEmail ?? "an account without a primary email"}
+            </span>
+            .
           </p>
           <p className="mt-3 text-slate-700">
             Sign in with the invited email address to claim the free plan.
@@ -160,12 +183,16 @@ const InvitePage = async ({ params }: InvitePageProps) => {
       throw new Error("Unable to authenticate invite claim.");
     }
 
-    await fetchMutation(api.lib.planEntitlements.acceptPlanInvite, {
-      tokenHash,
-      email: normalizeInviteEmail(signedInEmail),
-    }, {
-      token: convexToken,
-    });
+    await fetchMutation(
+      api.lib.planEntitlements.acceptPlanInvite,
+      {
+        tokenHash,
+        email: normalizeInviteEmail(signedInEmail),
+      },
+      {
+        token: convexToken,
+      },
+    );
 
     redirect("/dashboard/billing");
   };
@@ -180,8 +207,10 @@ const InvitePage = async ({ params }: InvitePageProps) => {
           Unlock {invite.invitedPlan.toUpperCase()} for free
         </h1>
         <p className="mt-3 text-slate-600">
-          You are signed in with <span className="font-medium">{primaryEmail}</span>. Claiming
-          this invite grants permanent {invite.invitedPlan.toUpperCase()} access on this account.
+          You are signed in with{" "}
+          <span className="font-medium">{primaryEmail}</span>. Claiming this
+          invite grants permanent {invite.invitedPlan.toUpperCase()} access on
+          this account.
         </p>
         <form action={claimInvite} className="mt-6">
           <Button type="submit">Claim invite</Button>

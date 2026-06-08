@@ -2,7 +2,7 @@ DESCRIPTION >
     Materialized daily link performance data with pre-aggregated metrics
 
 NODE daily_link_performance_node
-    SQL >
+SQL >
     %
     SELECT
         toDate(timestamp) as date,
@@ -12,7 +12,7 @@ NODE daily_link_performance_node
         linkTitle,
         linkUrl,
         countState() as total_clicks,
-        uniqState(profileUserId) as unique_users,
+        uniqStateIf(visitorId, visitorId != '') as unique_visitors,
         uniqState(location_country) as unique_countries,
         uniqState(referrer) as unique_referrers,
         minState(timestamp) as first_click_time,
@@ -27,5 +27,5 @@ NODE daily_link_performance_node
         linkTitle,
         linkUrl
 
-TYPE MATERIALIZED
+TYPE materialized
 DATASOURCE daily_link_performance_materialized

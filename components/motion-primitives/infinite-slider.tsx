@@ -6,7 +6,7 @@ import {
   MarqueeContent,
   type MarqueeProps,
 } from "@/components/ui/marquee";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/frontend/shared/utils";
 
 type InfiniteSliderProps = Omit<MarqueeProps, "children"> & {
   children: React.ReactNode;

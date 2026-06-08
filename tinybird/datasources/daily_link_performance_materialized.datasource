@@ -10,7 +10,7 @@ SCHEMA >
     `linkTitle` String,
     `linkUrl` String,
     `total_clicks` AggregateFunction(count, UInt64),
-    `unique_users` AggregateFunction(uniq, String),
+    `unique_visitors` AggregateFunction(uniq, String),
     `unique_countries` AggregateFunction(uniq, String),
     `unique_referrers` AggregateFunction(uniq, String),
     `first_click_time` AggregateFunction(min, DateTime),

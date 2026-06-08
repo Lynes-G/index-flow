@@ -14,4 +14,6 @@ export const profileFieldValidator = v.object({
   country: v.optional(v.string()),
 });
 
-export const profileFieldsValidator = v.optional(v.array(profileFieldValidator));
+export const profileFieldsValidator = v.optional(
+  v.array(profileFieldValidator),
+);

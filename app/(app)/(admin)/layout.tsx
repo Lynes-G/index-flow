@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import { LinkCreationSheetProvider } from "@/components/LinkCreationSheetProvider";
+import Header from "@/components/shared/layout/Header";
+import { LinkCreationSheetProvider } from "@/components/dashboard/links/LinkCreationSheetProvider";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <LinkCreationSheetProvider>
-      <div>
-        <Header />
-        <main className="max-w-7xl px-4 pt-10 lg:mx-auto xl:px-0">
+      <div className="dashboard-zone min-h-screen overflow-x-clip bg-transparent">
+        <Header logoVariant="icon" />
+        <main className="dashboard-zone mx-auto w-full max-w-[1760px] px-3 pt-6 pb-6 sm:px-4 sm:pt-8 lg:px-6 xl:px-6">
           {children}
         </main>
       </div>

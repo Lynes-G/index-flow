@@ -2,32 +2,50 @@ DESCRIPTION >
     Get link click analytics for a specific profile owner with time filtering
 
 NODE link_analytics_node
-    SQL >
+SQL >
     %
+    WITH filtered_clicks AS (
+        SELECT
+            timestamp,
+            visitorId,
+            linkTitle,
+            linkUrl,
+            location_country
+        FROM link_clicks
+        WHERE
+            profileUserId = {{String(profileUserId)}}
+            AND (event_type = 'link_click' OR event_type = '')
+            {% if defined(start_date) %}
+            AND toDate(timestamp) >= {{Date(start_date)}}
+            {% else %}
+            AND toDate(timestamp) >= today() - {{Int32(days_back, 30)}}
+            {% end %}
+            {% if defined(end_date) %}
+            AND toDate(timestamp) <= {{Date(end_date)}}
+            {% else %}
+            AND toDate(timestamp) <= today()
+            {% end %}
+            {% if defined(linkId) %}
+            AND linkId = {{String(linkId)}}
+            {% end %}
+    ),
+    summary AS (
+        SELECT
+            uniqIf(visitorId, visitorId != '') as range_unique_visitors,
+            uniq(location_country) as range_countries_reached
+        FROM filtered_clicks
+    )
     SELECT
         toDate(timestamp) as date,
         linkTitle,
         linkUrl,
         count() as total_clicks,
-        uniq(profileUserId) as unique_users,
-        uniq(location_country) as countries_reached
-    FROM link_clicks
-    WHERE
-        profileUserId = {{String(profileUserId)}}
-        AND (event_type = 'link_click' OR event_type = '')
-        {% if defined(start_date) %}
-        AND date >= {{Date(start_date)}}
-        {% else %}
-        AND date >= today() - 30
-        {% end %}
-        {% if defined(end_date) %}
-        AND date <= {{Date(end_date)}}
-        {% else %}
-        AND date <= today()
-        {% end %}
-        {% if defined(linkId) %}
-        AND linkId = {{String(linkId)}}
-        {% end %}
+        uniqIf(visitorId, visitorId != '') as unique_visitors,
+        uniq(location_country) as countries_reached,
+        any(summary.range_unique_visitors) as range_unique_visitors,
+        any(summary.range_countries_reached) as range_countries_reached
+    FROM filtered_clicks
+    CROSS JOIN summary
     GROUP BY date, linkTitle, linkUrl
     ORDER BY date DESC, total_clicks DESC
 

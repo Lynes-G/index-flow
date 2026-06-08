@@ -35,9 +35,12 @@ export const getCurrentUserEntitlements = async () => {
     hasUltraCapacityFeature: has({ feature: "ultra_capacity" }),
   });
 
-  const grant = await fetchQuery(api.lib.planEntitlements.getActivePlanGrantForUser, {
-    userId,
-  });
+  const grant = await fetchQuery(
+    api.lib.planEntitlements.getActivePlanGrantForUser,
+    {
+      userId,
+    },
+  );
   const grantedPlan = grant?.plan ?? null;
   const effectivePlan = resolveEffectivePlan({
     paidPlan,

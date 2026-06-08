@@ -1,8 +1,3 @@
-const getLocalhostAppUrl = () => {
-  const port = process.env.PORT?.trim() || "3000";
-  return `http://localhost:${port}`;
-};
-
 const normalizeConfiguredUrl = (value: string) => {
   const trimmedValue = value.trim();
 
@@ -28,20 +23,17 @@ const normalizeConfiguredUrl = (value: string) => {
 };
 
 export function getAppUrl() {
-  if (process.env.NODE_ENV !== "production") {
-    return getLocalhostAppUrl();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+  if (!appUrl?.trim()) {
+    throw new Error("Missing NEXT_PUBLIC_APP_URL");
   }
 
-  const configuredUrl =
-    normalizeConfiguredUrl(process.env.NEXT_PUBLIC_APP_URL ?? "") ??
-    normalizeConfiguredUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "") ??
-    normalizeConfiguredUrl(process.env.VERCEL_URL ?? "");
+  const configuredUrl = normalizeConfiguredUrl(appUrl);
 
-  if (configuredUrl) {
-    return configuredUrl;
+  if (!configuredUrl) {
+    throw new Error("Invalid NEXT_PUBLIC_APP_URL");
   }
 
-  throw new Error(
-    "No valid app URL found. Set NEXT_PUBLIC_APP_URL for production deployments.",
-  );
+  return configuredUrl;
 }

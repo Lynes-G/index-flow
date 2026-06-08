@@ -1,4 +1,5 @@
-export const normalizeInviteEmail = (email: string) => email.trim().toLowerCase();
+export const normalizeInviteEmail = (email: string) =>
+  email.trim().toLowerCase();
 
 export const maskInviteEmail = (email: string) => {
   const normalizedEmail = normalizeInviteEmail(email);

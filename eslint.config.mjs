@@ -8,6 +8,7 @@ const config = [
   ...nextTypescript,
   globalIgnores([
     ".agents/**",
+    ".codex-temp/**",
     "node_modules/**",
     "convex/_generated/**",
     "coverage/**",

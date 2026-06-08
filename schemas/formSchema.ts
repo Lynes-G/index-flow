@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isSafeExternalUrl } from "@/lib/externalLinks";
+import { isSafeExternalUrl } from "@/lib/frontend/shared/externalLinks";
 
 export const usernameFormSchema = z.object({
   username: z

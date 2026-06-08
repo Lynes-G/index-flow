@@ -1,0 +1,147 @@
+@layer components {
+  /* Dashboard base surfaces */
+  .dashboard-flat-surface {
+    border: 1.5px solid
+      color-mix(in srgb, var(--brand-eggplant) 18%, transparent);
+    background: rgba(255, 253, 248, 0.96);
+    box-shadow: 0 12px 28px
+      color-mix(in srgb, var(--brand-eggplant) 7%, transparent);
+  }
+
+  .dashboard-product-card {
+    border: 1px solid color-mix(in srgb, var(--brand-eggplant) 14%, transparent);
+    border-radius: 0.5rem;
+    background: rgba(255, 253, 248, 0.96);
+    box-shadow: 0 10px 24px
+      color-mix(in srgb, var(--brand-eggplant) 6%, transparent);
+  }
+
+  .dashboard-product-inset {
+    border: 1px solid color-mix(in srgb, var(--brand-eggplant) 12%, transparent);
+    border-radius: 0.5rem;
+    background: rgba(255, 249, 232, 0.78);
+  }
+
+  /* Dashboard settings panels */
+  .dashboard-settings-panel {
+    border: 1px solid rgb(226 232 240 / 75%);
+    border-radius: 0.5rem;
+    background: rgb(255 255 255 / 76%);
+  }
+
+  .dashboard-settings-panel-soft {
+    border: 1px solid rgb(226 232 240 / 80%);
+    border-radius: 0.5rem;
+    background: rgb(255 255 255 / 82%);
+  }
+
+  .dashboard-settings-panel-raised {
+    border: 1px solid rgb(226 232 240 / 80%);
+    border-radius: 0.5rem;
+    background: rgb(255 255 255 / 90%);
+    box-shadow: 0 14px 36px -28px rgb(15 23 42 / 50%);
+  }
+
+  /* Dashboard cards and panels */
+  .dashboard-subtle-card {
+    border: 1px solid rgb(226 232 240 / 80%);
+    border-radius: 0.5rem;
+    background: rgb(255 255 255 / 92%);
+    box-shadow: 0 16px 36px rgb(15 23 42 / 5%);
+  }
+
+  .dashboard-warm-panel {
+    border: 1px solid rgb(226 232 240 / 75%);
+    border-radius: 0.5rem;
+    background: linear-gradient(
+      180deg,
+      rgb(255 255 255 / 98%),
+      rgb(255 251 239 / 94%)
+    );
+    box-shadow: 0 16px 36px rgb(59 21 42 / 6%);
+  }
+
+  .dashboard-rail-card {
+    border: 2px solid var(--brand-eggplant);
+    background: linear-gradient(
+      180deg,
+      rgb(255 255 255 / 98%),
+      rgb(255 251 239 / 94%)
+    );
+    box-shadow: 5px 5px 0 var(--brand-purple);
+  }
+
+  /* Dashboard form controls */
+  .dashboard-brutalist-input {
+    height: 2.75rem;
+    border: 2px solid var(--brand-eggplant);
+    border-radius: 0;
+    background: #fff;
+  }
+
+  /* Dashboard shell and page backgrounds */
+  .dashboard-shell {
+    background:
+      var(--riso-halftone), linear-gradient(180deg, #fff5dc 0%, #ffeabd 100%) !important;
+    background-size:
+      58px 58px,
+      92px 92px,
+      cover !important;
+    border: 2px solid var(--riso-border);
+    border-radius: 0.75rem;
+    box-shadow: 10px 10px 0 color-mix(in srgb, var(--brand-eggplant) 92%, black);
+  }
+
+  .dashboard-shell::before,
+  .dashboard-shell::after {
+    content: none !important;
+    background: none !important;
+    background-image: none !important;
+  }
+
+  .dashboard-zone {
+    background: transparent !important;
+    background-image: none !important;
+  }
+
+  .dashboard-zone .dashboard-shell {
+    background:
+      var(--riso-halftone), linear-gradient(180deg, #fff5dc 0%, #ffeabd 100%) !important;
+    background-size:
+      58px 58px,
+      92px 92px,
+      cover !important;
+  }
+
+  .dashboard-no-bg-patterns {
+    background:
+      var(--riso-halftone), linear-gradient(180deg, #fff5dc 0%, #ffeabd 100%) !important;
+    background-size:
+      58px 58px,
+      92px 92px,
+      cover !important;
+  }
+
+  /* Dashboard shell spacing */
+  .dashboard-shell-inner {
+    padding: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .dashboard-shell-inner {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-shell-inner {
+      padding: 2rem;
+    }
+  }
+
+  /* Dashboard section dividers */
+  .dashboard-section-divider {
+    border-top: 1px solid
+      color-mix(in srgb, var(--brand-eggplant) 12%, transparent);
+  }
+}

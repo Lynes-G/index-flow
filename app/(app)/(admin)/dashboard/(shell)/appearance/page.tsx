@@ -1,54 +1,77 @@
 import CustomizationForm, {
   CustomizationDesktopPreviewRail,
   CustomizationPreviewProvider,
-} from "@/components/CustomizationForm";
-import { DashboardContextRail } from "@/components/dashboard/DashboardContextRail";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { auth } from "@clerk/nextjs/server";
-import { Palette } from "lucide-react";
-import { redirect } from "next/navigation";
+} from "@/components/dashboard/appearance/CustomizationForm";
+import DashboardDevPreviewNotice from "@/components/dashboard/shell/DashboardDevPreviewNotice";
+import { DashboardContextRail } from "@/components/dashboard/shell/DashboardContextRail";
+import DashboardShell from "@/components/dashboard/shell/DashboardShell";
+import DashboardSidebar from "@/components/dashboard/shell/DashboardSidebar";
+import { Button } from "@/components/ui/button";
+import { api } from "@/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+import { ExternalLink, Eye } from "lucide-react";
+import Link from "next/link";
+import { getAppUrl } from "@/lib/server/appUrl";
+import { getDashboardShellAccess } from "@/lib/server/dashboardShellAccess";
 
-const DashboardAppearancePage = async () => {
-  const { userId } = await auth();
+const resolvePublicPageMeta = (slug: string) => ({
+  href: `/u/${slug}`,
+  label: `${getAppUrl()}/u/${slug}`,
+});
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
+const DashboardAppearancePage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) => {
+  const { isDevPreview, userId } = await getDashboardShellAccess({
+    pathname: "/dashboard/appearance",
+    searchParams,
+  });
+
+  const currentSlug = userId
+    ? await fetchQuery(api.lib.usernames.getUserSlug, {
+        userId,
+      })
+    : null;
+  const resolvedSlug = currentSlug ?? userId ?? "your-profile";
+  const publicPage = resolvePublicPageMeta(resolvedSlug);
 
   return (
     <CustomizationPreviewProvider>
       <DashboardShell
         sidebar={<DashboardSidebar currentTask="appearance" />}
         rail={
-          <DashboardContextRail className="space-y-5">
-            <div className="space-y-3">
-              <p className="text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase">
-                Preview companion
-              </p>
-              <div className="space-y-2">
-                <h2 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900">
-                  Style first, compare constantly
-                </h2>
-                <p className="text-sm leading-6 text-slate-600">
-                  Keep the controls in the center and the public result on the
-                  right so each visual choice is easy to judge before you save.
-                </p>
-              </div>
-            </div>
+          <DashboardContextRail className="space-y-4 sm:space-y-5">
+            {/* The rail mirrors the public page so appearance changes stay visible
+                while the editor remains in the main working column. */}
             <CustomizationDesktopPreviewRail />
           </DashboardContextRail>
         }
-        title="Style the look of your public page"
-        description="Use this appearance workspace to tune layout, colors, imagery, and bio details while the live preview stays close to the controls."
+        title="Shape your public page"
+        description="Start with identity basics, then refine layout, media, and profile details once the page feels like you."
         actions={
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
-            <Palette className="size-4" />
-            Appearance workspace
-          </span>
+          <Button asChild size="sm">
+            <Link
+              href={publicPage.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={publicPage.label}
+            >
+              <Eye className="size-4" />
+              Open live page
+              <ExternalLink className="size-4" />
+            </Link>
+          </Button>
         }
       >
-        <CustomizationForm shellMode="appearance" />
+        {isDevPreview ? (
+          <div className="space-y-3.5 sm:space-y-5">
+            <DashboardDevPreviewNotice description="Appearance is read-only in preview mode." />
+          </div>
+        ) : (
+          <CustomizationForm shellMode="appearance" />
+        )}
       </DashboardShell>
     </CustomizationPreviewProvider>
   );

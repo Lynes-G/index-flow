@@ -4,20 +4,23 @@ import { BarChart3, Link2, Sparkles } from "lucide-react";
 const steps = [
   {
     number: "01",
-    title: "Shape the page",
-    description: "Set the look, headline, and first link.",
+    title: "Create the page",
+    description:
+      "Add your headline, featured link, and the core links people expect.",
     icon: Sparkles,
   },
   {
     number: "02",
-    title: "Route every audience touchpoint",
-    description: "Send socials, campaigns, and QR traffic to one clean page.",
+    title: "Share it everywhere",
+    description:
+      "Use one page across socials, campaigns, and offline touchpoints.",
     icon: Link2,
   },
   {
     number: "03",
-    title: "Read the response and tighten it",
-    description: "Check what earns attention, then tighten the next pass.",
+    title: "Track what works",
+    description:
+      "See what gets attention, then tighten the page with confidence.",
     icon: BarChart3,
   },
 ];
@@ -27,19 +30,19 @@ function ProcessStrip() {
     <div id="how-it-works" className="scroll-mt-24">
       <SectionShell
         eyebrow="How it works"
-        title="Three moves. One sharper page."
-        description="Build it, send traffic, tune the next pass."
-        className="relative"
+        title="Create it. Share it. Track it."
+        description="A simple flow that feels familiar to visitors and easy to manage for you."
+        className="landing-band-mint relative"
       >
         <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
           <div className="space-y-5">
-            <div className="template-card rounded-[2rem] p-6">
+            <div className="template-card rounded-lg p-6">
               <p className="text-sm leading-7 text-slate-600">
                 IndexFlow gives you one place to present the page, direct the
-                click, and read the response.
+                next click, and learn from the response.
               </p>
-              <div className="mt-5 inline-flex rounded-full bg-[color:var(--brand-accent)] px-4 py-2 text-sm font-semibold text-[#111216]">
-                Product-focused workflow
+              <div className="shadow-brand-neon-md border-brand-eggplant bg-brand-eggplant mt-5 inline-flex rounded-lg border-2 px-4 py-2 text-sm font-black text-white uppercase">
+                Link-in-bio, simplified
               </div>
             </div>
           </div>
@@ -51,17 +54,17 @@ function ProcessStrip() {
               return (
                 <article
                   key={step.number}
-                  className="template-card rounded-[2rem] p-6"
+                  className="template-card rounded-lg p-6"
                 >
                   <div className="mb-4 flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-[color:var(--brand-accent)] text-sm font-semibold text-[#111216]">
+                    <div className="shadow-brand-purple-sm border-brand-eggplant bg-brand-lime text-button-secondary-foreground flex size-10 items-center justify-center rounded-lg border-2 text-sm font-black">
                       {step.number}
                     </div>
-                    <div className="flex size-10 items-center justify-center rounded-2xl bg-[rgba(251,176,59,0.12)] text-[color:var(--brand-accent)]">
+                    <div className="border-brand-eggplant bg-brand-accent-soft text-brand-accent-ink flex size-10 items-center justify-center rounded-lg border-2">
                       <Icon className="size-4" />
                     </div>
                   </div>
-                  <h3 className="font-['Sora',sans-serif] text-2xl font-semibold tracking-[-0.05em] text-slate-900">
+                  <h3 className="font-['Sora',sans-serif] text-2xl font-black tracking-normal text-slate-900">
                     {step.title}
                   </h3>
                   <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">

@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/shared/layout/Header";
 import { ClosingPanel } from "@/components/marketing/closing-panel";
 import { EditorialHero } from "@/components/marketing/editorial-hero";
 import { FeatureStoryGrid } from "@/components/marketing/feature-story-grid";
@@ -12,8 +12,8 @@ export default async function Home() {
   if (userId) redirect("/dashboard");
 
   return (
-    <div className="template-shell min-h-screen text-slate-900">
-      <Header isFixed={true} logoHref="/" />
+    <div className="template-shell no-bg-patterns min-h-screen text-slate-900">
+      <Header isFixed={true} logoHref="/" pillExpandsOnScroll={true} />
 
       <main className="overflow-hidden">
         <EditorialHero />

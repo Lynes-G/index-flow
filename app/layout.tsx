@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
-import ConvexClientProvider from "@/components/ConvexClientProvider";
+import ConvexClientProvider from "@/components/shared/runtime/ConvexClientProvider";
+import DevelopmentServiceWorkerCleanup from "@/components/shared/runtime/DevelopmentServiceWorkerCleanup";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { appearanceGoogleFontsHref } from "@/lib/frontend/appearance/appearanceFonts";
 import { getAppUrl } from "@/lib/server/appUrl";
 
 export const metadata: Metadata = {
@@ -15,14 +17,15 @@ export const metadata: Metadata = {
     "Create a polished link-in-bio page with custom themes, flexible links, and built-in analytics.",
   applicationName: "IndexFlow",
   icons: {
-    icon: [
-      { url: "/indexflow-dark-icon.svg", media: "(prefers-color-scheme: light)" },
-      { url: "/indexflow-light-icon.svg", media: "(prefers-color-scheme: dark)" },
-      { url: "/indexflow-dark-icon.svg" },
-    ],
-    shortcut: ["/indexflow-dark-icon.svg"],
-    apple: ["/indexflow-dark-icon.svg"],
+    icon: [{ url: "/indexflow-favicon.svg" }],
+    shortcut: [{ url: "/indexflow-favicon.svg" }],
+    apple: [{ url: "/indexflow-favicon.svg" }],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -32,9 +35,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link rel="stylesheet" href={appearanceGoogleFontsHref} />
+      </head>
       <body suppressHydrationWarning={true}>
         <ClerkProvider dynamic>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            <DevelopmentServiceWorkerCleanup />
+            {children}
+          </ConvexClientProvider>
         </ClerkProvider>
         <Toaster richColors closeButton />
       </body>

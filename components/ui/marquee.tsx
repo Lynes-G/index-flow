@@ -7,7 +7,7 @@ import {
 } from "radix-ui";
 import * as React from "react";
 import { useComposedRefs } from "@/lib/compose-refs";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/frontend/shared/utils";
 
 const ROOT_NAME = "Marquee";
 const CONTENT_NAME = "MarqueeContent";

@@ -1,0 +1,215 @@
+@layer components {
+  /* Public link button styles */
+  .public-link-pill {
+    border: 1px solid rgb(226 232 240 / 50%);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 95%);
+  }
+
+  .public-link-rounded {
+    border: 1px solid rgb(226 232 240 / 55%);
+    border-radius: 1.65rem;
+    background: rgb(255 255 255 / 92%);
+  }
+
+  .public-link-outline {
+    border: 2px solid rgb(203 213 225 / 70%);
+    border-radius: 1.65rem;
+    background: rgb(255 255 255 / 72%);
+  }
+
+  .public-link-shadow {
+    border: 1px solid rgb(226 232 240 / 40%);
+    border-radius: 1.65rem;
+    background: rgb(255 255 255 / 98%);
+    box-shadow: 0 22px 40px -28px rgb(15 23 42 / 40%);
+  }
+
+  .public-link-brutalist {
+    border: 2.5px solid rgb(15 23 42);
+    border-radius: 0;
+    background: #fff7df;
+    box-shadow: 8px 8px 0 0 rgb(15 23 42 / 95%);
+  }
+
+  .public-link-glass {
+    border: 1px solid rgb(255 255 255 / 35%);
+    border-radius: 1.75rem;
+    background: rgb(255 255 255 / 18%);
+    box-shadow: 0 20px 45px -28px rgb(109 168 255 / 60%);
+    backdrop-filter: blur(24px);
+  }
+
+  .public-link-editorial {
+    border-left-width: 3px;
+    border-radius: 1.35rem;
+    background: rgb(255 255 255 / 88%);
+  }
+
+  /* Public links containers */
+  .public-links-section {
+    border: 1px solid rgb(255 255 255 / 65%);
+    border-radius: 2rem;
+    background: rgb(255 255 255 / 88%);
+    box-shadow: 0 28px 80px -42px rgb(15 23 42 / 45%);
+    backdrop-filter: blur(24px);
+  }
+
+  .public-links-section-glass {
+    border: 1px solid rgb(255 255 255 / 45%);
+    border-radius: 2rem;
+    background: rgb(255 255 255 / 18%);
+    box-shadow: 0 28px 80px -42px rgb(109 168 255 / 55%);
+    backdrop-filter: blur(40px);
+  }
+
+  .public-links-section-brutalist {
+    border: 3px solid rgb(2 6 23);
+    border-radius: 0;
+    background: #fff8e5;
+    box-shadow: 12px 12px 0 0 rgb(15 23 42);
+  }
+
+  /* Public hero layout */
+  .public-hero-banner {
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: 2rem;
+    box-shadow: 0 28px 80px -42px rgb(15 23 42 / 48%);
+  }
+
+  .public-hero-card {
+    border: 1px solid rgb(255 255 255 / 70%);
+    border-radius: 2rem;
+    background: rgb(255 255 255 / 88%);
+    box-shadow: 0 26px 80px -46px rgb(15 23 42 / 60%);
+    backdrop-filter: blur(24px);
+  }
+
+  .public-avatar-frame {
+    border: 1px solid rgb(255 255 255 / 70%);
+    background: #fff;
+    box-shadow: 0 18px 38px -18px rgb(15 23 42 / 55%);
+  }
+
+  /* Public profile detail cards */
+  .public-profile-detail-card {
+    border: 1px solid;
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 75%);
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill,
+      stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: var(--default-transition-timing-function);
+    transition-duration: var(--default-transition-duration);
+  }
+
+  .public-profile-detail-card-compact {
+    background: rgb(255 255 255 / 78%);
+  }
+
+  /* Public footer pills */
+  .public-footer-pill-dark {
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 10%);
+    backdrop-filter: blur(8px);
+  }
+
+  .public-footer-pill-light {
+    border: 1px solid rgb(226 232 240 / 70%);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 85%);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Public QR cards and sharing panels */
+  .public-qr-card {
+    border: 1px solid rgb(255 255 255 / 40%);
+    background: rgb(255 255 255 / 85%);
+    box-shadow: 0 25px 50px -12px rgb(15 23 42 / 10%);
+    backdrop-filter: blur(24px);
+  }
+
+  .public-qr-card-mobile {
+    border-color: rgb(255 255 255 / 45%);
+    border-radius: 1.75rem;
+    background: rgb(255 255 255 / 88%);
+  }
+
+  .public-share-panel {
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1.25rem;
+    background: rgb(255 255 255 / 90%);
+  }
+
+  /* Public social links */
+  .public-social-link {
+    border: 1px solid rgb(255 255 255 / 70%);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 80%);
+    box-shadow: 0 1px 2px rgb(2 6 23 / 5%);
+    backdrop-filter: blur(4px);
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill,
+      stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: var(--default-transition-timing-function);
+    transition-duration: var(--default-transition-duration);
+  }
+
+  .public-social-link:hover {
+    transform: translateY(-0.125rem);
+    border-color: #fff;
+    background: #fff;
+  }
+
+  /* Public QR buttons and links */
+  .public-qr-secondary-button {
+    height: 2.75rem;
+    border-color: rgb(226 232 240);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 90%);
+    color: rgb(51 65 85);
+    box-shadow: 0 1px 2px rgb(2 6 23 / 5%);
+  }
+
+  .public-qr-secondary-button:hover {
+    border-color: var(--accent-color);
+    background: var(--accent-soft);
+    color: var(--accent-color);
+    box-shadow: 0 10px 24px -18px var(--accent-color);
+  }
+
+  .public-qr-share-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid rgb(226 232 240);
+    background: rgb(255 255 255 / 85%);
+    color: rgb(51 65 85);
+    font-weight: 500;
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill,
+      stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: var(--default-transition-timing-function);
+    transition-duration: var(--default-transition-duration);
+  }
+
+  .public-qr-share-link:hover {
+    border-color: rgb(203 213 225);
+    background: #fff;
+  }
+
+  /* Public responsive adjustments */
+  @media (min-width: 640px) {
+    .public-links-section,
+    .public-links-section-glass {
+      border-radius: 2.25rem;
+    }
+
+    .public-hero-banner,
+    .public-hero-card {
+      border-radius: 2.3rem;
+    }
+  }
+}

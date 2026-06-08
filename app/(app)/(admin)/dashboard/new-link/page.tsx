@@ -1,8 +1,9 @@
-import CreateLinkPanel from "@/components/CreateLinkPanel";
+import CreateLinkPanel from "@/components/dashboard/links/CreateLinkPanel";
+import { Button } from "@/components/ui/button";
 import {
   AdminPageShell,
   AdminSurface,
-} from "@/components/dashboard/AdminShell";
+} from "@/components/dashboard/shell/AdminShell";
 import { api } from "@/convex/_generated/api";
 import { getCurrentUserEntitlements } from "@/lib/server/entitlements";
 import { auth } from "@clerk/nextjs/server";
@@ -21,7 +22,9 @@ const NewLinkPage = async () => {
 
   const access = {
     canCreate:
-      entitlements.linkLimit === null ? true : linkCount < entitlements.linkLimit,
+      entitlements.linkLimit === null
+        ? true
+        : linkCount < entitlements.linkLimit,
     limit: entitlements.linkLimit ?? "unlimited",
     currentCount: linkCount,
   };
@@ -32,13 +35,12 @@ const NewLinkPage = async () => {
         <AdminPageShell>
           <AdminSurface className="space-y-6">
             <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 focus-visible:outline-none"
-              >
-                <ArrowLeft className="size-4" />
-                Back to Dashboard
-              </Link>
+              <Button asChild variant="soft" size="sm">
+                <Link href="/dashboard">
+                  <ArrowLeft className="size-4" />
+                  Back to Dashboard
+                </Link>
+              </Button>
               <span className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold tracking-wide text-amber-900 uppercase">
                 <AlertCircle className="size-3.5" />
                 Limit reached
@@ -49,17 +51,17 @@ const NewLinkPage = async () => {
                 Link creation limit reached
               </h1>
               <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-                You have reached your current link limit (
-                {access.currentCount}/{access.limit}).
+                You have reached your current link limit ({access.currentCount}/
+                {access.limit}).
                 {!hasUnlimitedLinks &&
                   " Ultra access is currently available only through an admin invite."}
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/90 p-5">
+            <div className="dashboard-product-inset bg-slate-50/90 p-5">
               <p className="text-sm font-medium text-slate-800">
                 Your existing links stay active and editable. Return to the
-                dashboard to reorganize them or remove one before creating a
-                new link.
+                dashboard to reorganize them or remove one before creating a new
+                link.
               </p>
             </div>
           </AdminSurface>
@@ -72,21 +74,20 @@ const NewLinkPage = async () => {
     <div className="space-y-6 pb-10">
       <AdminPageShell>
         <AdminSurface className="space-y-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            <ArrowLeft className="size-4" />
-            Back to Dashboard
-          </Link>
+          <Button asChild variant="soft" size="sm" className="w-fit">
+            <Link href="/dashboard">
+              <ArrowLeft className="size-4" />
+              Back to Dashboard
+            </Link>
+          </Button>
           <div>
             <p className="text-sm font-medium text-slate-500">
               Dashboard / Links
             </p>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
               Add a new destination without leaving the dashboard styling
-              system. Your link will appear on your public page as soon as it
-              is saved.
+              system. Your link will appear on your public page as soon as it is
+              saved.
             </p>
           </div>
         </AdminSurface>

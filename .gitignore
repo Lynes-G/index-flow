@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+tinybird/.tinyb
 
 # Playwright test artifacts
 .playwright-mcp
@@ -64,9 +65,12 @@ CLAUDE.md
 eslint.config.mjs
 tmp-pnpm-dev-err.log
 tmp-pnpm-dev-out.log
-
+.codex-*
 
 # Misc
 /docs
 /design-system
+/notes
 *-dev-preview-*.*
+dev-server.*.*
+design-system/

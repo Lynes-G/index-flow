@@ -38,6 +38,7 @@ export default defineSchema({
     backgroundSolidColor: v.optional(v.string()),
     patternOverlayEnabled: v.optional(v.boolean()),
     patternOverlayValue: v.optional(v.string()),
+    patternOverlayOpacity: v.optional(v.number()),
     backgroundImageStorageId: v.optional(v.id("_storage")),
     backgroundImagePositionX: v.optional(v.number()),
     backgroundImagePositionY: v.optional(v.number()),

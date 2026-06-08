@@ -1,2 +1,2 @@
-1- Add Dynamic QR code.
-2- QR code scan tracking
+1- Add link shortener
+2- Fix the login and register page layouts

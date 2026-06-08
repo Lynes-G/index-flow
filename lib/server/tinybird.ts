@@ -1,6 +1,10 @@
 import { fetchWithTimeout, readResponseText } from "./http";
 
 const TINYBIRD_TIMEOUT_MS = 5000;
+const LINK_CLICKS_DATASOURCE = "link_clicks";
+const noStoreFetchOptions = {
+  next: { revalidate: 0 },
+};
 
 const getTinybirdConfig = () => {
   const host = process.env.TINYBIRD_HOST?.trim();
@@ -15,7 +19,7 @@ const getTinybirdConfig = () => {
 
 export const isTinybirdConfigured = () => getTinybirdConfig() !== null;
 
-export const buildTinybirdPipeUrl = (
+const buildTinybirdPipeUrl = (
   pipeName: string,
   params: Record<string, string | number>,
 ) => {
@@ -34,6 +38,19 @@ export const buildTinybirdPipeUrl = (
   return url.toString();
 };
 
+export const fetchTinybirdPipe = (
+  pipeName: string,
+  params: Record<string, string | number>,
+) =>
+  fetchWithTimeout(
+    buildTinybirdPipeUrl(pipeName, params),
+    {
+      headers: getTinybirdHeaders(),
+      ...noStoreFetchOptions,
+    },
+    TINYBIRD_TIMEOUT_MS,
+  );
+
 export const sendTinybirdEvent = async (event: unknown) => {
   const config = getTinybirdConfig();
 
@@ -42,7 +59,7 @@ export const sendTinybirdEvent = async (event: unknown) => {
   }
 
   const response = await fetchWithTimeout(
-    `${config.host}/v0/events?name=link_clicks`,
+    `${config.host}/v0/events?name=${LINK_CLICKS_DATASOURCE}`,
     {
       method: "POST",
       headers: {
@@ -62,7 +79,7 @@ export const sendTinybirdEvent = async (event: unknown) => {
   }
 };
 
-export const getTinybirdHeaders = () => {
+const getTinybirdHeaders = () => {
   const config = getTinybirdConfig();
 
   if (!config) {

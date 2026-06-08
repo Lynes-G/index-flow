@@ -36,7 +36,12 @@ const createMockCtx = ({
         query: (table: string) => ({
           withIndex: (
             indexName: string,
-            apply: (query: { eq: (field: string, value: string) => { field: string; value: string } }) => {
+            apply: (query: {
+              eq: (
+                field: string,
+                value: string,
+              ) => { field: string; value: string };
+            }) => {
               field: string;
               value: string;
             },
@@ -48,7 +53,9 @@ const createMockCtx = ({
             return {
               collect: async () => {
                 if (table === "planGrants" && indexName === "by_invite_id") {
-                  return grants.filter((grant) => grant.inviteId === lookup.value);
+                  return grants.filter(
+                    (grant) => grant.inviteId === lookup.value,
+                  );
                 }
 
                 return [];
@@ -77,10 +84,7 @@ test("revokeInvite deletes an accepted invite and its grants", async () => {
 
   const revokeInviteHandler = (
     revokeInvite as typeof revokeInvite & {
-      _handler: (
-        ctx: unknown,
-        args: { inviteId: string },
-      ) => Promise<null>;
+      _handler: (ctx: unknown, args: { inviteId: string }) => Promise<null>;
     }
   )._handler;
 

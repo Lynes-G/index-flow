@@ -3,11 +3,7 @@ const DashboardShellRouteGroupLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  return (
-    <div className="mx-[calc(50%-50dvw)] max-w-none px-4 xl:px-6 2xl:px-8">
-      {children}
-    </div>
-  );
+  return <div className="mx-auto w-full max-w-[1760px]">{children}</div>;
 };
 
 export default DashboardShellRouteGroupLayout;

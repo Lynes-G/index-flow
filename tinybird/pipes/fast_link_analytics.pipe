@@ -2,31 +2,51 @@ DESCRIPTION >
     Fast link analytics using materialized daily performance data
 
 NODE fast_link_analytics_node
-    SQL >
+SQL >
     %
+    WITH filtered_daily_data AS (
+        SELECT
+            date,
+            linkId,
+            linkTitle,
+            linkUrl,
+            total_clicks,
+            unique_visitors,
+            unique_countries
+        FROM daily_link_performance_materialized
+        WHERE
+            profileUserId = {{String(profileUserId)}}
+            {% if defined(start_date) %}
+            AND date >= {{Date(start_date)}}
+            {% else %}
+            AND date >= today() - {{Int32(days_back, 30)}}
+            {% end %}
+            {% if defined(end_date) %}
+            AND date <= {{Date(end_date)}}
+            {% else %}
+            AND date <= today()
+            {% end %}
+            {% if defined(linkId) %}
+            AND linkId = {{String(linkId)}}
+            {% end %}
+    ),
+    summary AS (
+        SELECT
+            uniqMerge(unique_visitors) as range_unique_visitors,
+            uniqMerge(unique_countries) as range_countries_reached
+        FROM filtered_daily_data
+    )
     SELECT
         date,
         linkTitle,
         linkUrl,
         countMerge(total_clicks) as total_clicks,
-        uniqMerge(unique_users) as unique_users,
-        uniqMerge(unique_countries) as countries_reached
-    FROM daily_link_performance_materialized
-    WHERE
-        profileUserId = {{String(profileUserId)}}
-        {% if defined(start_date) %}
-        AND date >= {{Date(start_date)}}
-        {% else %}
-        AND date >= today() - 30
-        {% end %}
-        {% if defined(end_date) %}
-        AND date <= {{Date(end_date)}}
-        {% else %}
-        AND date <= today()
-        {% end %}
-        {% if defined(linkId) %}
-        AND linkId = {{String(linkId)}}
-        {% end %}
+        uniqMerge(unique_visitors) as unique_visitors,
+        uniqMerge(unique_countries) as countries_reached,
+        any(summary.range_unique_visitors) as range_unique_visitors,
+        any(summary.range_countries_reached) as range_countries_reached
+    FROM filtered_daily_data
+    CROSS JOIN summary
     GROUP BY date, linkId, linkTitle, linkUrl
     ORDER BY date DESC, total_clicks DESC
 

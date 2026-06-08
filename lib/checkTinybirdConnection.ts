@@ -1,9 +1,5 @@
-import {
-  buildTinybirdPipeUrl,
-  getTinybirdHeaders,
-  isTinybirdConfigured,
-} from "@/lib/server/tinybird";
-import { fetchWithTimeout, readResponseText } from "@/lib/server/http";
+import { fetchTinybirdPipe, isTinybirdConfigured } from "@/lib/server/tinybird";
+import { readResponseText } from "@/lib/server/http";
 
 export interface TinybirdConnectionStatus {
   ok: boolean;
@@ -21,17 +17,10 @@ export async function checkTinybirdConnection(
   }
 
   try {
-    const response = await fetchWithTimeout(
-      buildTinybirdPipeUrl("profile_summary", {
-        profileUserId,
-        days_back: 30,
-      }),
-      {
-        headers: getTinybirdHeaders(),
-        next: { revalidate: 0 },
-      },
-      5000,
-    );
+    const response = await fetchTinybirdPipe("profile_summary", {
+      profileUserId,
+      days_back: 30,
+    });
 
     if (!response.ok) {
       const text = await readResponseText(response);
