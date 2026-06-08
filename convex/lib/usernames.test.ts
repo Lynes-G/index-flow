@@ -22,9 +22,13 @@ const createQueryBuilder = (
   resolve: (lookup: QueryLookup) => {
     unique?: () => Promise<unknown>;
     first?: () => Promise<unknown>;
+    collect?: () => Promise<unknown[]>;
   },
 ) => ({
   query: (table: string) => ({
+    collect: () =>
+      resolve({ table, indexName: "all", field: "", value: "" }).collect?.() ??
+      Promise.resolve([]),
     withIndex: (
       indexName: string,
       apply: (query: {
@@ -47,9 +51,11 @@ const createQueryBuilder = (
 
 const createGetUserIdBySlugCtx = ({
   usernameRecord = null,
+  legacyUsernameRecords = [],
   hasLinksForSlug = false,
 }: {
   usernameRecord?: { userId: string } | null;
+  legacyUsernameRecords?: Array<{ username: string; userId: string }>;
   hasLinksForSlug?: boolean;
 } = {}) => ({
   db: createQueryBuilder((lookup) => {
@@ -57,6 +63,12 @@ const createGetUserIdBySlugCtx = ({
       return {
         unique: async () =>
           lookup.value === "johndoe" ? usernameRecord : null,
+      };
+    }
+
+    if (lookup.table === "usernames" && lookup.indexName === "all") {
+      return {
+        collect: async () => legacyUsernameRecords,
       };
     }
 
@@ -95,6 +107,21 @@ test("getUserIdBySlug normalizes username slugs before lookup", async () => {
   const userId = await handler(ctx, { slug: " JohnDoe " });
 
   assert.equal(userId, "user_abc");
+});
+
+test("getUserIdBySlug supports legacy mixed-case stored usernames", async () => {
+  const handler = createHandler<{ slug: string }, string | null>(
+    getUserIdBySlug as never,
+  );
+  const ctx = createGetUserIdBySlugCtx({
+    legacyUsernameRecords: [
+      { username: "B2BSolution", userId: "user_legacy_b2b" },
+    ],
+  });
+
+  const userId = await handler(ctx, { slug: "b2bsolution" });
+
+  assert.equal(userId, "user_legacy_b2b");
 });
 
 test("getUserIdBySlug falls back to the slug when it matches a user with links", async () => {

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
+import { getUserIdForUsernameSlug } from "./slug";
 
 const usernamePattern = /^[a-z0-9_]+$/;
 const reservedUsernames = new Set([
@@ -150,13 +151,9 @@ export const getUserIdBySlug = query({
   returns: v.union(v.string(), v.null()),
   handler: async ({ db }, args) => {
     const slug = args.slug.trim();
-    const normalizedUsername = normalizeUsername(slug);
-    const usernameRecord = await db
-      .query("usernames")
-      .withIndex("by_username", (q) => q.eq("username", normalizedUsername))
-      .unique();
+    const usernameUserId = await getUserIdForUsernameSlug(db, slug);
 
-    if (usernameRecord) return usernameRecord.userId;
+    if (usernameUserId) return usernameUserId;
 
     const links = await db
       .query("links")
