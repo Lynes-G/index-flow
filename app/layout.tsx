@@ -16,9 +16,10 @@ export const metadata: Metadata = {
   description:
     "Create a polished link-in-bio page with custom themes, flexible links, and built-in analytics.",
   applicationName: "IndexFlow",
+  manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/indexflow-favicon.svg" }],
-    shortcut: [{ url: "/indexflow-favicon.svg" }],
+    icon: [{ url: "/favicon.ico" }, { url: "/indexflow-favicon.svg" }],
+    shortcut: [{ url: "/favicon.ico" }],
     apple: [{ url: "/indexflow-favicon.svg" }],
   },
 };
