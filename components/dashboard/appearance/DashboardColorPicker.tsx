@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Palette } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Button as AriaButton,
   ColorArea,
-  ColorField,
   ColorPicker as AriaColorPicker,
   ColorSlider,
   ColorThumb,
   Dialog,
   DialogTrigger,
-  Input as AriaInput,
-  Label as AriaLabel,
   Popover,
   SliderTrack,
   parseColor,
@@ -47,6 +44,26 @@ const hueSliderTrackStyle = {
     "linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
 };
 
+const normalizeHexColor = (input: string) => {
+  const trimmedInput = input.trim();
+  const match = trimmedInput.match(/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const hex = match[1];
+  const expandedHex =
+    hex.length === 3
+      ? hex
+          .split("")
+          .map((character) => `${character}${character}`)
+          .join("")
+      : hex;
+
+  return `#${expandedHex.toUpperCase()}`;
+};
+
 const DashboardColorPicker = ({
   label,
   value,
@@ -56,7 +73,9 @@ const DashboardColorPicker = ({
   dialogDescription = "Saturation means how vivid the color is. Brightness means how light or dark it feels.",
   triggerTitle = "Open color picker",
 }: DashboardColorPickerProps) => {
+  const hexInputId = useId();
   const [isOpen, setIsOpen] = useState(false);
+  const [hexInputValue, setHexInputValue] = useState(value);
   const rootRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLElement>(null);
   const parsedColor = parseColor(value);
@@ -64,6 +83,19 @@ const DashboardColorPicker = ({
   const handleColorChange = (nextColor: Color) => {
     onChange(nextColor.toString("hex"));
   };
+
+  const handleHexInputChange = (nextValue: string) => {
+    setHexInputValue(nextValue);
+
+    const normalizedColor = normalizeHexColor(nextValue);
+    if (normalizedColor) {
+      onChange(normalizedColor);
+    }
+  };
+
+  useEffect(() => {
+    setHexInputValue(value);
+  }, [value]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -166,12 +198,25 @@ const DashboardColorPicker = ({
                   </ColorSlider>
                 </div>
 
-                <ColorField className="space-y-2">
-                  <AriaLabel className="text-xs font-medium text-slate-600">
+                <div className="space-y-2">
+                  <label
+                    htmlFor={hexInputId}
+                    className="text-xs font-medium text-slate-600"
+                  >
                     Hex
-                  </AriaLabel>
-                  <AriaInput className={colorPickerInputClassName} />
-                </ColorField>
+                  </label>
+                  <input
+                    id={hexInputId}
+                    value={hexInputValue}
+                    onChange={(event) =>
+                      handleHexInputChange(event.currentTarget.value)
+                    }
+                    className={colorPickerInputClassName}
+                    inputMode="text"
+                    spellCheck={false}
+                    autoComplete="off"
+                  />
+                </div>
               </Dialog>
             </Popover>
           </DialogTrigger>
